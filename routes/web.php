@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\RefuelingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +21,8 @@ Route::middleware('auth')->group(function () {
     
     // Ресурсный маршрут для автомобилей с проверкой авторизации
     Route::resource('cars', CarController::class);
+    Route::resource('expenses', ExpenseController::class);
+    Route::resource('refuelings', RefuelingController::class);
 });
 
 require __DIR__.'/auth.php';
