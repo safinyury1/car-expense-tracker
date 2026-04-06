@@ -43,11 +43,11 @@
                                         <td class="px-4 py-2">{{ $car->year ?? '—' }}</td>
                                         <td class="px-4 py-2">{{ number_format($car->initial_odometer) }} км</td>
                                         <td class="px-4 py-2">
-                                            <a href="{{ route('cars.edit', $car) }}" class="text-blue-600 hover:text-blue-900 mr-3">✏️ Редактировать</a>
+                                            <a href="{{ route('cars.edit', $car) }}" class="text-blue-600 hover:text-blue-900 mr-3">Редактировать</a>
                                             <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить этот автомобиль?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">🗑️ Удалить</button>
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Удалить</button>
                                             </form>
                                         </td>
                                     </tr>

@@ -24,6 +24,9 @@
                     <x-nav-link :href="route('refuelings.index')" :active="request()->routeIs('refuelings.*')">
                         {{ __('Заправки') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
+                        {{ __('Напоминания') }}
+                    </x-nav-link>
                 </div>
             </div>
 

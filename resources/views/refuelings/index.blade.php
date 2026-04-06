@@ -59,11 +59,11 @@
                                         <td class="px-4 py-2">{{ number_format($refueling->total_amount, 2) }} ₽</td>
                                         <td class="px-4 py-2">{{ number_format($refueling->odometer) }} км</td>
                                         <td class="px-4 py-2">
-                                            <a href="{{ route('refuelings.edit', $refueling) }}" class="text-blue-600 hover:text-blue-900 mr-3">✏️ Ред.</a>
+                                            <a href="{{ route('refuelings.edit', $refueling) }}" class="text-blue-600 hover:text-blue-900 mr-3">Ред.</a>
                                             <form action="{{ route('refuelings.destroy', $refueling) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">🗑️ Удалить</button>
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Удалить</button>
                                             </form>
                                         </td>
                                     </tr>

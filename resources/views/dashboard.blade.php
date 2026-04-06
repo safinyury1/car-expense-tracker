@@ -36,6 +36,30 @@
                     </div>
                 </div>
             @else
+                <!-- Активные напоминания -->
+                @if($activeReminders->isNotEmpty())
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                        <div class="p-4 border-b border-yellow-200 bg-yellow-50">
+                            <h3 class="font-semibold text-yellow-800">Активные напоминания</h3>
+                        </div>
+                        <div class="p-4">
+                            <ul class="list-disc list-inside">
+                                @foreach($activeReminders as $reminder)
+                                    <li class="text-gray-700">
+                                        {{ $reminder->title }} — при пробеге {{ number_format($reminder->due_odometer) }} км
+                                        @if($reminder->due_date)
+                                            (также до {{ $reminder->due_date->format('d.m.Y') }})
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <div class="mt-3">
+                                <a href="{{ route('reminders.index', ['car_id' => $selectedCarId]) }}" class="text-sm text-blue-600 hover:text-blue-800">Все напоминания →</a>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Карточки с ключевыми показателями -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

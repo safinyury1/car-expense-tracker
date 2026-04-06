@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
+use App\Models\Reminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class DashboardController extends Controller
             return view('dashboard', [
                 'cars' => $cars,
                 'selectedCar' => null,
+                'selectedCarId' => null,
                 'totalExpenses' => 0,
                 'totalFuelCost' => 0,
                 'avgFuelConsumption' => 0,
@@ -33,6 +35,7 @@ class DashboardController extends Controller
                 'fuelConsumptionHistory' => [],
                 'recentExpenses' => collect(),
                 'recentRefuelings' => collect(),
+                'activeReminders' => collect(),
             ]);
         }
         
@@ -63,6 +66,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
         
+        // 6. Активные напоминания (для текущего автомобиля)
+        $activeReminders = Reminder::where('car_id', $selectedCarId)
+            ->where('is_completed', false)
+            ->orderBy('due_odometer', 'asc')
+            ->get();
+        
         return view('dashboard', compact(
             'cars',
             'selectedCar',
@@ -75,7 +84,8 @@ class DashboardController extends Controller
             'expensesByMonth',
             'fuelConsumptionHistory',
             'recentExpenses',
-            'recentRefuelings'
+            'recentRefuelings',
+            'activeReminders'
         ));
     }
     
@@ -179,7 +189,7 @@ class DashboardController extends Controller
             if ($item->category) {
                 $result[] = [
                     'name' => $item->category->name,
-                    'amount' => $item->total,
+                    'amount' => (float) $item->total,
                 ];
             }
         }
@@ -187,7 +197,7 @@ class DashboardController extends Controller
         if ($fuelTotal > 0) {
             $result[] = [
                 'name' => 'Топливо',
-                'amount' => $fuelTotal,
+                'amount' => (float) $fuelTotal,
             ];
         }
         
@@ -226,7 +236,7 @@ class DashboardController extends Controller
             
             $result[] = [
                 'month' => $month,
-                'total' => $expensesSum + $refuelingsSum,
+                'total' => (float) ($expensesSum + $refuelingsSum),
             ];
         }
         
