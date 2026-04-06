@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 class ExpenseController extends Controller
 {
@@ -125,4 +126,55 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index', ['car_id' => $carId])
             ->with('success', 'Расход успешно удалён!');
     }
+
+    /**
+ * Экспорт расходов в CSV
+ */
+public function exportCsv(Request $request)
+{
+    $carId = $request->get('car_id');
+    
+    $query = Expense::with(['car', 'category'])
+        ->whereHas('car', function ($q) {
+            $q->where('user_id', Auth::id());
+        });
+    
+    if ($carId) {
+        $query->where('car_id', $carId);
+    }
+    
+    $expenses = $query->orderBy('date', 'desc')->get();
+    
+    $filename = 'expenses_' . date('Y-m-d_H-i-s') . '.csv';
+    
+    $handle = fopen('php://temp', 'w+');
+    
+    // Добавляем BOM для правильного отображения кириллицы в Excel
+    fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+    
+    // Заголовки (разделитель — точка с запятой)
+    fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Категория', 'Сумма (₽)', 'Пробег (км)', 'Описание'], ';');
+    
+    // Данные
+    foreach ($expenses as $expense) {
+        fputcsv($handle, [
+            $expense->id,
+            $expense->date->format('d.m.Y'),
+            $expense->car->brand . ' ' . $expense->car->model,
+            $expense->category->name,
+            $expense->amount,
+            $expense->odometer,
+            $expense->description ?? '',
+        ], ';');
+    }
+    
+    rewind($handle);
+    $csvContent = stream_get_contents($handle);
+    fclose($handle);
+    
+    return Response::make($csvContent, 200, [
+        'Content-Type' => 'text/csv; charset=utf-8',
+        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    ]);
+}
 }

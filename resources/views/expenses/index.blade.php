@@ -24,9 +24,14 @@
                             <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Фильтр</button>
                         </form>
                         
-                        <a href="{{ route('expenses.create', ['car_id' => $carId]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить расход
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('expenses.export-csv', ['car_id' => $carId]) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                📥 Экспорт CSV
+                            </a>
+                            <a href="{{ route('expenses.create', ['car_id' => $carId]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                + Добавить расход
+                            </a>
+                        </div>
                     </div>
 
                     @if(session('success'))
@@ -68,6 +73,7 @@
                                     </tr>
                                 @endforeach
                             </tbody>
+                        
                         <div class="mt-4">
                             {{ $expenses->appends(['car_id' => $carId])->links() }}
                         </div>

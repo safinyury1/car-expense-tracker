@@ -10,10 +10,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
-                    <div class="mb-4">
-                        <a href="{{ route('cars.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить автомобиль
-                        </a>
+                    <div class="mb-4 flex justify-between items-center">
+                        <div></div>
+                        <div class="flex gap-2">
+                            <a href="{{ route('cars.export-csv') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                📥 Экспорт CSV
+                            </a>
+                            <a href="{{ route('cars.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                + Добавить автомобиль
+                            </a>
+                        </div>
                     </div>
 
                     @if(session('success'))
@@ -53,7 +59,6 @@
                                     </tr>
                                 @endforeach
                             </tbody>
-                        </table>
                     @endif
                 </div>
             </div>

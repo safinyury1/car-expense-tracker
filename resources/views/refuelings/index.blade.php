@@ -10,6 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
+                    <!-- Фильтр по автомобилям -->
                     <div class="mb-4 flex justify-between items-center">
                         <form method="GET" action="{{ route('refuelings.index') }}" class="flex gap-2">
                             <select name="car_id" class="border-gray-300 rounded-md shadow-sm">
@@ -23,9 +24,14 @@
                             <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Фильтр</button>
                         </form>
                         
-                        <a href="{{ route('refuelings.create', ['car_id' => $carId]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить заправку
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('refuelings.export-csv', ['car_id' => $carId]) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                📥 Экспорт CSV
+                            </a>
+                            <a href="{{ route('refuelings.create', ['car_id' => $carId]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                + Добавить заправку
+                            </a>
+                        </div>
                     </div>
 
                     @if(session('success'))
