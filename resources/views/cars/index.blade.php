@@ -14,10 +14,10 @@
                         <div></div>
                         <div class="flex gap-2">
                             <a href="{{ route('cars.export-csv') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                📥 Экспорт CSV
+                                Экспорт CSV
                             </a>
                             <a href="{{ route('cars.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                + Добавить автомобиль
+                                Добавить автомобиль
                             </a>
                         </div>
                     </div>

@@ -11,25 +11,59 @@ use Illuminate\Support\Facades\Response;
 class RefuelingController extends Controller
 {
     /**
-     * Список заправок
+     * Список заправок с поиском и фильтрацией
      */
     public function index(Request $request)
     {
         $carId = $request->get('car_id');
+        $search = $request->get('search');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $sortBy = $request->get('sort_by', 'date');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        // Разрешённые поля для сортировки
+        $allowedSortFields = ['date', 'liters', 'total_amount', 'odometer', 'created_at'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'date';
+        }
         
         $query = Refueling::with('car')
             ->whereHas('car', function ($q) {
                 $q->where('user_id', Auth::id());
             });
         
+        // Фильтр по автомобилю
         if ($carId) {
             $query->where('car_id', $carId);
         }
         
-        $refuelings = $query->orderBy('date', 'desc')->paginate(20);
+        // Фильтр по диапазону дат
+        if ($dateFrom) {
+            $query->whereDate('date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('date', '<=', $dateTo);
+        }
+        
+        // Поиск по АЗС, автомобилю
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('gas_station', 'like', "%{$search}%")
+                  ->orWhereHas('car', function ($car) use ($search) {
+                      $car->where('brand', 'like', "%{$search}%")
+                          ->orWhere('model', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Сортировка
+        $query->orderBy($sortBy, $sortOrder);
+        
+        $refuelings = $query->paginate(20)->appends($request->all());
         $cars = Auth::user()->cars;
         
-        return view('refuelings.index', compact('refuelings', 'cars', 'carId'));
+        return view('refuelings.index', compact('refuelings', 'cars', 'carId', 'search', 'dateFrom', 'dateTo', 'sortBy', 'sortOrder'));
     }
 
     /**
@@ -129,55 +163,73 @@ class RefuelingController extends Controller
     }
 
     /**
- * Экспорт заправок в CSV
- */
-public function exportCsv(Request $request)
-{
-    $carId = $request->get('car_id');
-    
-    $query = Refueling::with('car')
-        ->whereHas('car', function ($q) {
-            $q->where('user_id', Auth::id());
-        });
-    
-    if ($carId) {
-        $query->where('car_id', $carId);
+     * Экспорт заправок в CSV
+     */
+    public function exportCsv(Request $request)
+    {
+        $carId = $request->get('car_id');
+        $search = $request->get('search');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        
+        $query = Refueling::with('car')
+            ->whereHas('car', function ($q) {
+                $q->where('user_id', Auth::id());
+            });
+        
+        if ($carId) {
+            $query->where('car_id', $carId);
+        }
+        
+        if ($dateFrom) {
+            $query->whereDate('date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('date', '<=', $dateTo);
+        }
+        
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('gas_station', 'like', "%{$search}%")
+                  ->orWhereHas('car', function ($car) use ($search) {
+                      $car->where('brand', 'like', "%{$search}%")
+                          ->orWhere('model', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        $refuelings = $query->orderBy('date', 'desc')->get();
+        
+        $filename = 'refuelings_' . date('Y-m-d_H-i-s') . '.csv';
+        $handle = fopen('php://temp', 'w+');
+        
+        // Добавляем BOM для правильного отображения кириллицы
+        fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        // Заголовки
+        fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Литры', 'Цена/л (₽)', 'Сумма (₽)', 'Пробег (км)', 'АЗС'], ';');
+        
+        // Данные
+        foreach ($refuelings as $refueling) {
+            fputcsv($handle, [
+                $refueling->id,
+                $refueling->date->format('d.m.Y'),
+                $refueling->car->brand . ' ' . $refueling->car->model,
+                $refueling->liters,
+                $refueling->price_per_liter,
+                $refueling->total_amount,
+                $refueling->odometer,
+                $refueling->gas_station ?? '',
+            ], ';');
+        }
+        
+        rewind($handle);
+        $csvContent = stream_get_contents($handle);
+        fclose($handle);
+        
+        return Response::make($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
-    
-    $refuelings = $query->orderBy('date', 'desc')->get();
-    
-    $filename = 'refuelings_' . date('Y-m-d_H-i-s') . '.csv';
-    
-    // Используем fopen('php://output', 'w') для потоковой записи
-    $handle = fopen('php://temp', 'w+');
-    
-    // Добавляем BOM для правильного отображения кириллицы в Excel
-    fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-    
-    // Заголовки (разделитель — точка с запятой)
-    fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Литры', 'Цена/л (₽)', 'Сумма (₽)', 'Пробег (км)', 'АЗС'], ';');
-    
-    // Данные
-    foreach ($refuelings as $refueling) {
-        fputcsv($handle, [
-            $refueling->id,
-            $refueling->date->format('d.m.Y'),
-            $refueling->car->brand . ' ' . $refueling->car->model,
-            $refueling->liters,
-            $refueling->price_per_liter,
-            $refueling->total_amount,
-            $refueling->odometer,
-            $refueling->gas_station ?? '',
-        ], ';');
-    }
-    
-    rewind($handle);
-    $csvContent = stream_get_contents($handle);
-    fclose($handle);
-    
-    return Response::make($csvContent, 200, [
-        'Content-Type' => 'text/csv; charset=utf-8',
-        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-    ]);
-}
 }

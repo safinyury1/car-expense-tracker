@@ -12,25 +12,69 @@ use Illuminate\Support\Facades\Response;
 class ExpenseController extends Controller
 {
     /**
-     * Список расходов
+     * Список расходов с поиском и фильтрацией
      */
     public function index(Request $request)
     {
         $carId = $request->get('car_id');
+        $search = $request->get('search');
+        $categoryId = $request->get('category_id');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $sortBy = $request->get('sort_by', 'date');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        // Разрешённые поля для сортировки
+        $allowedSortFields = ['date', 'amount', 'odometer', 'created_at'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'date';
+        }
         
         $query = Expense::with(['car', 'category'])
             ->whereHas('car', function ($q) {
                 $q->where('user_id', Auth::id());
             });
         
+        // Фильтр по автомобилю
         if ($carId) {
             $query->where('car_id', $carId);
         }
         
-        $expenses = $query->orderBy('date', 'desc')->paginate(20);
-        $cars = Auth::user()->cars;
+        // Фильтр по категории
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
         
-        return view('expenses.index', compact('expenses', 'cars', 'carId'));
+        // Фильтр по диапазону дат
+        if ($dateFrom) {
+            $query->whereDate('date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('date', '<=', $dateTo);
+        }
+        
+        // Поиск по описанию, категории, автомобилю
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhereHas('category', function ($cat) use ($search) {
+                      $cat->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('car', function ($car) use ($search) {
+                      $car->where('brand', 'like', "%{$search}%")
+                          ->orWhere('model', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Сортировка
+        $query->orderBy($sortBy, $sortOrder);
+        
+        $expenses = $query->paginate(20)->appends($request->all());
+        $cars = Auth::user()->cars;
+        $categories = ExpenseCategory::all();
+        
+        return view('expenses.index', compact('expenses', 'cars', 'categories', 'carId', 'search', 'categoryId', 'dateFrom', 'dateTo', 'sortBy', 'sortOrder'));
     }
 
     /**
@@ -128,53 +172,80 @@ class ExpenseController extends Controller
     }
 
     /**
- * Экспорт расходов в CSV
- */
-public function exportCsv(Request $request)
-{
-    $carId = $request->get('car_id');
-    
-    $query = Expense::with(['car', 'category'])
-        ->whereHas('car', function ($q) {
-            $q->where('user_id', Auth::id());
-        });
-    
-    if ($carId) {
-        $query->where('car_id', $carId);
+     * Экспорт расходов в CSV
+     */
+    public function exportCsv(Request $request)
+    {
+        $carId = $request->get('car_id');
+        $search = $request->get('search');
+        $categoryId = $request->get('category_id');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        
+        $query = Expense::with(['car', 'category'])
+            ->whereHas('car', function ($q) {
+                $q->where('user_id', Auth::id());
+            });
+        
+        if ($carId) {
+            $query->where('car_id', $carId);
+        }
+        
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        if ($dateFrom) {
+            $query->whereDate('date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('date', '<=', $dateTo);
+        }
+        
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhereHas('category', function ($cat) use ($search) {
+                      $cat->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('car', function ($car) use ($search) {
+                      $car->where('brand', 'like', "%{$search}%")
+                          ->orWhere('model', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        $expenses = $query->orderBy('date', 'desc')->get();
+        
+        $filename = 'expenses_' . date('Y-m-d_H-i-s') . '.csv';
+        $handle = fopen('php://temp', 'w+');
+        
+        // Добавляем BOM для правильного отображения кириллицы
+        fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        // Заголовки
+        fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Категория', 'Сумма (₽)', 'Пробег (км)', 'Описание'], ';');
+        
+        // Данные
+        foreach ($expenses as $expense) {
+            fputcsv($handle, [
+                $expense->id,
+                $expense->date->format('d.m.Y'),
+                $expense->car->brand . ' ' . $expense->car->model,
+                $expense->category->name,
+                $expense->amount,
+                $expense->odometer,
+                $expense->description ?? '',
+            ], ';');
+        }
+        
+        rewind($handle);
+        $csvContent = stream_get_contents($handle);
+        fclose($handle);
+        
+        return Response::make($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
-    
-    $expenses = $query->orderBy('date', 'desc')->get();
-    
-    $filename = 'expenses_' . date('Y-m-d_H-i-s') . '.csv';
-    
-    $handle = fopen('php://temp', 'w+');
-    
-    // Добавляем BOM для правильного отображения кириллицы в Excel
-    fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-    
-    // Заголовки (разделитель — точка с запятой)
-    fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Категория', 'Сумма (₽)', 'Пробег (км)', 'Описание'], ';');
-    
-    // Данные
-    foreach ($expenses as $expense) {
-        fputcsv($handle, [
-            $expense->id,
-            $expense->date->format('d.m.Y'),
-            $expense->car->brand . ' ' . $expense->car->model,
-            $expense->category->name,
-            $expense->amount,
-            $expense->odometer,
-            $expense->description ?? '',
-        ], ';');
-    }
-    
-    rewind($handle);
-    $csvContent = stream_get_contents($handle);
-    fclose($handle);
-    
-    return Response::make($csvContent, 200, [
-        'Content-Type' => 'text/csv; charset=utf-8',
-        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-    ]);
-}
 }

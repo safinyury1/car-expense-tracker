@@ -25,7 +25,7 @@
                         </form>
                         
                         <a href="{{ route('reminders.create', ['car_id' => $carId]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить напоминание
+                            Добавить напоминание
                         </a>
                     </div>
 

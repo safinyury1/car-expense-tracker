@@ -31,6 +31,10 @@
                     <x-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
                         {{ __('Напоминания') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
+                       {{ __('Сравнение') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -106,6 +110,10 @@
             <x-responsive-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
                 {{ __('Напоминания') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
+                {{ __('Сравнение') }}
+            </x-responsive-nav-link>
+
         </div>
 
         <!-- Responsive Settings Options -->

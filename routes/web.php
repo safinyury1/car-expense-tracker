@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefuelingController;
 use App\Http\Controllers\ReminderController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CompareController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
     
     // Ресурсные маршруты без метода show
     Route::resource('cars', CarController::class)->except(['show']);
