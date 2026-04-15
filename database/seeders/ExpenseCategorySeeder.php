@@ -2,29 +2,30 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\ExpenseCategory;
 
 class ExpenseCategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run()
-{
-    $categories = [
-        ['name' => 'Топливо', 'icon' => 'fuel'],
-        ['name' => 'Ремонт', 'icon' => 'repair'],
-        ['name' => 'Страховка', 'icon' => 'insurance'],
-        ['name' => 'Налог', 'icon' => 'tax'],
-        ['name' => 'Мойка', 'icon' => 'wash'],
-        ['name' => 'Штрафы', 'icon' => 'fine'],
-        ['name' => 'Парковка', 'icon' => 'parking'],
-        ['name' => 'Прочее', 'icon' => 'other'],
-    ];
+    {
+        $categories = [
+            ['name' => 'Топливо', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Ремонт', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Страховка', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Налог', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Мойка', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Штрафы', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Парковка', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Шины', 'is_default' => true, 'user_id' => null],
+            ['name' => 'Прочее', 'is_default' => true, 'user_id' => null],
+        ];
 
-    foreach ($categories as $category) {
-        \App\Models\ExpenseCategory::create($category);
+        foreach ($categories as $category) {
+            ExpenseCategory::updateOrCreate(
+                ['name' => $category['name'], 'is_default' => true],
+                $category
+            );
+        }
     }
-}
 }

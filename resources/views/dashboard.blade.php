@@ -1,251 +1,316 @@
 <x-app-layout>
     <x-slot name="header">
+    <div class="flex justify-between items-center">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Дашборд') }}
+            {{ __('Статистика') }}
         </h2>
-    </x-slot>
+        <button onclick="window.print()" 
+                class="bg-blue-600 hover:bg-blue-700 text-blue px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Экспорт PDF
+        </button>
+    </div>
+</x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            <!-- Выбор автомобиля -->
-            @if($cars->isNotEmpty())
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <!-- Выбор автомобиля и периода -->
+<div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+    <div class="p-4">
+        <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+                <label class="font-medium text-gray-700">Автомобиль:</label>
+                <select name="car_id" class="border-gray-300 rounded-md shadow-sm" onchange="this.form.submit()">
+                    <option value="all" {{ $selectedCarId === 'all' ? 'selected' : '' }}>
+                        🚗 Все автомобили
+                    </option>
+                    @foreach($cars as $car)
+                        <option value="{{ $car->id }}" {{ $selectedCarId == $car->id ? 'selected' : '' }}>
+                            {{ $car->brand }} {{ $car->model }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <label class="font-medium text-gray-700">📅 Период:</label>
+                <select name="period" id="period" class="border-gray-300 rounded-md shadow-sm" onchange="toggleCustomDate()">
+                    <option value="all" {{ $period == 'all' ? 'selected' : '' }}>Всё время</option>
+                    <option value="today" {{ $period == 'today' ? 'selected' : '' }}>Сегодня</option>
+                    <option value="week" {{ $period == 'week' ? 'selected' : '' }}>Последняя неделя</option>
+                    <option value="month" {{ $period == 'month' ? 'selected' : '' }}>Последний месяц</option>
+                    <option value="custom" {{ $period == 'custom' ? 'selected' : '' }}>Свой период</option>
+                </select>
+            </div>
+            
+            <div id="customDateRange" class="flex items-center gap-2 {{ $period != 'custom' ? 'hidden' : '' }}">
+                <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 rounded-md shadow-sm" placeholder="Дата от">
+                <span class="text-gray-500">—</span>
+                <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 rounded-md shadow-sm" placeholder="Дата до">
+            </div>
+            
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm">
+                Применить
+            </button>
+            
+            @if($period != 'all' || $selectedCarId != 'all')
+                <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-700 text-sm">Сбросить</a>
+            @endif
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleCustomDate() {
+        const period = document.getElementById('period').value;
+        const customDateRange = document.getElementById('customDateRange');
+        if (period === 'custom') {
+            customDateRange.classList.remove('hidden');
+        } else {
+            customDateRange.classList.add('hidden');
+        }
+    }
+</script>
+
+            <!-- Карточки с показателями -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4">
-                        <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-4">
-                            <label class="font-medium text-gray-700">Автомобиль:</label>
-                            <select name="car_id" class="border-gray-300 rounded-md shadow-sm" onchange="this.form.submit()">
-                                @foreach($cars as $car)
-                                    <option value="{{ $car->id }}" {{ $selectedCarId == $car->id ? 'selected' : '' }}>
-                                        {{ $car->brand }} {{ $car->model }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </form>
+                        <p class="text-sm text-gray-500">Общие расходы</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ number_format($data['totalExpenses'], 2) }} ₽</p>
                     </div>
                 </div>
+                
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4">
+                        <p class="text-sm text-gray-500">Затраты на топливо</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ number_format($data['totalFuelCost'], 2) }} ₽</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4">
+                        <p class="text-sm text-gray-500">Средний расход топлива</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $data['avgFuelConsumption'] }} <span class="text-sm font-normal">л/100 км</span></p>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4">
+                        <p class="text-sm text-gray-500">Стоимость 1 км</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ number_format($data['costPerKm'], 2) }} ₽</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Графики -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold text-gray-700">Структура расходов</h3>
+                    </div>
+                    <div class="p-4">
+                        <canvas id="expensesChart" height="300"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold text-gray-700">Динамика расходов по месяцам</h3>
+                    </div>
+                    <div class="p-4">
+                        <canvas id="trendChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- График расхода топлива -->
+            @if(count($fuelHistory) >= 2)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-4 border-b">
+                    <h3 class="font-semibold text-gray-700">История расхода топлива (л/100 км)</h3>
+                </div>
+                <div class="p-4">
+                    <canvas id="fuelChart" height="300"></canvas>
+                </div>
+            </div>
             @endif
 
-            @if(!$selectedCar)
+            <!-- ИНСАЙТЫ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-center text-gray-500">
-                        <p class="mb-4">У вас пока нет добавленных автомобилей.</p>
-                        <a href="{{ route('cars.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить автомобиль
-                        </a>
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold text-gray-700">📊 Расходы в день</h3>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-3xl font-bold text-gray-800">{{ number_format($insights['dailyAverage'], 2) }} ₽</p>
+                        <p class="text-sm text-gray-500 mt-1">в среднем за день</p>
                     </div>
                 </div>
-            @else
-                <!-- Активные напоминания -->
-                @if($activeReminders->isNotEmpty())
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                        <div class="p-4 border-b border-yellow-200 bg-yellow-50">
-                            <h3 class="font-semibold text-yellow-800">Активные напоминания</h3>
-                        </div>
-                        <div class="p-4">
-                            <ul class="list-disc list-inside">
-                                @foreach($activeReminders as $reminder)
-                                    <li class="text-gray-700">
-                                        {{ $reminder->title }} — при пробеге {{ number_format($reminder->due_odometer) }} км
-                                        @if($reminder->due_date)
-                                            (также до {{ $reminder->due_date->format('d.m.Y') }})
-                                        @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <div class="mt-3">
-                                <a href="{{ route('reminders.index', ['car_id' => $selectedCarId]) }}" class="text-sm text-blue-600 hover:text-blue-800">Все напоминания →</a>
+                
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold text-gray-700">💰 Средняя трата</h3>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-3xl font-bold text-gray-800">{{ number_format($insights['averageExpense'], 2) }} ₽</p>
+                        <p class="text-sm text-gray-500 mt-1">за одну операцию</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ТОП-3 расходов -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-4 border-b">
+                    <h3 class="font-semibold text-gray-700">🏆 Топ-3 самых больших расходов</h3>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @forelse($topExpenses as $index => $expense)
+                        <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm 
+                                    {{ $index == 0 ? 'bg-yellow-500' : ($index == 1 ? 'bg-gray-400' : 'bg-orange-500') }}">
+                                    {{ $index + 1 }}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800">{{ $expense['title'] }}</p>
+                                    <p class="text-xs text-gray-400">{{ $expense['date'] }} • {{ number_format($expense['odometer']) }} км</p>
+                                    @if($selectedCarId === 'all' && isset($expense['car']))
+                                        <p class="text-xs text-blue-500 mt-1">{{ $expense['car'] }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xl font-bold text-red-600">{{ number_format($expense['amount'], 2) }} ₽</p>
+                                <p class="text-xs text-gray-400">{{ $expense['category'] }}</p>
                             </div>
                         </div>
-                    </div>
-                @endif
-
-                <!-- Карточки с ключевыми показателями -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500">Общие расходы</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($totalExpenses, 2) }} ₽</p>
+                    @empty
+                        <div class="p-8 text-center text-gray-400">
+                            Нет данных о расходах
                         </div>
-                    </div>
-                    
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500">Затраты на топливо</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($totalFuelCost, 2) }} ₽</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500">Средний расход топлива</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $avgFuelConsumption }} л/100 км</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500">Стоимость 1 км</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($costPerKm, 2) }} ₽</p>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
-
-                <!-- Графики -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <!-- Круговая диаграмма: структура расходов -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4 border-b">
-                            <h3 class="font-semibold text-gray-700">Структура расходов</h3>
-                        </div>
-                        <div class="p-4" id="expensesChart"></div>
-                    </div>
-                    
-                    <!-- Линейная диаграмма: динамика расходов -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4 border-b">
-                            <h3 class="font-semibold text-gray-700">Динамика расходов по месяцам</h3>
-                        </div>
-                        <div class="p-4" id="trendChart"></div>
-                    </div>
-                </div>
-
-                <!-- График расхода топлива -->
-                @if(count($fuelConsumptionHistory) >= 2)
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                        <div class="p-4 border-b">
-                            <h3 class="font-semibold text-gray-700">История расхода топлива (л/100 км)</h3>
-                        </div>
-                        <div class="p-4" id="fuelChart"></div>
-                    </div>
-                @endif
-
-                <!-- Последние операции -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Последние расходы -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4 border-b">
-                            <h3 class="font-semibold text-gray-700">Последние расходы</h3>
-                        </div>
-                        <div class="p-4">
-                            @if($recentExpenses->isEmpty())
-                                <p class="text-gray-500 text-center">Нет данных</p>
-                            @else
-                                <table class="min-w-full">
-                                    <thead>
-                                        <tr class="text-left text-sm text-gray-500">
-                                            <th class="pb-2">Дата</th>
-                                            <th class="pb-2">Категория</th>
-                                            <th class="pb-2">Сумма</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($recentExpenses as $expense)
-                                            <tr class="border-t">
-                                                <td class="py-2 text-sm">{{ $expense->date->format('d.m.Y') }}</td>
-                                                <td class="py-2 text-sm">{{ $expense->category->name }}</td>
-                                                <td class="py-2 text-sm font-medium">{{ number_format($expense->amount, 2) }} ₽</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                <div class="mt-3 text-right">
-                                    <a href="{{ route('expenses.index', ['car_id' => $selectedCarId]) }}" class="text-sm text-blue-600 hover:text-blue-800">Все расходы →</a>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Последние заправки -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-4 border-b">
-                            <h3 class="font-semibold text-gray-700">Последние заправки</h3>
-                        </div>
-                        <div class="p-4">
-                            @if($recentRefuelings->isEmpty())
-                                <p class="text-gray-500 text-center">Нет данных</p>
-                            @else
-                                <table class="min-w-full">
-                                    <thead>
-                                        <tr class="text-left text-sm text-gray-500">
-                                            <th class="pb-2">Дата</th>
-                                            <th class="pb-2">Литры</th>
-                                            <th class="pb-2">Сумма</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($recentRefuelings as $refueling)
-                                            <tr class="border-t">
-                                                <td class="py-2 text-sm">{{ $refueling->date->format('d.m.Y') }}</td>
-                                                <td class="py-2 text-sm">{{ number_format($refueling->liters, 2) }} л</td>
-                                                <td class="py-2 text-sm font-medium">{{ number_format($refueling->total_amount, 2) }} ₽</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                <div class="mt-3 text-right">
-                                    <a href="{{ route('refuelings.index', ['car_id' => $selectedCarId]) }}" class="text-sm text-blue-600 hover:text-blue-800">Все заправки →</a>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @endif
+            </div>
         </div>
     </div>
 
-    <!-- Подключаем ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    
-    @if($selectedCar)
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Структура расходов (круговая диаграмма)
-        const expensesData = {{ Illuminate\Support\Js::from($expensesByCategory) }};
-        const expensesChartOptions = {
-            series: expensesData.map(function(item) { return item.amount; }),
-            chart: { type: 'donut', height: 350 },
-            labels: expensesData.map(function(item) { return item.name; }),
-            responsive: [{
-                breakpoint: 480,
-                options: { chart: { width: 200 }, legend: { position: 'bottom' } }
-            }]
-        };
-        const expensesChart = new ApexCharts(document.querySelector("#expensesChart"), expensesChartOptions);
-        expensesChart.render();
+        // Структура расходов
+        const ctx1 = document.getElementById('expensesChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: @json($chartData['categories']),
+                datasets: [{
+                    data: @json($chartData['amounts']),
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw.toLocaleString('ru-RU') + ' ₽';
+                            }
+                        }
+                    }
+                }
+            }
+        });
         
-        // Динамика расходов (линейная диаграмма)
-        const trendData = {{ Illuminate\Support\Js::from($expensesByMonth) }};
-        const trendChartOptions = {
-            series: [{
-                name: 'Расходы',
-                data: trendData.map(function(item) { return item.total; })
-            }],
-            chart: { type: 'line', height: 350, toolbar: { show: true } },
-            xaxis: { categories: trendData.map(function(item) { return item.month; }), title: { text: 'Месяц' } },
-            yaxis: { title: { text: 'Сумма (₽)' } },
-            stroke: { curve: 'smooth', width: 3 },
-            colors: ['#3b82f6']
-        };
-        const trendChart = new ApexCharts(document.querySelector("#trendChart"), trendChartOptions);
-        trendChart.render();
+        // Динамика расходов
+        const ctx2 = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: @json($monthlyData['months']),
+                datasets: [{
+                    label: 'Расходы',
+                    data: @json($monthlyData['totals']),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw.toLocaleString('ru-RU') + ' ₽';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { 
+                        ticks: { 
+                            callback: function(value) { 
+                                return value.toLocaleString('ru-RU') + ' ₽'; 
+                            }
+                        }
+                    }
+                }
+            }
+        });
         
         // Расход топлива
-        @if(count($fuelConsumptionHistory) >= 2)
-        const fuelData = {{ Illuminate\Support\Js::from($fuelConsumptionHistory) }};
-        const fuelChartOptions = {
-            series: [{
-                name: 'Расход топлива',
-                data: fuelData.map(function(item) { return item.consumption; })
-            }],
-            chart: { type: 'line', height: 350, toolbar: { show: true } },
-            xaxis: { categories: fuelData.map(function(item) { return item.date; }), title: { text: 'Дата' } },
-            yaxis: { title: { text: 'л/100 км' }, min: 0 },
-            stroke: { curve: 'smooth', width: 3 },
-            colors: ['#10b981']
-        };
-        const fuelChart = new ApexCharts(document.querySelector("#fuelChart"), fuelChartOptions);
-        fuelChart.render();
+        @if(count($fuelHistory) >= 2)
+        const ctx3 = document.getElementById('fuelChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: @json(array_column($fuelHistory, 'date')),
+                datasets: [{
+                    label: 'Расход топлива',
+                    data: @json(array_column($fuelHistory, 'consumption')),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + ' л/100 км';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { title: { display: true, text: 'л/100 км' } }
+                }
+            }
+        });
         @endif
     </script>
-    @endif
 </x-app-layout>

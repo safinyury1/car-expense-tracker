@@ -32,11 +32,31 @@
                             <label for="category_id" class="block text-gray-700 font-bold mb-2">Категория *</label>
                             <select name="category_id" id="category_id" class="w-full border-gray-300 rounded-md shadow-sm" required>
                                 <option value="">Выберите категорию</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id', $expense->category_id) == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
+                                
+                                @php
+                                    $userCategories = $categories->where('user_id', Auth::id());
+                                    $defaultCategories = $categories->where('is_default', true);
+                                @endphp
+                                
+                                @if($userCategories->count() > 0)
+                                    <optgroup label="📌 Мои категории">
+                                        @foreach($userCategories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id', $expense->category_id) == $category->id ? 'selected' : '' }}>
+                                                {{ $category->icon }} {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endif
+                                
+                                @if($defaultCategories->count() > 0)
+                                    <optgroup label="⭐ Стандартные категории">
+                                        @foreach($defaultCategories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id', $expense->category_id) == $category->id ? 'selected' : '' }}>
+                                                {{ $category->icon }} {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endif
                             </select>
                             @error('category_id')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -62,6 +82,11 @@
                         <div class="mb-4">
                             <label for="odometer" class="block text-gray-700 font-bold mb-2">Пробег (км) *</label>
                             <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $expense->odometer) }}" min="0" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                            @if(isset($maxOdometer) && $maxOdometer > 0)
+                                <p class="text-sm text-gray-500 mt-1">
+                                    ⚠️ Последний зафиксированный пробег (без учёта этой записи): {{ number_format($maxOdometer) }} км
+                                </p>
+                            @endif
                             @error('odometer')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror

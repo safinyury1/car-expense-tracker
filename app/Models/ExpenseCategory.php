@@ -12,11 +12,30 @@ class ExpenseCategory extends Model
     protected $fillable = [
         'name',
         'icon',
+        'user_id',
+        'is_default',
     ];
 
-    // Связь: категория имеет много расходов
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Исправлено: указываем правильное имя внешнего ключа
     public function expenses()
     {
-        return $this->hasMany(Expense::class);
+        return $this->hasMany(Expense::class, 'category_id');
+    }
+
+    public static function getCategoriesForUser($userId)
+    {
+        return self::where(function ($query) use ($userId) {
+            $query->where('user_id', $userId)
+                  ->orWhere('is_default', true);
+        })->orderBy('is_default', 'desc')->orderBy('name')->get();
     }
 }

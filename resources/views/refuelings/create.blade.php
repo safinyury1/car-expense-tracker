@@ -54,6 +54,11 @@
                         <div class="mb-4">
                             <label for="odometer" class="block text-gray-700 font-bold mb-2">Пробег (км) *</label>
                             <input type="number" name="odometer" id="odometer" value="{{ old('odometer') }}" min="0" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                            @if($maxOdometer > 0)
+                                <p class="text-sm text-gray-500 mt-1">
+                                    ⚠️ Последний зафиксированный пробег: {{ number_format($maxOdometer) }} км
+                                </p>
+                            @endif
                             @error('odometer')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror

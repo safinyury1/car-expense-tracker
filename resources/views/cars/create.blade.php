@@ -6,57 +6,23 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form action="{{ route('cars.store') }}" method="POST">
-                        @csrf
-
-                        <div class="mb-4">
-                            <label for="brand" class="block text-gray-700 font-bold mb-2">Марка *</label>
-                            <input type="text" name="brand" id="brand" value="{{ old('brand') }}" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" required>
-                            @error('brand')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="model" class="block text-gray-700 font-bold mb-2">Модель *</label>
-                            <input type="text" name="model" id="model" value="{{ old('model') }}" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" required>
-                            @error('model')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="year" class="block text-gray-700 font-bold mb-2">Год выпуска</label>
-                            <input type="number" name="year" id="year" value="{{ old('year') }}" min="1900" max="{{ date('Y') }}" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
-                            @error('year')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="vin" class="block text-gray-700 font-bold mb-2">VIN-код</label>
-                            <input type="text" name="vin" id="vin" value="{{ old('vin') }}" maxlength="17" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
-                            @error('vin')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="initial_odometer" class="block text-gray-700 font-bold mb-2">Начальный пробег (км)</label>
-                            <input type="number" name="initial_odometer" id="initial_odometer" value="{{ old('initial_odometer', 0) }}" min="0" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
-                            @error('initial_odometer')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="flex justify-between">
-                            <a href="{{ route('cars.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Назад</a>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Сохранить</button>
-                        </div>
-                    </form>
+                <div class="p-8 text-center">
+                    <!-- Иконка автомобиля (вид спереди) -->
+                    <div class="inline-block p-6 bg-blue-100 rounded-full mb-6">
+    <img src="{{ asset('images/car.svg') }}" class="w-19 h-20" alt="Car">
+</div>
+                    
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Добавьте свой первый автомобиль</h3>
+                    <p class="text-gray-500 mb-8">Введите сервисную историю, расходы и напоминания для вашего авто</p>
+                    
+                    <a href="{{ route('cars.create.form') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg inline-flex items-center gap-2 transition duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Добавить авто
+                    </a>
                 </div>
             </div>
         </div>

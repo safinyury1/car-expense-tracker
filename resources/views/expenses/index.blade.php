@@ -14,70 +14,64 @@
                     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                         <form method="GET" action="{{ route('expenses.index') }}" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <!-- Поисковая строка -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Поиск</label>
-                                    <input type="text" name="search" value="{{ $search }}" placeholder="Описание, категория, авто..." class="w-full border-gray-300 rounded-md shadow-sm">
+                                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Описание, категория, авто..." class="w-full border-gray-300 rounded-md shadow-sm">
                                 </div>
                                 
-                                <!-- Автомобиль -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Автомобиль</label>
                                     <select name="car_id" class="w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Все автомобили</option>
                                         @foreach($cars as $car)
-                                            <option value="{{ $car->id }}" {{ $carId == $car->id ? 'selected' : '' }}>
+                                            <option value="{{ $car->id }}" {{ ($carId ?? '') == $car->id ? 'selected' : '' }}>
                                                 {{ $car->brand }} {{ $car->model }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 
-                                <!-- Категория -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Категория</label>
                                     <select name="category_id" class="w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="">Все категории</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ $categoryId == $category->id ? 'selected' : '' }}>
+                                        @foreach($categories ?? [] as $category)
+                                            <option value="{{ $category->id }}" {{ ($categoryId ?? '') == $category->id ? 'selected' : '' }}>
                                                 {{ $category->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 
-                                <!-- Сортировка -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Сортировка</label>
                                     <select name="sort_by" class="w-full border-gray-300 rounded-md shadow-sm">
-                                        <option value="date" {{ $sortBy == 'date' ? 'selected' : '' }}>По дате</option>
-                                        <option value="amount" {{ $sortBy == 'amount' ? 'selected' : '' }}>По сумме</option>
-                                        <option value="odometer" {{ $sortBy == 'odometer' ? 'selected' : '' }}>По пробегу</option>
+                                        <option value="date" {{ ($sortBy ?? '') == 'date' ? 'selected' : '' }}>По дате</option>
+                                        <option value="amount" {{ ($sortBy ?? '') == 'amount' ? 'selected' : '' }}>По сумме</option>
+                                        <option value="odometer" {{ ($sortBy ?? '') == 'odometer' ? 'selected' : '' }}>По пробегу</option>
                                     </select>
                                 </div>
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Дата от -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Дата от</label>
-                                    <input type="date" name="date_from" value="{{ $dateFrom }}" class="w-full border-gray-300 rounded-md shadow-sm">
+                                    <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="w-full border-gray-300 rounded-md shadow-sm">
                                 </div>
                                 
-                                <!-- Дата до -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Дата до</label>
-                                    <input type="date" name="date_to" value="{{ $dateTo }}" class="w-full border-gray-300 rounded-md shadow-sm">
+                                    <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="w-full border-gray-300 rounded-md shadow-sm">
                                 </div>
                             </div>
                             
                             <div class="flex justify-between items-center">
                                 <div class="flex gap-2">
                                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                        Применить фильтры
+                                        🔍 Применить фильтры
                                     </button>
-                                    <a href="{{ route('expenses.index', ['car_id' => $carId]) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                                        Сбросить
+                                    <a href="{{ route('expenses.index', ['car_id' => $carId ?? '']) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                        🗑️ Сбросить
                                     </a>
                                 </div>
                                 <div class="text-sm text-gray-500">
@@ -90,10 +84,10 @@
                     <!-- Кнопки действий -->
                     <div class="mb-4 flex justify-end gap-2">
                         <a href="{{ route('expenses.export-csv', request()->all()) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                            Экспорт CSV
+                            📥 Экспорт CSV
                         </a>
-                        <a href="{{ route('expenses.create', ['car_id' => $carId]) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Добавить расход
+                        <a href="{{ route('expenses.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            + Добавить расход
                         </a>
                     </div>
 
@@ -135,17 +129,17 @@
                                                 {{ $expense->description ?: '—' }}
                                             </td>
                                             <td class="px-4 py-2">
-                                                <a href="{{ route('expenses.edit', $expense) }}" class="text-blue-600 hover:text-blue-900 mr-3"></a>
-                                                <form action="{{ route('expenses.destroy', $expense) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
+                                                <a href="{{ route('expenses.edit', $expense) }}" class="text-blue-600 hover:text-blue-900 mr-3">✏️</a>
+                                                <form action="{{ route('expenses.destroy', $expense) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить этот расход?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900"></button>
+                                                    <button type="submit" class="text-red-600 hover:text-red-900">🗑️</button>
                                                 </form>
                                             </td>
-                                         </tr>
+                                        </tr>
                                     @endforeach
                                 </tbody>
-                             </table>
+                            </table>
                         </div>
                         
                         <div class="mt-4">

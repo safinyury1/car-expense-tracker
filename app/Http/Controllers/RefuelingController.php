@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Refueling;
+use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class RefuelingController extends Controller
 {
+    use ValidatesOdometer;
+
     /**
      * Список заправок с поиском и фильтрацией
      */
@@ -74,7 +77,16 @@ class RefuelingController extends Controller
         $cars = Auth::user()->cars;
         $selectedCar = $request->get('car_id');
         
-        return view('refuelings.create', compact('cars', 'selectedCar'));
+        // Получаем максимальный пробег для выбранного авто
+        $maxOdometer = 0;
+        if ($selectedCar) {
+            $maxOdometer = max(
+                \App\Models\Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
+                Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
+            );
+        }
+        
+        return view('refuelings.create', compact('cars', 'selectedCar', 'maxOdometer'));
     }
 
     /**
@@ -100,6 +112,9 @@ class RefuelingController extends Controller
             abort(403);
         }
         
+        // Валидация пробега
+        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'refueling');
+        
         Refueling::create($validated);
         
         return redirect()->route('refuelings.index', ['car_id' => $validated['car_id']])
@@ -117,7 +132,13 @@ class RefuelingController extends Controller
         
         $cars = Auth::user()->cars;
         
-        return view('refuelings.edit', compact('refueling', 'cars'));
+        // Получаем максимальный пробег для этого авто (исключая текущую запись)
+        $maxOdometer = max(
+            \App\Models\Expense::where('car_id', $refueling->car_id)->max('odometer') ?? 0,
+            Refueling::where('car_id', $refueling->car_id)->where('id', '!=', $refueling->id)->max('odometer') ?? 0
+        );
+        
+        return view('refuelings.edit', compact('refueling', 'cars', 'maxOdometer'));
     }
 
     /**
@@ -139,6 +160,9 @@ class RefuelingController extends Controller
         ]);
         
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
+        
+        // Валидация пробега (исключаем текущую запись)
+        $this->validateOdometer($validated['car_id'], $validated['odometer'], $refueling->id, 'refueling');
         
         $refueling->update($validated);
         

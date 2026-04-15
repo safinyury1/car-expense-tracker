@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class ExpenseController extends Controller
 {
+    use ValidatesOdometer;
+
     /**
      * Список расходов с поиском и фильтрацией
      */
@@ -86,7 +89,16 @@ class ExpenseController extends Controller
         $categories = ExpenseCategory::all();
         $selectedCar = $request->get('car_id');
         
-        return view('expenses.create', compact('cars', 'categories', 'selectedCar'));
+        // Получаем максимальный пробег для выбранного авто
+        $maxOdometer = 0;
+        if ($selectedCar) {
+            $maxOdometer = max(
+                Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
+                \App\Models\Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
+            );
+        }
+        
+        return view('expenses.create', compact('cars', 'categories', 'selectedCar', 'maxOdometer'));
     }
 
     /**
@@ -109,6 +121,9 @@ class ExpenseController extends Controller
             abort(403);
         }
         
+        // Валидация пробега
+        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'expense');
+        
         Expense::create($validated);
         
         return redirect()->route('expenses.index', ['car_id' => $validated['car_id']])
@@ -128,7 +143,13 @@ class ExpenseController extends Controller
         $cars = Auth::user()->cars;
         $categories = ExpenseCategory::all();
         
-        return view('expenses.edit', compact('expense', 'cars', 'categories'));
+        // Получаем максимальный пробег для этого авто (исключая текущую запись)
+        $maxOdometer = max(
+            Expense::where('car_id', $expense->car_id)->where('id', '!=', $expense->id)->max('odometer') ?? 0,
+            \App\Models\Refueling::where('car_id', $expense->car_id)->max('odometer') ?? 0
+        );
+        
+        return view('expenses.edit', compact('expense', 'cars', 'categories', 'maxOdometer'));
     }
 
     /**
@@ -148,6 +169,9 @@ class ExpenseController extends Controller
             'odometer' => 'required|integer|min:0',
             'description' => 'nullable|string',
         ]);
+        
+        // Валидация пробега (исключаем текущую запись)
+        $this->validateOdometer($validated['car_id'], $validated['odometer'], $expense->id, 'expense');
         
         $expense->update($validated);
         
