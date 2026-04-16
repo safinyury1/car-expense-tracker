@@ -9,6 +9,8 @@ use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,7 +38,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index')->middleware('has.car');
+    Route::delete('/history/{type}/{id}', [HistoryController::class, 'destroy'])->name('history.destroy')->middleware('has.car');
     
+
+    // settings
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
+    Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
     // Обзор
     Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index')->middleware('has.car');
     

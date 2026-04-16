@@ -101,6 +101,41 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's theme.
+     */
+    public function updateTheme(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'theme' => 'required|in:light,dark',
+        ]);
+
+        $request->user()->update([
+            'theme' => $request->theme,
+        ]);
+
+        return redirect()->route('profile.edit')->with('status', 'theme-updated');
+    }
+
+    /**
+     * Update the user's language.
+     */
+    public function updateLanguage(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'language' => 'required|in:ru,en',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'language' => $request->language,
+        ]);
+
+        app()->setLocale($request->language);
+
+        return redirect()->route('profile.edit')->with('status', 'language-updated');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

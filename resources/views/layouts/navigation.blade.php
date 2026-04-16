@@ -15,10 +15,16 @@
                     <x-nav-link :href="route('overview.index')" :active="request()->routeIs('overview.*')">
                         {{ __('Обзор') }}
                     </x-nav-link>
-                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Отчёт') }}
-                </x-nav-link>    
+                    
                     @if(Auth::user()->cars->isNotEmpty())
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Статистика') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
+                            {{ __('История') }}
+                        </x-nav-link>
+                        
                         <x-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
                             {{ __('Мои автомобили') }}
                         </x-nav-link>
@@ -41,6 +47,10 @@
                         
                         <x-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
                             {{ __('Сравнение') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                            {{ __('Настройки') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -70,6 +80,10 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Профиль') }}
+                        </x-dropdown-link>
+                        
+                        <x-dropdown-link :href="route('settings.index')">
+                            {{ __('Настройки') }}
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
@@ -103,6 +117,14 @@
             </x-responsive-nav-link>
             
             @if(Auth::user()->cars->isNotEmpty())
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Статистика') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
+                    {{ __('История') }}
+                </x-responsive-nav-link>
+                
                 <x-responsive-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
                     {{ __('Мои автомобили') }}
                 </x-responsive-nav-link>
@@ -126,6 +148,10 @@
                 <x-responsive-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
                     {{ __('Сравнение') }}
                 </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                    {{ __('Настройки') }}
+                </x-responsive-nav-link>
             @endif
         </div>
 
@@ -148,6 +174,10 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Профиль') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('settings.index')">
+                    {{ __('Настройки') }}
                 </x-responsive-nav-link>
 
                 <form method="POST" action="{{ route('logout') }}">
