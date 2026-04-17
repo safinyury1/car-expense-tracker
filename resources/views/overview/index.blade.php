@@ -1,4 +1,9 @@
 <x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Обзор') }}
+        </h2>
+    </x-slot>
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
@@ -8,7 +13,7 @@
                 <div class="p-6">
                     <!-- Верхняя часть: фото + марка/модель + кнопки -->
                     <div class="flex items-center gap-5">
-                        <!-- Фото ровно по центру -->
+                        <!-- Фото -->
                         <div class="relative shrink-0">
                             @if($selectedCar->photo)
                                 <img src="{{ Storage::url($selectedCar->photo) }}" 
@@ -38,7 +43,6 @@
                                     @endif
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <!-- Кнопка смены автомобиля -->
                                     <div class="relative">
                                         <button onclick="toggleCarDropdown()" 
                                                 class="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg px-3 py-1.5 text-sm flex items-center gap-1 transition">
@@ -56,7 +60,6 @@
                                             @endforeach
                                         </div>
                                     </div>
-                                    <!-- Кнопка редактирования авто -->
                                     <a href="{{ route('cars.edit', $selectedCar) }}" 
                                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg p-1.5 transition">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +71,6 @@
                         </div>
                     </div>
 
-                    <!-- Форма загрузки фото (скрытая) -->
                     <form id="photoForm" action="{{ route('cars.update.photo', $selectedCar) }}" method="POST" enctype="multipart/form-data" class="hidden">
                         @csrf
                         @method('PATCH')
@@ -96,7 +98,6 @@
                         </button>
                     </div>
                     
-                    <!-- Форма редактирования пробега (скрытая) -->
                     <form id="odometerForm" action="{{ route('cars.update.odometer', $selectedCar) }}" method="POST" class="hidden mt-4 pt-4 border-t border-gray-100">
                         @csrf
                         @method('PATCH')
@@ -115,7 +116,7 @@
             <!-- Две колонки -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 
-                <!-- Напоминания -->
+                <!-- Напоминания (без галок) -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="px-5 py-3 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-semibold text-gray-700">🔔 Напоминания</h3>
@@ -123,31 +124,20 @@
                     </div>
                     <div class="divide-y divide-gray-100">
                         @forelse($activeReminders as $reminder)
-                            <div class="px-5 py-3 flex justify-between items-center">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">{{ $reminder->title }}</p>
-                                    <p class="text-xs text-gray-400">
-                                        @php
-                                            $diff = $reminder->due_odometer - $maxOdometer;
-                                        @endphp
-                                        @if($diff > 0)
-                                            через {{ number_format($diff) }} км
-                                        @elseif($diff < 0)
-                                            {{ number_format(abs($diff)) }} км назад
-                                        @else
-                                            требуется сейчас
-                                        @endif
-                                    </p>
-                                </div>
-                                <form action="{{ route('reminders.toggle', $reminder) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="text-green-500 hover:text-green-700">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </button>
-                                </form>
+                            <div class="px-5 py-3">
+                                <p class="text-sm font-medium text-gray-800">{{ $reminder->title }}</p>
+                                <p class="text-xs text-gray-400">
+                                    @php
+                                        $diff = $reminder->due_odometer - $maxOdometer;
+                                    @endphp
+                                    @if($diff > 0)
+                                        через {{ number_format($diff) }} км
+                                    @elseif($diff < 0)
+                                        {{ number_format(abs($diff)) }} км назад
+                                    @else
+                                        требуется сейчас
+                                    @endif
+                                </p>
                             </div>
                         @empty
                             <div class="px-5 py-8 text-center text-gray-400 text-sm">
@@ -169,13 +159,13 @@
                             <span class="text-sm text-gray-700">Добавить расход</span>
                         </a>
                         <a href="{{ route('refuelings.create', ['car_id' => $selectedCarId]) }}" 
-                           class="flex items-center gap-3 p-2 bg-green-50 hover:bg-green-100 rounded-lg transition">
-                            <span class="text-green-500">⛽</span>
+                           class="flex items-center gap-3 p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
+                            <span class="text-blue-500">⛽</span>
                             <span class="text-sm text-gray-700">Добавить заправку</span>
                         </a>
                         <a href="{{ route('reminders.create', ['car_id' => $selectedCarId]) }}" 
-                           class="flex items-center gap-3 p-2 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition">
-                            <span class="text-yellow-500">⏰</span>
+                           class="flex items-center gap-3 p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
+                            <span class="text-blue-500">⏰</span>
                             <span class="text-sm text-gray-700">Добавить напоминание</span>
                         </a>
                     </div>
@@ -191,11 +181,11 @@
                     @forelse($events as $event)
                         <div class="px-5 py-3 flex justify-between items-center">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $event['type'] == 'expense' ? 'bg-red-100' : 'bg-green-100' }}">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-red-100">
                                     @if($event['type'] == 'expense')
                                         <span class="text-red-500 text-sm">💰</span>
                                     @else
-                                        <span class="text-green-500 text-sm">⛽</span>
+                                        <span class="text-red-500 text-sm">⛽</span>
                                     @endif
                                 </div>
                                 <div>
@@ -203,7 +193,7 @@
                                     <p class="text-xs text-gray-400">{{ $event['date']->format('d.m.Y') }} • {{ number_format($event['odometer']) }} км</p>
                                 </div>
                             </div>
-                            <p class="text-sm font-bold {{ $event['type'] == 'expense' ? 'text-red-600' : 'text-green-600' }}">
+                            <p class="text-sm font-bold text-red-600">
                                 -{{ number_format($event['amount'], 2) }} ₽
                             </p>
                         </div>
@@ -222,7 +212,6 @@
             const dropdown = document.getElementById('carDropdown');
             dropdown.classList.toggle('hidden');
         }
-        // Закрыть dropdown при клике вне
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('carDropdown');
             const button = event.target.closest('button');

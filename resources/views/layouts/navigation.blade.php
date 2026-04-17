@@ -1,7 +1,8 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false, showMenu: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
+            <!-- Левая часть -->
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
@@ -25,18 +26,6 @@
                             {{ __('История') }}
                         </x-nav-link>
                         
-                        <x-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
-                            {{ __('Мои автомобили') }}
-                        </x-nav-link>
-                        
-                        <x-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
-                            {{ __('Расходы') }}
-                        </x-nav-link>
-                        
-                        <x-nav-link :href="route('refuelings.index')" :active="request()->routeIs('refuelings.*')">
-                            {{ __('Заправки') }}
-                        </x-nav-link>
-                        
                         <x-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
                             {{ __('Напоминания') }}
                         </x-nav-link>
@@ -49,15 +38,63 @@
                             {{ __('Сравнение') }}
                         </x-nav-link>
                         
-                        <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
-                            {{ __('Настройки') }}
-                        </x-nav-link>
                     @endif
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
+            <!-- Центральная часть с кнопкой -->
+            <div class="hidden sm:flex sm:items-center mr-20">
+                <div class="relative">
+                    <button @click="showMenu = !showMenu" 
+                            class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                    
+                    <!-- Выпадающее меню -->
+                    <div x-show="showMenu" 
+                         @click.away="showMenu = false"
+                         x-cloak
+                         class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 z-50"
+                         style="display: none;">
+                        <div class="py-1">
+                            <a href="{{ route('refuelings.create') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Добавить заправку
+                            </a>
+                            <a href="{{ route('expenses.create') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Добавить расход
+                            </a>
+                            <a href="{{ route('cars.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m0-3H4.5m16.5-3h-9m-6 0H3m9-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m-6 0H3" />
+                                </svg>
+                                Добавить автомобиль
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{{ route('service.create') }}" 
+                            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Добавить обслуживание
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая часть -->
+            <div class="hidden sm:flex sm:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
@@ -78,10 +115,6 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Профиль') }}
-                        </x-dropdown-link>
-                        
                         <x-dropdown-link :href="route('settings.index')">
                             {{ __('Настройки') }}
                         </x-dropdown-link>
@@ -125,18 +158,6 @@
                     {{ __('История') }}
                 </x-responsive-nav-link>
                 
-                <x-responsive-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
-                    {{ __('Мои автомобили') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
-                    {{ __('Расходы') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('refuelings.index')" :active="request()->routeIs('refuelings.*')">
-                    {{ __('Заправки') }}
-                </x-responsive-nav-link>
-                
                 <x-responsive-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
                     {{ __('Напоминания') }}
                 </x-responsive-nav-link>
@@ -147,10 +168,6 @@
                 
                 <x-responsive-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
                     {{ __('Сравнение') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
-                    {{ __('Настройки') }}
                 </x-responsive-nav-link>
             @endif
         </div>
@@ -172,10 +189,6 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Профиль') }}
-                </x-responsive-nav-link>
-                
                 <x-responsive-nav-link :href="route('settings.index')">
                     {{ __('Настройки') }}
                 </x-responsive-nav-link>
@@ -191,3 +204,7 @@
         </div>
     </div>
 </nav>
+
+<style>
+    [x-cloak] { display: none !important; }
+</style>

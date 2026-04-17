@@ -17,6 +17,9 @@ class Car extends Model
         'vin',
         'initial_odometer',
         'photo',
+        'distance_unit',
+        'volume_init',
+        'currency',
     ];
 
     protected $casts = [

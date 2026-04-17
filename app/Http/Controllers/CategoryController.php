@@ -9,11 +9,9 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
-    // Конструктор удалён! Проверка auth теперь в маршрутах
-
     public function index()
     {
-        $categories = ExpenseCategory::getCategoriesForUser(Auth::id());
+        $categories = ExpenseCategory::where('is_default', true)->get();
         $userCategories = ExpenseCategory::where('user_id', Auth::id())->get();
         
         return view('categories.index', compact('categories', 'userCategories'));

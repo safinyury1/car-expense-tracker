@@ -11,6 +11,8 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\CarSettingsController;
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,7 +21,6 @@ Route::get('/', function () {
 
 // Дашборд (статистика, графики)
 Route::middleware(['auth', 'has.car'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::middleware(['auth', 'has.car'])->get('/dashboard/export-pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.export-pdf');
 
 // Редирект после логина/регистрации
 Route::middleware('auth')->get('/home', function () {
@@ -39,22 +40,32 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/history', [HistoryController::class, 'index'])->name('history.index')->middleware('has.car');
-    Route::delete('/history/{type}/{id}', [HistoryController::class, 'destroy'])->name('history.destroy')->middleware('has.car');
+    Route::get('/service/create', [ServiceController::class, 'create'])->name('service.create')->middleware('has.car');
+    Route::post('/service', [ServiceController::class, 'store'])->name('service.store')->middleware('has.car');
+    Route::get('/service/{reminder}', [ServiceController::class, 'show'])->name('service.show')->middleware('has.car');
     
-
-    // settings
-    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
-    Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
     // Обзор
     Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index')->middleware('has.car');
     
-    // Автомобили
-    Route::get('/cars/create-form', [CarController::class, 'createForm'])->name('cars.create.form');
-    Route::resource('cars', CarController::class)->except(['show']);
+    // История
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index')->middleware('has.car');
+    Route::delete('/history/{type}/{id}', [HistoryController::class, 'destroy'])->name('history.destroy')->middleware('has.car');
     
-    // Обновление фото и пробега
+    // Настройки
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
+    Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
+    
+    // Настройки авто
+    Route::get('/car-settings', [CarSettingsController::class, 'index'])->name('car-settings.index');
+    Route::post('/car-settings/distance-unit', [CarSettingsController::class, 'updateDistanceUnit'])->name('car-settings.distance-unit');
+    Route::post('/car-settings/volume-unit', [CarSettingsController::class, 'updateVolumeUnit'])->name('car-settings.volume-unit');
+    Route::post('/car-settings/currency', [CarSettingsController::class, 'updateCurrency'])->name('car-settings.currency');
+    Route::post('/car-settings/delete-all', [CarSettingsController::class, 'deleteAllData'])->name('car-settings.delete-all');
+    Route::post('/car-settings/delete-car', [CarSettingsController::class, 'deleteCar'])->name('car-settings.delete-car');
+    
+    // Автомобили
+    Route::resource('cars', CarController::class)->except(['show']);
     Route::patch('/cars/{car}/update-photo', [CarController::class, 'updatePhoto'])->name('cars.update.photo');
     Route::patch('/cars/{car}/update-odometer', [CarController::class, 'updateOdometer'])->name('cars.update.odometer');
     
@@ -75,9 +86,6 @@ Route::middleware('auth')->group(function () {
     
     // Сравнение
     Route::get('/compare', [CompareController::class, 'index'])->name('compare.index')->middleware('has.car');
-    
-    // Экспорт автомобилей
-    Route::get('cars/export-csv', [CarController::class, 'exportCsv'])->name('cars.export-csv');
 });
 
 require __DIR__.'/auth.php';

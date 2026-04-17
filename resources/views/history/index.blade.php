@@ -48,9 +48,9 @@
                             </div>
                             
                             <div id="customDateRange" class="flex items-center gap-2 {{ $period != 'custom' ? 'hidden' : '' }}">
-                                <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 rounded-md shadow-sm" placeholder="Дата от">
+                                <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 rounded-md shadow-sm">
                                 <span class="text-gray-500">—</span>
-                                <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 rounded-md shadow-sm" placeholder="Дата до">
+                                <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 rounded-md shadow-sm">
                             </div>
                             
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm">
@@ -89,13 +89,13 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-4">
                                     <!-- Иконка в зависимости от типа -->
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $operation['type'] === 'expense' ? 'bg-red-100' : 'bg-green-100' }}">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $operation['type'] === 'expense' ? 'bg-red-100' : 'bg-red-100' }}">
                                         @if($operation['type'] === 'expense')
                                             <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         @else
-                                            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
                                         @endif
@@ -127,7 +127,7 @@
                                 </div>
                                 
                                 <div class="text-right">
-                                    <p class="text-lg font-bold {{ $operation['type'] === 'expense' ? 'text-red-600' : 'text-green-600' }}">
+                                    <p class="text-lg font-bold text-red-600">
                                         -{{ number_format($operation['amount'], 2) }} ₽
                                     </p>
                                     <form action="{{ route('history.destroy', ['type' => $operation['type'], 'id' => $operation['id']]) }}" 

@@ -38,13 +38,6 @@
                                 <a href="{{ route('profile.edit') }}" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition">
                                     Редактировать профиль
                                 </a>
-                                <form action="{{ route('profile.avatar.delete') }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm text-red-500 hover:text-red-600 transition">
-                                        Удалить фото
-                                    </button>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -58,46 +51,28 @@
                 <input type="file" name="avatar" id="avatarInput" accept="image/jpeg,image/png,image/jpg" onchange="this.form.submit()">
             </form>
 
-            <!-- Настройки аккаунта -->
+            <!-- Управление автомобилями -->
             <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
                 <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="font-semibold text-gray-800 text-lg">Настройки аккаунта</h3>
+                    <h3 class="font-semibold text-gray-800 text-lg">Управление автомобилями</h3>
                 </div>
                 <div class="divide-y divide-gray-100">
-                    <!-- Смена пароля -->
+                    <!-- Настройки авто -->
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-700">Смена пароля</p>
-                            <p class="text-sm text-gray-500">Обновите ваш пароль для входа</p>
+                            <p class="font-medium text-gray-700">Настройки авто</p>
+                            <p class="text-sm text-gray-500">Единицы измерения, валюта, категории</p>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
-                            Изменить →
+                        <a href="{{ route('car-settings.index') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
+                            Перейти →
                         </a>
                     </div>
                     
-                    <!-- Удалить аккаунт -->
+                    <!-- Мой гараж -->
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-red-600">Удалить аккаунт</p>
-                            <p class="text-sm text-gray-500">Безвозвратное удаление всех данных</p>
-                        </div>
-                        <a href="{{ route('profile.edit') }}" class="text-red-500 hover:text-red-600 text-sm font-medium">
-                            Удалить →
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Настройки авто -->
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="font-semibold text-gray-800 text-lg">Настройки авто</h3>
-                </div>
-                <div class="px-6 py-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-medium text-gray-700">Управление автомобилями</p>
-                            <p class="text-sm text-gray-500">Добавление, редактирование, удаление авто</p>
+                            <p class="font-medium text-gray-700">Мой гараж</p>
+                            <p class="text-sm text-gray-500">Список ваших автомобилей</p>
                         </div>
                         <a href="{{ route('cars.index') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
                             Перейти →
@@ -127,8 +102,7 @@
                     <!-- Язык (заглушка) -->
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-700">Язык / Language</p>
-                            <p class="text-sm text-gray-500">Русский / English</p>
+                            <p class="font-medium text-gray-700">Язык</p>
                         </div>
                         <div class="flex gap-2">
                             <button class="px-4 py-1.5 rounded-lg text-sm bg-blue-500 text-white cursor-default">
