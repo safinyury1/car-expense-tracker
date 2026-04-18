@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Настройки авто') }}
             </h2>
-            <select id="carSelect" class="border-gray-300 rounded-md shadow-sm text-sm">
+            <select id="carSelect" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm text-sm">
                 @foreach($cars as $car)
                     <option value="{{ $car->id }}" {{ $selectedCar?->id == $car->id ? 'selected' : '' }}>
                         {{ $car->brand }} {{ $car->model }}
@@ -18,70 +18,70 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             
             @if($selectedCar)
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
                     <!-- Единица расстояния -->
-                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-800">Единица расстояния</p>
-                            <p class="text-sm text-gray-500">Километры (км) или Мили (mi)</p>
+                            <p class="font-medium text-gray-800 dark:text-gray-200">Единица расстояния</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Километры (км) или Мили (mi)</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="updateDistanceUnit('km')" 
-                                    class="distance-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'km' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="distance-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'km' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 км
                             </button>
                             <button onclick="updateDistanceUnit('miles')" 
-                                    class="distance-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'miles' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="distance-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'miles' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 мили
                             </button>
                         </div>
                     </div>
 
                     <!-- Единица объема -->
-                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-800">Единица объема</p>
-                            <p class="text-sm text-gray-500">Литры (л) или Галлоны (gal)</p>
+                            <p class="font-medium text-gray-800 dark:text-gray-200">Единица объема</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Литры (л) или Галлоны (gal)</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="updateVolumeUnit('liters')" 
-                                    class="volume-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'liters' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="volume-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'liters' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 литры
                             </button>
                             <button onclick="updateVolumeUnit('gallons')" 
-                                    class="volume-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'gallons' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="volume-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'gallons' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 галлоны
                             </button>
                         </div>
                     </div>
 
                     <!-- Валюта -->
-                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-800">Валюта</p>
-                            <p class="text-sm text-gray-500">Выберите валюту для отображения</p>
+                            <p class="font-medium text-gray-800 dark:text-gray-200">Валюта</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Выберите валюту для отображения</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="updateCurrency('RUB')" 
-                                    class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'RUB' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'RUB' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 RUB ₽
                             </button>
                             <button onclick="updateCurrency('USD')" 
-                                    class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'USD' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'USD' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 USD $
                             </button>
                             <button onclick="updateCurrency('EUR')" 
-                                    class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'EUR' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                    class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'EUR' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 EUR €
                             </button>
                         </div>
                     </div>
 
                     <!-- Категории (ссылка) -->
-                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-800">Категории</p>
-                            <p class="text-sm text-gray-500">Управление категориями расходов</p>
+                            <p class="font-medium text-gray-800 dark:text-gray-200">Категории</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Управление категориями расходов</p>
                         </div>
                         <a href="{{ route('categories.index') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
                             Настроить →
@@ -89,12 +89,12 @@
                     </div>
 
                     <!-- Удалить все данные -->
-                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-red-600">Удалить все данные</p>
-                            <p class="text-sm text-gray-500">Очистить расходы, заправки и напоминания</p>
+                            <p class="font-medium text-red-600 dark:text-red-400">Удалить все данные</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Очистить расходы, заправки и напоминания</p>
                         </div>
-                        <button onclick="confirmDeleteData()" class="text-red-500 hover:text-red-600 text-sm font-medium">
+                        <button onclick="confirmDeleteData()" class="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 text-sm font-medium">
                             Очистить →
                         </button>
                     </div>
@@ -102,16 +102,16 @@
                     <!-- Удалить автомобиль -->
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-red-600">Удалить автомобиль</p>
-                            <p class="text-sm text-gray-500">Полностью удалить автомобиль со всеми данными</p>
+                            <p class="font-medium text-red-600 dark:text-red-400">Удалить автомобиль</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Полностью удалить автомобиль со всеми данными</p>
                         </div>
-                        <button onclick="confirmDeleteCar()" class="text-red-500 hover:text-red-600 text-sm font-medium">
+                        <button onclick="confirmDeleteCar()" class="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 text-sm font-medium">
                             Удалить →
                         </button>
                     </div>
                 </div>
             @else
-                <div class="bg-white rounded-2xl shadow-sm overflow-hidden p-8 text-center text-gray-500">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden p-8 text-center text-gray-500 dark:text-gray-400">
                     У вас нет автомобилей. Добавьте автомобиль в разделе "Мои автомобили"
                 </div>
             @endif

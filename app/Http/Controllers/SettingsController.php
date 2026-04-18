@@ -24,19 +24,4 @@ class SettingsController extends Controller
         
         return response()->json(['success' => true]);
     }
-    
-    public function updateLanguage(Request $request)
-    {
-        $request->validate([
-            'language' => 'required|in:ru,en'
-        ]);
-        
-        $user = Auth::user();
-        $user->language = $request->language;
-        $user->save();
-        
-        app()->setLocale($request->language);
-        
-        return response()->json(['success' => true]);
-    }
 }

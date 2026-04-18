@@ -91,7 +91,6 @@ class CarController extends Controller
             abort(403);
         }
 
-        // Удаляем фото
         if ($car->photo && Storage::disk('public')->exists($car->photo)) {
             Storage::disk('public')->delete($car->photo);
         }
@@ -143,7 +142,6 @@ class CarController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         
-        // Удаляем старое фото
         if ($car->photo && Storage::disk('public')->exists($car->photo)) {
             Storage::disk('public')->delete($car->photo);
         }
@@ -165,10 +163,9 @@ class CarController extends Controller
             'odometer' => 'required|integer|min:0',
         ]);
         
-        // Добавляем запись расхода с новым пробегом
         Expense::create([
             'car_id' => $car->id,
-            'category_id' => 9, // категория "Прочее" (ID может отличаться)
+            'category_id' => 9,
             'date' => now(),
             'amount' => 0,
             'odometer' => $request->odometer,

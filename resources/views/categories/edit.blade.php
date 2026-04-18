@@ -1,30 +1,30 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Редактировать категорию') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('categories.update', $category) }}" method="POST">
                         @csrf
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label for="name" class="block text-gray-700 font-bold mb-2">Название категории *</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                            <label for="name" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Название категории *</label>
+                            <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" required>
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="mb-4">
-                            <label for="icon" class="block text-gray-700 font-bold mb-2">Иконка (эмодзи)</label>
-                            <input type="text" name="icon" id="icon" value="{{ old('icon', $category->icon) }}" maxlength="10" class="w-full border-gray-300 rounded-md shadow-sm" placeholder="📌">
-                            <p class="text-sm text-gray-500 mt-1">Можно использовать любой эмодзи, например: 💰, 🔧, ⛽</p>
+                            <label for="icon" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Иконка (эмодзи)</label>
+                            <input type="text" name="icon" id="icon" value="{{ old('icon', $category->icon) }}" maxlength="10" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" placeholder="📌">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Можно использовать любой эмодзи, например: 💰, 🔧, ⛽</p>
                             @error('icon')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror

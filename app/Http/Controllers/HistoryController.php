@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
+use App\Models\Income;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,18 +15,12 @@ class HistoryController extends Controller
     {
         $cars = Auth::user()->cars;
         
-        // Выбранный автомобиль
         $selectedCarId = $request->get('car_id', 'all');
-        
-        // Выбранная категория для фильтрации
         $categoryFilter = $request->get('category', 'all');
-        
-        // Выбранный период
         $period = $request->get('period', 'all');
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
         
-        // Получаем все операции (расходы + заправки)
         $operations = collect();
         
         if ($selectedCarId === 'all') {
@@ -33,24 +28,30 @@ class HistoryController extends Controller
             
             $expensesQuery = Expense::whereIn('car_id', $carIds)->with('category', 'car');
             $refuelingsQuery = Refueling::whereIn('car_id', $carIds)->with('car');
+            $incomesQuery = Income::whereIn('car_id', $carIds)->with('car');
         } else {
             $expensesQuery = Expense::where('car_id', $selectedCarId)->with('category', 'car');
             $refuelingsQuery = Refueling::where('car_id', $selectedCarId)->with('car');
+            $incomesQuery = Income::where('car_id', $selectedCarId)->with('car');
         }
         
         // Применяем фильтр по дате
         if ($period === 'today') {
             $expensesQuery->whereDate('date', today());
             $refuelingsQuery->whereDate('date', today());
+            $incomesQuery->whereDate('date', today());
         } elseif ($period === 'week') {
             $expensesQuery->whereDate('date', '>=', now()->subWeek());
             $refuelingsQuery->whereDate('date', '>=', now()->subWeek());
+            $incomesQuery->whereDate('date', '>=', now()->subWeek());
         } elseif ($period === 'month') {
             $expensesQuery->whereDate('date', '>=', now()->subMonth());
             $refuelingsQuery->whereDate('date', '>=', now()->subMonth());
+            $incomesQuery->whereDate('date', '>=', now()->subMonth());
         } elseif ($period === 'custom' && $dateFrom && $dateTo) {
             $expensesQuery->whereDate('date', '>=', $dateFrom)->whereDate('date', '<=', $dateTo);
             $refuelingsQuery->whereDate('date', '>=', $dateFrom)->whereDate('date', '<=', $dateTo);
+            $incomesQuery->whereDate('date', '>=', $dateFrom)->whereDate('date', '<=', $dateTo);
         }
         
         $expenses = $expensesQuery->get()->map(function ($item) use ($selectedCarId) {
@@ -87,14 +88,34 @@ class HistoryController extends Controller
             ];
         });
         
-        // Объединяем и сортируем по дате
-        $allOperations = $expenses->concat($refuelings);
+        $incomes = $incomesQuery->get()->map(function ($item) use ($selectedCarId) {
+            return [
+                'id' => $item->id,
+                'type' => 'income',
+                'date' => $item->date,
+                'title' => $item->title,
+                'amount' => $item->amount,
+                'odometer' => $item->odometer,
+                'description' => $item->description,
+                'car_name' => $selectedCarId === 'all' ? $item->car->brand . ' ' . $item->car->model : null,
+                'category' => $item->category,
+                'liters' => null,
+                'price_per_liter' => null,
+                'gas_station' => null,
+            ];
+        });
         
-        // Применяем фильтр по категории
+        $allOperations = $expenses->concat($refuelings)->concat($incomes);
+        
+        // Фильтр по категории
         if ($categoryFilter !== 'all') {
             if ($categoryFilter === 'Топливо') {
                 $allOperations = $allOperations->filter(function ($item) {
                     return $item['type'] === 'refueling';
+                });
+            } elseif ($categoryFilter === 'Доходы') {
+                $allOperations = $allOperations->filter(function ($item) {
+                    return $item['type'] === 'income';
                 });
             } else {
                 $allOperations = $allOperations->filter(function ($item) use ($categoryFilter) {
@@ -112,10 +133,11 @@ class HistoryController extends Controller
                 $categories->push($expense['category']);
             }
         }
-        
-        // Добавляем "Топливо" если есть заправки
         if ($refuelings->count() > 0 && !$categories->contains('Топливо')) {
             $categories->push('Топливо');
+        }
+        if ($incomes->count() > 0 && !$categories->contains('Доходы')) {
+            $categories->push('Доходы');
         }
         
         $sortedCategories = $categories->sort()->values();
@@ -137,6 +159,12 @@ class HistoryController extends Controller
                 abort(403);
             }
             $refueling->delete();
+        } elseif ($type === 'income') {
+            $income = Income::findOrFail($id);
+            if ($income->car->user_id !== Auth::id()) {
+                abort(403);
+            }
+            $income->delete();
         }
         
         return redirect()->route('history.index')

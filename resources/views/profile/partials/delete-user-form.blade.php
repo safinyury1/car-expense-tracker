@@ -1,9 +1,9 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Удалить аккаунт') }}
         </h2>
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __('После удаления аккаунта все данные будут безвозвратно удалены.') }}
         </p>
     </header>
@@ -18,10 +18,10 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                 {{ __('Вы уверены, что хотите удалить аккаунт?') }}
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('После удаления аккаунта все данные будут безвозвратно удалены. Пожалуйста, введите пароль для подтверждения.') }}
             </p>
 
@@ -32,7 +32,7 @@
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-1 block w-3/4"
+                    class="mt-1 block w-3/4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                     placeholder="{{ __('Пароль') }}"
                 />
 
