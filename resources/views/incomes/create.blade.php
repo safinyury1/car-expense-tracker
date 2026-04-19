@@ -12,7 +12,6 @@
                     @csrf
                     
                     <div class="p-6 space-y-5">
-                        <!-- Выбор автомобиля -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Автомобиль</label>
                             <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
@@ -24,19 +23,17 @@
                             </select>
                         </div>
                         
-                        <!-- Категория дохода -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Категория</label>
                             <select name="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
-                                <option value="salary">💰 Зарплата</option>
-                                <option value="business">🏢 Бизнес</option>
-                                <option value="gift">🎁 Подарок</option>
-                                <option value="refund">↩️ Возврат</option>
-                                <option value="other">📦 Прочее</option>
+                                <option value="salary">Зарплата</option>
+                                <option value="business">Бизнес</option>
+                                <option value="gift">Подарок</option>
+                                <option value="refund">Возврат</option>
+                                <option value="other">Прочее</option>
                             </select>
                         </div>
                         
-                        <!-- Название -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Название</label>
                             <input type="text" name="title" required
@@ -44,30 +41,26 @@
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
                         </div>
                         
-                        <!-- Дата -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Дата</label>
                             <input type="date" name="date" value="{{ date('Y-m-d') }}" required
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
                         </div>
                         
-                        <!-- Сумма -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Сумма (₽)</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Сумма</label>
                             <input type="number" name="amount" step="0.01" required
                                    placeholder="Сумма дохода"
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
                         </div>
                         
-                        <!-- Пробег -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Пробег (км)</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Пробег</label>
                             <input type="number" name="odometer"
                                    placeholder="Текущий пробег (опционально)"
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
                         </div>
                         
-                        <!-- Описание -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Описание</label>
                             <textarea name="description" rows="3"

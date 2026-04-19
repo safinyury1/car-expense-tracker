@@ -18,7 +18,7 @@
                                      class="w-24 h-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600">
                             @else
                                 <div class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <svg class="w-10 h-10 text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-10 h-10 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m0-3H4.5m16.5-3h-9m-6 0H3m9-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m-6 0H3" />
                                     </svg>
                                 </div>
@@ -37,7 +37,7 @@
                                 <div>
                                     <h3 class="text-xl font-bold text-gray-800 dark:text-white">{{ $selectedCar->brand }} {{ $selectedCar->model }}</h3>
                                     @if($selectedCar->year)
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{{ $selectedCar->year }} г.</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $selectedCar->year }} г.</p>
                                     @endif
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -82,10 +82,10 @@
                 <div class="p-6">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">Текущий пробег</p>
-                            <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ number_format($maxOdometer) }} <span class="text-base font-normal">км</span></p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Текущий пробег</p>
+                            <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ number_format($convertedOdometer) }} <span class="text-base font-normal">{{ $distanceUnit }}</span></p>
                             @if($lastUpdate)
-                                <p class="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-400 mt-1">обновлено {{ $lastUpdate->diffForHumans() }}</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">обновлено {{ $lastUpdate->diffForHumans() }}</p>
                             @endif
                         </div>
                         <button onclick="document.getElementById('odometerForm').classList.toggle('hidden')" 
@@ -96,11 +96,11 @@
                         </button>
                     </div>
                     
-                    <form id="odometerForm" action="{{ route('cars.update.odometer', $selectedCar) }}" method="POST" class="hidden mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 dark:border-gray-700">
+                    <form id="odometerForm" action="{{ route('cars.update.odometer', $selectedCar) }}" method="POST" class="hidden mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                         @csrf
                         @method('PATCH')
                         <div class="flex gap-2">
-                            <input type="number" name="odometer" value="{{ $maxOdometer }}" 
+                            <input type="number" name="odometer" value="{{ $convertedOdometer }}" 
                                    class="flex-1 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm text-sm" 
                                    placeholder="Новый пробег" required>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm">Сохранить</button>
@@ -116,17 +116,17 @@
                 
                 <!-- Напоминания -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                    <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700 flex justify-between items-center">
+                    <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300">🔔 Напоминания</h3>
                         <a href="{{ route('reminders.index', ['car_id' => $selectedCarId]) }}" class="text-sm text-blue-500 hover:underline">Все</a>
                     </div>
                     <div class="divide-y divide-gray-100 dark:divide-gray-700">
                         @forelse($activeReminders as $reminder)
-                            <div class="px-5 py-3">
+                            <a href="{{ route('reminders.show', $reminder) }}" class="block px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $reminder->title }}</p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-400">
+                                <p class="text-xs text-gray-400 dark:text-gray-500">
                                     @php
-                                        $diff = $reminder->due_odometer - $maxOdometer;
+                                        $diff = $reminder->due_odometer - $maxOdometerKm;
                                     @endphp
                                     @if($diff > 0)
                                         через {{ number_format($diff) }} км
@@ -136,9 +136,9 @@
                                         требуется сейчас
                                     @endif
                                 </p>
-                            </div>
+                            </a>
                         @empty
-                            <div class="px-5 py-8 text-center text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-400 text-sm">
+                            <div class="px-5 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">
                                 Нет активных напоминаний
                             </div>
                         @endforelse
@@ -147,7 +147,7 @@
 
                 <!-- Быстрые действия -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                    <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700">
+                    <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300">⚡ Быстрые действия</h3>
                     </div>
                     <div class="p-4 space-y-2">
@@ -170,34 +170,55 @@
                 </div>
             </div>
 
-            <!-- Лента событий -->
+            <!-- Лента событий (фильтруем ручное обновление пробега) -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-                <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700">
+                <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300">📋 Последние события</h3>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($events as $event)
-                        <div class="px-5 py-3 flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-red-100 dark:bg-red-900/50">
-                                    @if($event['type'] == 'expense')
-                                        <span class="text-red-500 text-sm">💰</span>
-                                    @else
-                                        <span class="text-red-500 text-sm">⛽</span>
-                                    @endif
+                        @if($event['title'] !== 'Прочее' || ($event['title'] === 'Прочее' && $event['description'] !== 'Ручное обновление пробега'))
+                            <a href="{{ route($event['type'] . 's.show', $event['id']) }}" 
+                               class="block px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $event['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : ($event['type'] === 'service' ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-red-100 dark:bg-red-900/50') }}">
+                                            @if($event['type'] === 'expense')
+                                                <span class="text-red-500 text-sm">💰</span>
+                                            @elseif($event['type'] === 'refueling')
+                                                <span class="text-red-500 text-sm">⛽</span>
+                                            @elseif($event['type'] === 'income')
+                                                <span class="text-green-500 text-sm">💰</span>
+                                            @else
+                                                <span class="text-blue-500 text-sm">🔧</span>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $event['title'] }}</p>
+                                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::parse($event['date'])->format('d.m.Y') }} • {{ number_format($event['odometer']) }} {{ $event['distance_unit'] }}</p>
+                                            @if(isset($event['liters']))
+                                                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $event['liters'] }} {{ $event['volume_unit'] }}</p>
+                                            @endif
+                                            @if(isset($event['description']) && $event['description'] && $event['description'] !== 'Ручное обновление пробега')
+                                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ $event['description'] }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-bold {{ $event['type'] === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                            @if($event['type'] === 'income')
+                                                +{{ number_format($event['amount'], 2) }} {{ $event['currency'] }}
+                                            @elseif($event['amount'] != 0)
+                                                -{{ number_format($event['amount'], 2) }} {{ $event['currency'] }}
+                                            @endif
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $event['title'] }}</p>
-                                    <p class="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-400">{{ $event['date']->format('d.m.Y') }} • {{ number_format($event['odometer']) }} км</p>
-                                </div>
-                            </div>
-                            <p class="text-sm font-bold text-red-600 dark:text-red-400">
-                                -{{ number_format($event['amount'], 2) }} ₽
-                            </p>
-                        </div>
+                            </a>
+                        @endif
                     @empty
-                        <div class="px-5 py-8 text-center text-gray-400 dark:text-gray-500 dark:text-gray-400 dark:text-gray-400 text-sm">
-                            Нет событий. Добавьте расход или заправку.
+                        <div class="px-5 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">
+                            Нет событий. Добавьте расход, заправку или доход.
                         </div>
                     @endforelse
                 </div>

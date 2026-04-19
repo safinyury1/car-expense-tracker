@@ -10,7 +10,6 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    <!-- Форма поиска и фильтрации -->
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <form method="GET" action="{{ route('expenses.index') }}" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -81,7 +80,6 @@
                         </form>
                     </div>
 
-                    <!-- Кнопки действий -->
                     <div class="mb-4 flex justify-end gap-2">
                         <a href="{{ route('expenses.export-csv', request()->all()) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             📥 Экспорт CSV
@@ -123,8 +121,8 @@
                                                     {{ $expense->category->name }}
                                                 </span>
                                             </td>
-                                            <td class="px-4 py-2 font-medium">{{ number_format($expense->amount, 2) }} ₽</td>
-                                            <td class="px-4 py-2">{{ number_format($expense->odometer) }} км</td>
+                                            <td class="px-4 py-2 font-medium">{{ number_format($expense->converted_amount, 2) }} {{ $expense->currency }}</td>
+                                            <td class="px-4 py-2">{{ number_format($expense->converted_odometer) }} {{ $expense->distance_unit }}</td>
                                             <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
                                                 {{ $expense->description ?: '—' }}
                                             </td>

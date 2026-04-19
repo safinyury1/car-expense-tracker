@@ -10,7 +10,6 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    <!-- Фильтры -->
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <form method="GET" action="{{ route('refuelings.index') }}" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -72,7 +71,6 @@
                         </form>
                     </div>
 
-                    <!-- Кнопки действий -->
                     <div class="mb-4 flex justify-end gap-2">
                         <a href="{{ route('refuelings.export-csv', request()->all()) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             📥 Экспорт CSV
@@ -110,10 +108,10 @@
                                         <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td class="px-4 py-2">{{ $refueling->date->format('d.m.Y') }}</td>
                                             <td class="px-4 py-2">{{ $refueling->car->brand }} {{ $refueling->car->model }}</td>
-                                            <td class="px-4 py-2">{{ number_format($refueling->liters, 2) }} л</td>
-                                            <td class="px-4 py-2">{{ number_format($refueling->price_per_liter, 2) }} ₽</td>
-                                            <td class="px-4 py-2 font-medium">{{ number_format($refueling->total_amount, 2) }} ₽</td>
-                                            <td class="px-4 py-2">{{ number_format($refueling->odometer) }} км</td>
+                                            <td class="px-4 py-2">{{ number_format($refueling->converted_liters, 2) }} {{ $refueling->volume_unit }}</td>
+                                            <td class="px-4 py-2">{{ number_format($refueling->converted_price, 2) }} {{ $refueling->currency }}/{{ $refueling->volume_unit }}</td>
+                                            <td class="px-4 py-2 font-medium">{{ number_format($refueling->converted_amount, 2) }} {{ $refueling->currency }}</td>
+                                            <td class="px-4 py-2">{{ number_format($refueling->converted_odometer) }} {{ $refueling->distance_unit }}</td>
                                             <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{{ $refueling->gas_station ?: '—' }}</td>
                                             <td class="px-4 py-2">
                                                 <a href="{{ route('refuelings.edit', $refueling) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">✏️</a>

@@ -34,12 +34,13 @@
                                         <th class="px-4 py-2 text-left">Модель</th>
                                         <th class="px-4 py-2 text-left">Год</th>
                                         <th class="px-4 py-2 text-left">Начальный пробег</th>
+                                        <th class="px-4 py-2 text-left">Текущий пробег</th>
                                         <th class="px-4 py-2 text-left">Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($cars as $car)
-                                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td class="px-4 py-2">
                                                 @if($car->photo)
                                                     <img src="{{ Storage::url($car->photo) }}" class="w-10 h-10 rounded-full object-cover">
@@ -54,7 +55,8 @@
                                             <td class="px-4 py-2">{{ $car->brand }}</td>
                                             <td class="px-4 py-2">{{ $car->model }}</td>
                                             <td class="px-4 py-2">{{ $car->year ?? '—' }}</td>
-                                            <td class="px-4 py-2">{{ number_format($car->initial_odometer) }} км</td>
+                                            <td class="px-4 py-2">{{ number_format($car->converted_initial_odometer) }} {{ $car->distance_unit }}</td>
+                                            <td class="px-4 py-2 font-semibold">{{ number_format($car->converted_current_odometer) }} {{ $car->distance_unit }}</td>
                                             <td class="px-4 py-2">
                                                 <a href="{{ route('cars.edit', $car) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">✏️ Редактировать</a>
                                                 <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить этот автомобиль?')">
@@ -66,6 +68,7 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
+                            </table>
                         </div>
                     @endif
                 </div>

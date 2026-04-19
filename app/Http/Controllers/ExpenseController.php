@@ -5,18 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
-use App\Traits\ValidatesOdometer;
+use App\Models\Refueling;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class ExpenseController extends Controller
 {
-    use ValidatesOdometer;
+    use ConvertsUnits;
 
-    /**
-     * Список расходов с поиском и фильтрацией
-     */
     public function index(Request $request)
     {
         $carId = $request->get('car_id');
@@ -27,7 +25,6 @@ class ExpenseController extends Controller
         $sortBy = $request->get('sort_by', 'date');
         $sortOrder = $request->get('sort_order', 'desc');
         
-        // Разрешённые поля для сортировки
         $allowedSortFields = ['date', 'amount', 'odometer', 'created_at'];
         if (!in_array($sortBy, $allowedSortFields)) {
             $sortBy = 'date';
@@ -38,17 +35,15 @@ class ExpenseController extends Controller
                 $q->where('user_id', Auth::id());
             });
         
-        // Фильтр по автомобилю
         if ($carId) {
             $query->where('car_id', $carId);
+            $car = Car::find($carId);
         }
         
-        // Фильтр по категории
         if ($categoryId) {
             $query->where('category_id', $categoryId);
         }
         
-        // Фильтр по диапазону дат
         if ($dateFrom) {
             $query->whereDate('date', '>=', $dateFrom);
         }
@@ -56,7 +51,6 @@ class ExpenseController extends Controller
             $query->whereDate('date', '<=', $dateTo);
         }
         
-        // Поиск по описанию, категории, автомобилю
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
@@ -70,40 +64,51 @@ class ExpenseController extends Controller
             });
         }
         
-        // Сортировка
         $query->orderBy($sortBy, $sortOrder);
         
         $expenses = $query->paginate(20)->appends($request->all());
+        
+        foreach ($expenses as $expense) {
+            if (isset($car)) {
+                $expense->converted_amount = $this->convertCurrency($expense->amount, $car);
+                $expense->converted_odometer = $this->convertDistance($expense->odometer, $car);
+                $expense->currency = $this->getCurrencySymbol($car);
+                $expense->distance_unit = $this->getDistanceUnit($car);
+            } else {
+                $expense->converted_amount = $expense->amount;
+                $expense->converted_odometer = $expense->odometer;
+                $expense->currency = '₽';
+                $expense->distance_unit = 'км';
+            }
+        }
+        
         $cars = Auth::user()->cars;
-        $categories = ExpenseCategory::all();
+        $categories = ExpenseCategory::getCategoriesForUser(Auth::id());
         
         return view('expenses.index', compact('expenses', 'cars', 'categories', 'carId', 'search', 'categoryId', 'dateFrom', 'dateTo', 'sortBy', 'sortOrder'));
     }
 
-    /**
-     * Форма создания расхода
-     */
     public function create(Request $request)
     {
         $cars = Auth::user()->cars;
-        $categories = ExpenseCategory::all();
+        $categories = ExpenseCategory::getCategoriesForUser(Auth::id());
         $selectedCar = $request->get('car_id');
         
-        // Получаем максимальный пробег для выбранного авто
         $maxOdometer = 0;
         if ($selectedCar) {
-            $maxOdometer = max(
-                Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                \App\Models\Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
-            );
+            $car = Car::find($selectedCar);
+            if ($car) {
+                $maxOdometerKm = max(
+                    Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
+                    Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
+                );
+                $maxOdometer = $this->convertDistance($maxOdometerKm, $car);
+            }
         }
         
         return view('expenses.create', compact('cars', 'categories', 'selectedCar', 'maxOdometer'));
     }
 
-    /**
-     * Сохранение расхода
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -115,14 +120,10 @@ class ExpenseController extends Controller
             'description' => 'nullable|string',
         ]);
         
-        // Проверяем, что автомобиль принадлежит пользователю
         $car = Car::findOrFail($validated['car_id']);
         if ($car->user_id !== Auth::id()) {
             abort(403);
         }
-        
-        // Валидация пробега
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'expense');
         
         Expense::create($validated);
         
@@ -130,31 +131,35 @@ class ExpenseController extends Controller
             ->with('success', 'Расход успешно добавлен!');
     }
 
-    /**
-     * Форма редактирования расхода
-     */
-    public function edit(Expense $expense)
+    public function show(Expense $expense)
     {
-        // Проверяем, что расход принадлежит автомобилю пользователя
         if ($expense->car->user_id !== Auth::id()) {
             abort(403);
         }
         
         $cars = Auth::user()->cars;
-        $categories = ExpenseCategory::all();
         
-        // Получаем максимальный пробег для этого авто (исключая текущую запись)
-        $maxOdometer = max(
+        return view('expenses.show', compact('expense', 'cars'));
+    }
+
+    public function edit(Expense $expense)
+    {
+        if ($expense->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $cars = Auth::user()->cars;
+        $categories = ExpenseCategory::getCategoriesForUser(Auth::id());
+        
+        $maxOdometerKm = max(
             Expense::where('car_id', $expense->car_id)->where('id', '!=', $expense->id)->max('odometer') ?? 0,
-            \App\Models\Refueling::where('car_id', $expense->car_id)->max('odometer') ?? 0
+            Refueling::where('car_id', $expense->car_id)->max('odometer') ?? 0
         );
+        $maxOdometer = $this->convertDistance($maxOdometerKm, $expense->car);
         
         return view('expenses.edit', compact('expense', 'cars', 'categories', 'maxOdometer'));
     }
 
-    /**
-     * Обновление расхода
-     */
     public function update(Request $request, Expense $expense)
     {
         if ($expense->car->user_id !== Auth::id()) {
@@ -170,18 +175,12 @@ class ExpenseController extends Controller
             'description' => 'nullable|string',
         ]);
         
-        // Валидация пробега (исключаем текущую запись)
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], $expense->id, 'expense');
-        
         $expense->update($validated);
         
         return redirect()->route('expenses.index', ['car_id' => $expense->car_id])
             ->with('success', 'Расход успешно обновлён!');
     }
 
-    /**
-     * Удаление расхода
-     */
     public function destroy(Expense $expense)
     {
         if ($expense->car->user_id !== Auth::id()) {
@@ -195,9 +194,6 @@ class ExpenseController extends Controller
             ->with('success', 'Расход успешно удалён!');
     }
 
-    /**
-     * Экспорт расходов в CSV
-     */
     public function exportCsv(Request $request)
     {
         $carId = $request->get('car_id');
@@ -244,13 +240,9 @@ class ExpenseController extends Controller
         $filename = 'expenses_' . date('Y-m-d_H-i-s') . '.csv';
         $handle = fopen('php://temp', 'w+');
         
-        // Добавляем BOM для правильного отображения кириллицы
         fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-        
-        // Заголовки
         fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Категория', 'Сумма (₽)', 'Пробег (км)', 'Описание'], ';');
         
-        // Данные
         foreach ($expenses as $expense) {
             fputcsv($handle, [
                 $expense->id,

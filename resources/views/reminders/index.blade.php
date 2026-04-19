@@ -21,7 +21,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Фильтр</button>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Применить</button>
                         </form>
                         
                         <a href="{{ route('reminders.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -45,7 +45,7 @@
                                         <th class="px-4 py-2 text-left">Статус</th>
                                         <th class="px-4 py-2 text-left">Автомобиль</th>
                                         <th class="px-4 py-2 text-left">Напоминание</th>
-                                        <th class="px-4 py-2 text-left">Пробег (км)</th>
+                                        <th class="px-4 py-2 text-left">Пробег</th>
                                         <th class="px-4 py-2 text-left">Дата</th>
                                         <th class="px-4 py-2 text-left">Действия</th>
                                     </tr>
@@ -63,13 +63,15 @@
                                                 </form>
                                             </td>
                                             <td class="px-4 py-2">{{ $reminder->car->brand }} {{ $reminder->car->model }}</td>
-                                            <td class="px-4 py-2 {{ $reminder->is_completed ? 'line-through text-gray-500 dark:text-gray-400' : 'font-medium' }}">
-                                                {{ $reminder->title }}
+                                            <td class="px-4 py-2">
+                                                <a href="{{ route('reminders.show', $reminder) }}" class="{{ $reminder->is_completed ? 'line-through text-gray-500 dark:text-gray-400' : 'font-medium text-blue-600 dark:text-blue-400 hover:underline' }}">
+                                                    {{ $reminder->title }}
+                                                </a>
                                                 @if($reminder->service_type === 'service' && $reminder->service_cost > 0)
                                                     <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">({{ number_format($reminder->service_cost, 2) }} ₽)</span>
                                                 @endif
                                             </td>
-                                            <td class="px-4 py-2">{{ number_format($reminder->due_odometer) }} км</td>
+                                            <td class="px-4 py-2">{{ number_format($reminder->converted_odometer) }} {{ $reminder->distance_unit }}</td>
                                             <td class="px-4 py-2">{{ $reminder->due_date ? $reminder->due_date->format('d.m.Y') : '—' }}</td>
                                             <td class="px-4 py-2">
                                                 <a href="{{ route('reminders.edit', $reminder) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">✏️ Ред.</a>
@@ -82,7 +84,7 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
-                            树立
+                            </table>
                         </div>
                         
                         <div class="mt-4">

@@ -36,7 +36,8 @@ class CarSettingsController extends Controller
         $car->distance_unit = $request->unit;
         $car->save();
         
-        return response()->json(['success' => true]);
+        return redirect()->route('car-settings.index', ['car_id' => $car->id])
+            ->with('success', 'Единица расстояния обновлена!');
     }
     
     public function updateVolumeUnit(Request $request)
@@ -54,7 +55,8 @@ class CarSettingsController extends Controller
         $car->volume_unit = $request->unit;
         $car->save();
         
-        return response()->json(['success' => true]);
+        return redirect()->route('car-settings.index', ['car_id' => $car->id])
+            ->with('success', 'Единица объема обновлена!');
     }
     
     public function updateCurrency(Request $request)
@@ -72,7 +74,8 @@ class CarSettingsController extends Controller
         $car->currency = $request->currency;
         $car->save();
         
-        return response()->json(['success' => true]);
+        return redirect()->route('car-settings.index', ['car_id' => $car->id])
+            ->with('success', 'Валюта обновлена!');
     }
     
     public function deleteAllData(Request $request)
@@ -103,12 +106,10 @@ class CarSettingsController extends Controller
         // Сбрасываем настройки и пробег автомобиля
         $car->initial_odometer = 0;
         $car->photo = null;
-        $car->distance_unit = 'km';
-        $car->volume_unit = 'liters';
-        $car->currency = 'RUB';
         $car->save();
         
-        return response()->json(['success' => true, 'message' => 'Все данные автомобиля удалены']);
+        return redirect()->route('car-settings.index', ['car_id' => $car->id])
+            ->with('success', 'Все данные автомобиля удалены');
     }
     
     public function deleteCar(Request $request)
@@ -135,6 +136,7 @@ class CarSettingsController extends Controller
         // Удаляем сам автомобиль
         $car->delete();
         
-        return response()->json(['success' => true, 'message' => 'Автомобиль удален']);
+        return redirect()->route('car-settings.index')
+            ->with('success', 'Автомобиль удален');
     }
 }

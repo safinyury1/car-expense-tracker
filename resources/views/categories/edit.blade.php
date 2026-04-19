@@ -9,6 +9,21 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
+                    @if(session('error'))
+                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 mb-4">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 mb-4">
+                            @foreach($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+
                     <form action="{{ route('categories.update', $category) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -17,15 +32,6 @@
                             <label for="name" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Название категории *</label>
                             <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" required>
                             @error('name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="icon" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Иконка (эмодзи)</label>
-                            <input type="text" name="icon" id="icon" value="{{ old('icon', $category->icon) }}" maxlength="10" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" placeholder="📌">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Можно использовать любой эмодзи, например: 💰, 🔧, ⛽</p>
-                            @error('icon')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>

@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Expense;
+use App\Models\Refueling;
+use App\Models\Income;
+use App\Models\Reminder;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
@@ -11,12 +15,29 @@ use Illuminate\Support\Facades\Storage;
 
 class CarController extends Controller
 {
+    use ConvertsUnits;
+
     public function index()
     {
         $cars = Auth::user()->cars()->orderBy('id', 'desc')->get();
         
         if ($cars->isEmpty()) {
             return redirect()->route('cars.create')->with('warning', 'Сначала добавьте автомобиль!');
+        }
+        
+        foreach ($cars as $car) {
+            $car->converted_initial_odometer = $this->convertDistance($car->initial_odometer, $car);
+            
+            $maxOdometerKm = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                Reminder::where('car_id', $car->id)->max('due_odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+            
+            $car->converted_current_odometer = $this->convertDistance($maxOdometerKm, $car);
+            $car->distance_unit = $this->getDistanceUnit($car);
         }
         
         return view('cars.index', compact('cars'));
@@ -62,6 +83,10 @@ class CarController extends Controller
         if ($car->user_id !== Auth::id()) {
             abort(403);
         }
+        
+        $car->converted_initial_odometer = $this->convertDistance($car->initial_odometer, $car);
+        $car->distance_unit = $this->getDistanceUnit($car);
+        
         return view('cars.edit', compact('car'));
     }
 
@@ -163,14 +188,9 @@ class CarController extends Controller
             'odometer' => 'required|integer|min:0',
         ]);
         
-        Expense::create([
-            'car_id' => $car->id,
-            'category_id' => 9,
-            'date' => now(),
-            'amount' => 0,
-            'odometer' => $request->odometer,
-            'description' => 'Ручное обновление пробега',
-        ]);
+        // Просто обновляем начальный пробег автомобиля, НЕ создаём запись в расходах
+        $car->initial_odometer = $request->odometer;
+        $car->save();
         
         return redirect()->route('overview.index', ['car_id' => $car->id])
             ->with('success', 'Пробег обновлён!');

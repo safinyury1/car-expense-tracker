@@ -81,82 +81,102 @@
                 </div>
             </div>
             
-            <!-- Список операций -->
+            <!-- Список операций (кликабельный) -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($operations as $operation)
-                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $operation['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : 'bg-red-100 dark:bg-red-900/50' }}">
-                                        @if($operation['type'] === 'expense')
-                                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        @elseif($operation['type'] === 'refueling')
-                                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                            </svg>
-                                        @else
-                                            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        @endif
+                        @php
+                            $routeMap = [
+                                'expense' => 'expenses.show',
+                                'refueling' => 'refuelings.show',
+                                'income' => 'incomes.show',
+                                'service' => 'service.show',
+                            ];
+                            $routeName = $routeMap[$operation['type']] ?? null;
+                        @endphp
+                        @if($routeName)
+                            <a href="{{ route($routeName, $operation['id']) }}" 
+                               class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $operation['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : ($operation['type'] === 'service' ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-red-100 dark:bg-red-900/50') }}">
+                                            @if($operation['type'] === 'expense')
+                                                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            @elseif($operation['type'] === 'refueling')
+                                                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                </svg>
+                                            @elseif($operation['type'] === 'service')
+                                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            @else
+                                                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            @endif
+                                        </div>
+                                        
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <p class="font-medium text-gray-800 dark:text-white">{{ $operation['title'] }}</p>
+                                                @if($selectedCarId === 'all' && $operation['car_name'])
+                                                    <span class="text-xs text-gray-400 dark:text-gray-500">• {{ $operation['car_name'] }}</span>
+                                                @endif
+                                            </div>
+                                            <div class="flex items-center gap-2 mt-0.5">
+                                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::parse($operation['date'])->format('d.m.Y') }}</span>
+                                                <span class="text-xs text-gray-300 dark:text-gray-600">•</span>
+                                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ number_format($operation['odometer']) }} {{ $operation['distance_unit'] }}</span>
+                                                @if($operation['type'] === 'refueling' && isset($operation['liters']))
+                                                    <span class="text-xs text-gray-300 dark:text-gray-600">•</span>
+                                                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ $operation['liters'] }} {{ $operation['volume_unit'] }}</span>
+                                                @endif
+                                            </div>
+                                            @if($operation['description'])
+                                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $operation['description'] }}</p>
+                                            @endif
+                                            @if($operation['type'] === 'refueling' && isset($operation['gas_station']) && $operation['gas_station'])
+                                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">📍 {{ $operation['gas_station'] }}</p>
+                                            @endif
+                                        </div>
                                     </div>
                                     
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <p class="font-medium text-gray-800 dark:text-white">{{ $operation['title'] }}</p>
-                                            @if($selectedCarId === 'all' && $operation['car_name'])
-                                                <span class="text-xs text-gray-400 dark:text-gray-500">• {{ $operation['car_name'] }}</span>
+                                    <div class="text-right">
+                                        <p class="text-lg font-bold {{ $operation['type'] === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                            @if($operation['type'] === 'income')
+                                                +{{ number_format($operation['amount'], 2) }} {{ $operation['currency'] }}
+                                            @else
+                                                -{{ number_format($operation['amount'], 2) }} {{ $operation['currency'] }}
                                             @endif
-                                        </div>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <span class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::parse($operation['date'])->format('d.m.Y') }}</span>
-                                            <span class="text-xs text-gray-300 dark:text-gray-600">•</span>
-                                            <span class="text-xs text-gray-400 dark:text-gray-500">{{ number_format($operation['odometer']) }} км</span>
-                                            @if($operation['type'] === 'refueling' && $operation['liters'])
-                                                <span class="text-xs text-gray-300 dark:text-gray-600">•</span>
-                                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ $operation['liters'] }} л</span>
-                                            @endif
-                                        </div>
-                                        @if($operation['description'])
-                                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $operation['description'] }}</p>
-                                        @endif
-                                        @if($operation['type'] === 'refueling' && $operation['gas_station'])
-                                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">📍 {{ $operation['gas_station'] }}</p>
-                                        @endif
+                                        </p>
                                     </div>
                                 </div>
-                                
-                                <div class="text-right">
-                                    <p class="text-lg font-bold {{ $operation['type'] === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                        @if($operation['type'] === 'income')
-                                            +{{ number_format($operation['amount'], 2) }} ₽
-                                        @else
-                                            -{{ number_format($operation['amount'], 2) }} ₽
-                                        @endif
-                                    </p>
-                                    <form action="{{ route('history.destroy', ['type' => $operation['type'], 'id' => $operation['id']]) }}" 
-                                          method="POST" 
-                                          class="inline-block"
-                                          onsubmit="return confirm('Вы уверены, что хотите удалить эту запись?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition mt-1">
-                                            Удалить
-                                        </button>
-                                    </form>
+                            </a>
+                        @else
+                            <div class="p-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center">
+                                            <span class="text-red-500 text-sm">⚠️</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-800 dark:text-white">{{ $operation['title'] }}</p>
+                                            <p class="text-xs text-gray-400 dark:text-gray-500">Неизвестный тип записи</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     @empty
                         <div class="p-8 text-center text-gray-400 dark:text-gray-500">
                             <svg class="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             <p>Нет записей</p>
-                            <p class="text-sm mt-1">Добавьте расход, заправку или доход</p>
+                            <p class="text-sm mt-1">Добавьте расход, заправку, обслуживание или доход</p>
                         </div>
                     @endforelse
                 </div>

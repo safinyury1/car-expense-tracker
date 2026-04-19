@@ -21,8 +21,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Дашборд (статистика, графики)
 Route::middleware(['auth', 'has.car'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+// Редирект после логина/регистрации
 Route::middleware('auth')->get('/home', function () {
     $user = Auth::user();
     if ($user->cars()->count() == 0) {
@@ -67,14 +69,17 @@ Route::middleware('auth')->group(function () {
     
     // Расходы
     Route::resource('expenses', ExpenseController::class)->except(['show'])->middleware('has.car');
+    Route::get('expenses/{expense}', [ExpenseController::class, 'show'])->name('expenses.show')->middleware('has.car');
     Route::get('expenses/export-csv', [ExpenseController::class, 'exportCsv'])->name('expenses.export-csv')->middleware('has.car');
     
     // Заправки
     Route::resource('refuelings', RefuelingController::class)->except(['show'])->middleware('has.car');
+    Route::get('refuelings/{refueling}', [RefuelingController::class, 'show'])->name('refuelings.show')->middleware('has.car');
     Route::get('refuelings/export-csv', [RefuelingController::class, 'exportCsv'])->name('refuelings.export-csv')->middleware('has.car');
     
     // Напоминания
     Route::resource('reminders', ReminderController::class)->except(['show'])->middleware('has.car');
+    Route::get('reminders/{reminder}', [ReminderController::class, 'show'])->name('reminders.show')->middleware('has.car');
     Route::patch('reminders/{reminder}/toggle', [ReminderController::class, 'toggle'])->name('reminders.toggle')->middleware('has.car');
     
     // Категории
@@ -86,11 +91,13 @@ Route::middleware('auth')->group(function () {
     // Доходы
     Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create')->middleware('has.car');
     Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store')->middleware('has.car');
+    Route::get('/incomes/{income}', [IncomeController::class, 'show'])->name('incomes.show')->middleware('has.car');
     Route::delete('/incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy')->middleware('has.car');
     
     // Обслуживание
     Route::get('/service/create', [ServiceController::class, 'create'])->name('service.create')->middleware('has.car');
     Route::post('/service', [ServiceController::class, 'store'])->name('service.store')->middleware('has.car');
+    Route::get('/service/{reminder}', [ServiceController::class, 'show'])->name('service.show')->middleware('has.car');
     
     // Руководство
     Route::get('/guide', [GuideController::class, 'index'])->name('guide.index')->middleware('auth');

@@ -6,82 +6,150 @@ use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
 use App\Models\Reminder;
+use App\Models\Income;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OverviewController extends Controller
 {
+    use ConvertsUnits;
+    
     public function index(Request $request)
     {
         $cars = Auth::user()->cars;
         
-        // Выбранный автомобиль (по умолчанию первый)
-        $selectedCarId = $request->get('car_id', $cars->first()?->id);
+        $selectedCarId = $request->get('car_id');
+        if (!$selectedCarId && session()->has('selected_car_id')) {
+            $selectedCarId = session('selected_car_id');
+        }
+        if (!$selectedCarId) {
+            $selectedCarId = $cars->first()?->id;
+        }
+        if ($selectedCarId) {
+            session(['selected_car_id' => $selectedCarId]);
+        }
+        
         $selectedCar = $cars->find($selectedCarId);
         
         if (!$selectedCar) {
             return redirect()->route('cars.create');
         }
         
-        // Текущий пробег (максимальный из всех записей)
-        $maxOdometer = max(
+        // Текущий пробег в КМ (для расчётов)
+        $maxOdometerKm = max(
             Expense::where('car_id', $selectedCarId)->max('odometer') ?? 0,
             Refueling::where('car_id', $selectedCarId)->max('odometer') ?? 0,
+            Income::where('car_id', $selectedCarId)->max('odometer') ?? 0,
             $selectedCar->initial_odometer ?? 0
         );
         
-        // Дата последнего обновления пробега
+        // Конвертированный пробег для отображения
+        $convertedOdometer = $this->convertDistance($maxOdometerKm, $selectedCar);
+        $distanceUnit = $this->getDistanceUnit($selectedCar);
+        
+        // Последнее обновление - берём MAX дату из всех записей И из обновления пробега
         $lastExpense = Expense::where('car_id', $selectedCarId)->latest('date')->first();
         $lastRefueling = Refueling::where('car_id', $selectedCarId)->latest('date')->first();
+        $lastIncome = Income::where('car_id', $selectedCarId)->latest('date')->first();
+        $lastService = Reminder::where('car_id', $selectedCarId)->where('service_type', 'service')->latest('service_date')->first();
         
-        $lastUpdate = null;
-        if ($lastExpense && $lastRefueling) {
-            $lastUpdate = $lastExpense->date > $lastRefueling->date ? $lastExpense->date : $lastRefueling->date;
-        } elseif ($lastExpense) {
-            $lastUpdate = $lastExpense->date;
-        } elseif ($lastRefueling) {
-            $lastUpdate = $lastRefueling->date;
-        }
+        // Также проверяем дату последнего обновления автомобиля (изменение пробега)
+        $lastCarUpdate = $selectedCar->updated_at;
+        
+        $latestDate = null;
+        if ($lastExpense) $latestDate = $lastExpense->date;
+        if ($lastRefueling && (!$latestDate || $lastRefueling->date > $latestDate)) $latestDate = $lastRefueling->date;
+        if ($lastIncome && (!$latestDate || $lastIncome->date > $latestDate)) $latestDate = $lastIncome->date;
+        if ($lastService && $lastService->service_date && (!$latestDate || $lastService->service_date > $latestDate)) $latestDate = $lastService->service_date;
+        if ($lastCarUpdate && (!$latestDate || $lastCarUpdate > $latestDate)) $latestDate = $lastCarUpdate;
+        
+        $lastUpdate = $latestDate;
         
         // Активные напоминания
         $activeReminders = Reminder::where('car_id', $selectedCarId)
             ->where('is_completed', false)
+            ->where(function($q) {
+                $q->whereNull('service_type')->orWhere('service_type', '!=', 'service');
+            })
             ->orderBy('due_odometer', 'asc')
             ->get();
         
-        // Лента событий (последние 10 записей: расходы + заправки)
-        $expenses = Expense::where('car_id', $selectedCarId)
-            ->with('category')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'type' => 'expense',
-                    'date' => $item->date,
-                    'title' => $item->category->name,
-                    'amount' => $item->amount,
-                    'odometer' => $item->odometer,
-                    'description' => $item->description,
-                ];
-            });
+        // Лента событий
+        $allEvents = collect();
         
-        $refuelings = Refueling::where('car_id', $selectedCarId)
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'type' => 'refueling',
-                    'date' => $item->date,
-                    'title' => 'Заправка',
-                    'liters' => $item->liters,
-                    'amount' => $item->total_amount,
-                    'odometer' => $item->odometer,
-                    'gas_station' => $item->gas_station,
-                ];
-            });
+        $expenses = Expense::where('car_id', $selectedCarId)->with('category')->get();
+        foreach ($expenses as $item) {
+            $allEvents->push([
+                'id' => $item->id,
+                'type' => 'expense',
+                'date' => $item->date,
+                'title' => $item->category->name,
+                'amount' => $this->convertCurrency($item->amount, $selectedCar),
+                'currency' => $this->getCurrencySymbol($selectedCar),
+                'odometer' => $this->convertDistance($item->odometer, $selectedCar),
+                'distance_unit' => $this->getDistanceUnit($selectedCar),
+                'description' => $item->description,
+                'sort_date' => $item->date->timestamp,
+            ]);
+        }
         
-        $events = $expenses->concat($refuelings)
-            ->sortByDesc('date')
-            ->take(10);
+        $refuelings = Refueling::where('car_id', $selectedCarId)->get();
+        foreach ($refuelings as $item) {
+            $allEvents->push([
+                'id' => $item->id,
+                'type' => 'refueling',
+                'date' => $item->date,
+                'title' => 'Заправка',
+                'amount' => $this->convertCurrency($item->total_amount, $selectedCar),
+                'currency' => $this->getCurrencySymbol($selectedCar),
+                'odometer' => $this->convertDistance($item->odometer, $selectedCar),
+                'distance_unit' => $this->getDistanceUnit($selectedCar),
+                'liters' => $this->convertVolume($item->liters, $selectedCar),
+                'volume_unit' => $this->getVolumeUnit($selectedCar),
+                'gas_station' => $item->gas_station,
+                'sort_date' => $item->date->timestamp,
+            ]);
+        }
         
-        return view('overview.index', compact('cars', 'selectedCar', 'selectedCarId', 'maxOdometer', 'lastUpdate', 'activeReminders', 'events'));
+        $incomes = Income::where('car_id', $selectedCarId)->get();
+        foreach ($incomes as $item) {
+            $allEvents->push([
+                'id' => $item->id,
+                'type' => 'income',
+                'date' => $item->date,
+                'title' => $item->title,
+                'amount' => $this->convertCurrency($item->amount, $selectedCar),
+                'currency' => $this->getCurrencySymbol($selectedCar),
+                'odometer' => $this->convertDistance($item->odometer ?? 0, $selectedCar),
+                'distance_unit' => $this->getDistanceUnit($selectedCar),
+                'description' => $item->description,
+                'sort_date' => $item->date->timestamp,
+            ]);
+        }
+        
+        $services = Reminder::where('car_id', $selectedCarId)
+            ->where('service_type', 'service')
+            ->where('is_completed', true)
+            ->get();
+        foreach ($services as $item) {
+            $serviceDate = $item->service_date ?? $item->created_at;
+            $allEvents->push([
+                'id' => $item->id,
+                'type' => 'service',
+                'date' => $serviceDate,
+                'title' => $item->title,
+                'amount' => $this->convertCurrency($item->service_cost ?? 0, $selectedCar),
+                'currency' => $this->getCurrencySymbol($selectedCar),
+                'odometer' => $this->convertDistance($item->due_odometer, $selectedCar),
+                'distance_unit' => $this->getDistanceUnit($selectedCar),
+                'description' => $item->service_notes,
+                'sort_date' => $serviceDate->timestamp,
+            ]);
+        }
+        
+        $events = $allEvents->sortByDesc('sort_date')->take(10)->values();
+        
+        return view('overview.index', compact('cars', 'selectedCar', 'selectedCarId', 'maxOdometerKm', 'convertedOdometer', 'distanceUnit', 'lastUpdate', 'activeReminders', 'events'));
     }
 }

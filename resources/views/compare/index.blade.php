@@ -61,7 +61,7 @@
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Общие расходы</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
-                                                {{ number_format($comparisonData[$car->id]['totalExpenses'], 2) }} ₽
+                                                {{ number_format($comparisonData[$car->id]['totalExpenses'], 2) }} {{ $comparisonData[$car->id]['currency'] }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -69,7 +69,7 @@
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Затраты на топливо</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
-                                                {{ number_format($comparisonData[$car->id]['totalFuelCost'], 2) }} ₽
+                                                {{ number_format($comparisonData[$car->id]['totalFuelCost'], 2) }} {{ $comparisonData[$car->id]['currency'] }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -77,7 +77,7 @@
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Средний расход топлива</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
-                                                {{ $comparisonData[$car->id]['avgFuelConsumption'] }} л/100 км
+                                                {{ $comparisonData[$car->id]['avgFuelConsumption'] }} {{ $comparisonData[$car->id]['fuel_unit'] }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -85,7 +85,7 @@
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Стоимость 1 км</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
-                                                {{ number_format($comparisonData[$car->id]['costPerKm'], 2) }} ₽
+                                                {{ number_format($comparisonData[$car->id]['costPerKm'], 2) }} {{ $comparisonData[$car->id]['currency'] }} / {{ $comparisonData[$car->id]['distance_unit'] }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -93,7 +93,7 @@
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Общий пробег</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
-                                                {{ number_format($comparisonData[$car->id]['totalDistance']) }} км
+                                                {{ number_format($comparisonData[$car->id]['totalDistance']) }} {{ $comparisonData[$car->id]['distance_unit'] }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -194,10 +194,10 @@
                 labels: { style: { colors: '#6b7280' } }
             },
             yaxis: {
-                title: { text: 'Сумма (₽)' },
+                title: { text: 'Сумма' },
                 labels: {
                     formatter: function(value) {
-                        return value.toLocaleString('ru-RU') + ' ₽';
+                        return value.toLocaleString('ru-RU') + ' ' + (comparisonData[0]?.currency || '₽');
                     },
                     style: { colors: '#6b7280' }
                 }
@@ -205,7 +205,7 @@
             tooltip: {
                 y: {
                     formatter: function(value) {
-                        return value.toLocaleString('ru-RU') + ' ₽';
+                        return value.toLocaleString('ru-RU') + ' ' + (comparisonData[0]?.currency || '₽');
                     }
                 }
             },
@@ -232,10 +232,10 @@
                 labels: { style: { colors: '#6b7280' } }
             },
             yaxis: {
-                title: { text: 'Сумма (₽)' },
+                title: { text: 'Сумма' },
                 labels: {
                     formatter: function(value) {
-                        return value.toLocaleString('ru-RU') + ' ₽';
+                        return value.toLocaleString('ru-RU') + ' ' + (trendData.series[0]?.currency || '₽');
                     },
                     style: { colors: '#6b7280' }
                 }
@@ -250,7 +250,7 @@
             tooltip: {
                 y: {
                     formatter: function(value) {
-                        return value.toLocaleString('ru-RU') + ' ₽';
+                        return value.toLocaleString('ru-RU') + ' ' + (trendData.series[0]?.currency || '₽');
                     }
                 }
             },
@@ -280,7 +280,7 @@
                 tooltip: {
                     y: {
                         formatter: function(value) {
-                            return value.toLocaleString('ru-RU') + ' ₽';
+                            return value.toLocaleString('ru-RU') + ' ' + (comparisonData[0]?.currency || '₽');
                         }
                     }
                 },

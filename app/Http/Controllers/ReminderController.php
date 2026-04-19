@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Reminder;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReminderController extends Controller
 {
-    /**
-     * Список напоминаний
-     */
+    use ConvertsUnits;
+
     public function index(Request $request)
     {
         $carId = $request->get('car_id');
@@ -23,20 +23,28 @@ class ReminderController extends Controller
         
         if ($carId) {
             $query->where('car_id', $carId);
+            $car = Car::find($carId);
         }
         
         $reminders = $query->orderBy('is_completed', 'asc')
             ->orderBy('due_odometer', 'asc')
             ->paginate(20);
         
+        foreach ($reminders as $reminder) {
+            if (isset($car)) {
+                $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $car);
+                $reminder->distance_unit = $this->getDistanceUnit($car);
+            } else {
+                $reminder->converted_odometer = $reminder->due_odometer;
+                $reminder->distance_unit = 'км';
+            }
+        }
+        
         $cars = Auth::user()->cars;
         
         return view('reminders.index', compact('reminders', 'cars', 'carId'));
     }
 
-    /**
-     * Форма создания напоминания
-     */
     public function create(Request $request)
     {
         $cars = Auth::user()->cars;
@@ -45,9 +53,6 @@ class ReminderController extends Controller
         return view('reminders.create', compact('cars', 'selectedCar'));
     }
 
-    /**
-     * Сохранение напоминания
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -58,7 +63,6 @@ class ReminderController extends Controller
             'is_completed' => 'boolean',
         ]);
         
-        // Проверяем, что автомобиль принадлежит пользователю
         $car = Car::findOrFail($validated['car_id']);
         if ($car->user_id !== Auth::id()) {
             abort(403);
@@ -70,9 +74,17 @@ class ReminderController extends Controller
             ->with('success', 'Напоминание успешно добавлено!');
     }
 
-    /**
-     * Форма редактирования напоминания
-     */
+    public function show(Reminder $reminder)
+    {
+        if ($reminder->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $cars = Auth::user()->cars;
+        
+        return view('reminders.show', compact('reminder', 'cars'));
+    }
+
     public function edit(Reminder $reminder)
     {
         if ($reminder->car->user_id !== Auth::id()) {
@@ -84,9 +96,6 @@ class ReminderController extends Controller
         return view('reminders.edit', compact('reminder', 'cars'));
     }
 
-    /**
-     * Обновление напоминания
-     */
     public function update(Request $request, Reminder $reminder)
     {
         if ($reminder->car->user_id !== Auth::id()) {
@@ -107,9 +116,6 @@ class ReminderController extends Controller
             ->with('success', 'Напоминание успешно обновлено!');
     }
 
-    /**
-     * Переключение статуса выполнения (быстрый чекбокс)
-     */
     public function toggle(Request $request, Reminder $reminder)
     {
         if ($reminder->car->user_id !== Auth::id()) {
@@ -123,9 +129,6 @@ class ReminderController extends Controller
             ->with('success', $reminder->is_completed ? 'Напоминание отмечено как выполненное!' : 'Напоминание отмечено как невыполненное!');
     }
 
-    /**
-     * Удаление напоминания
-     */
     public function destroy(Reminder $reminder)
     {
         if ($reminder->car->user_id !== Auth::id()) {

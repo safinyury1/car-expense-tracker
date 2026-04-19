@@ -18,8 +18,6 @@ class ExpenseCategorySeeder extends Seeder
             ['name' => 'Платная дорога', 'is_default' => true, 'user_id' => null],
             ['name' => 'Парковка', 'is_default' => true, 'user_id' => null],
             ['name' => 'Прочие расходы', 'is_default' => true, 'user_id' => null],
-            ['name' => 'Зарплата', 'is_default' => true, 'user_id' => null],
-            ['name' => 'Обслуживание', 'is_default' => true, 'user_id' => null],
         ];
 
         foreach ($categories as $category) {

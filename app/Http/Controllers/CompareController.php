@@ -5,26 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CompareController extends Controller
 {
-    /**
-     * Страница сравнения автомобилей
-     */
+    use ConvertsUnits;
+
     public function index(Request $request)
     {
         $cars = Auth::user()->cars;
         
-        // Получаем ID выбранных автомобилей (максимум 4)
         $selectedCarIds = $request->get('cars', []);
         if (!is_array($selectedCarIds)) {
             $selectedCarIds = [];
         }
         
-        // Ограничиваем максимум 4 автомобиля
         $selectedCarIds = array_slice($selectedCarIds, 0, 4);
         
         $selectedCars = Car::whereIn('id', $selectedCarIds)
@@ -37,16 +35,11 @@ class CompareController extends Controller
             $comparisonData[$car->id] = $this->getCarStatistics($car->id);
         }
         
-        // Данные для графика общих расходов
         $chartData = $this->getComparisonChartData($selectedCarIds);
-        
-        // Данные для круговой диаграммы по каждому автомобилю
         $expenseDistributionData = [];
         foreach ($selectedCars as $car) {
             $expenseDistributionData[$car->id] = $this->getExpenseDistribution($car->id);
         }
-        
-        // Данные для линейного графика динамики расходов
         $monthlyTrendData = $this->getMonthlyTrendData($selectedCarIds);
         
         return view('compare.index', compact(
@@ -60,34 +53,19 @@ class CompareController extends Controller
         ));
     }
     
-    /**
-     * Получение статистики по автомобилю
-     */
     private function getCarStatistics($carId)
     {
         $car = Car::find($carId);
         
-        // Общие расходы
         $expensesSum = Expense::where('car_id', $carId)->sum('amount');
         $refuelingsSum = Refueling::where('car_id', $carId)->sum('total_amount');
         $totalExpenses = $expensesSum + $refuelingsSum;
-        
-        // Затраты на топливо
         $totalFuelCost = Refueling::where('car_id', $carId)->sum('total_amount');
-        
-        // Средний расход топлива
         $avgFuelConsumption = $this->calculateAvgFuelConsumption($carId);
-        
-        // Стоимость 1 км
         $costPerKm = $this->calculateCostPerKm($carId, $totalExpenses);
-        
-        // Количество расходов
         $expensesCount = Expense::where('car_id', $carId)->count();
-        
-        // Количество заправок
         $refuelingsCount = Refueling::where('car_id', $carId)->count();
         
-        // Общий пробег
         $maxOdometer = Refueling::where('car_id', $carId)->max('odometer');
         if (!$maxOdometer) {
             $maxOdometer = Expense::where('car_id', $carId)->max('odometer');
@@ -96,28 +74,23 @@ class CompareController extends Controller
         
         return [
             'car' => $car,
-            'totalExpenses' => $totalExpenses,
-            'totalFuelCost' => $totalFuelCost,
-            'avgFuelConsumption' => $avgFuelConsumption,
-            'costPerKm' => $costPerKm,
+            'totalExpenses' => $this->convertCurrency($totalExpenses, $car),
+            'totalFuelCost' => $this->convertCurrency($totalFuelCost, $car),
+            'avgFuelConsumption' => $this->convertFuelConsumption($avgFuelConsumption, $car),
+            'costPerKm' => $this->convertCurrency($costPerKm, $car),
             'expensesCount' => $expensesCount,
             'refuelingsCount' => $refuelingsCount,
-            'totalDistance' => max($totalDistance, 0),
+            'totalDistance' => $this->convertDistance(max($totalDistance, 0), $car),
+            'currency' => $this->getCurrencySymbol($car),
+            'distance_unit' => $this->getDistanceUnit($car),
+            'fuel_unit' => ($car->distance_unit === 'miles' && $car->volume_unit === 'gallons') ? 'mpg' : 'л/100 км',
         ];
     }
     
-    /**
-     * Расчёт среднего расхода топлива
-     */
     private function calculateAvgFuelConsumption($carId)
     {
-        $refuelings = Refueling::where('car_id', $carId)
-            ->orderBy('date', 'asc')
-            ->get();
-        
-        if ($refuelings->count() < 2) {
-            return 0;
-        }
+        $refuelings = Refueling::where('car_id', $carId)->orderBy('date', 'asc')->get();
+        if ($refuelings->count() < 2) return 0;
         
         $totalLiters = 0;
         $totalDistance = 0;
@@ -134,41 +107,25 @@ class CompareController extends Controller
             $prevOdometer = $refueling->odometer;
         }
         
-        if ($totalDistance == 0) {
-            return 0;
-        }
-        
+        if ($totalDistance == 0) return 0;
         return round(($totalLiters / $totalDistance) * 100, 1);
     }
     
-    /**
-     * Расчёт стоимости 1 км
-     */
     private function calculateCostPerKm($carId, $totalExpenses)
     {
         $car = Car::find($carId);
-        
         $maxOdometer = Refueling::where('car_id', $carId)->max('odometer');
         if (!$maxOdometer) {
             $maxOdometer = Expense::where('car_id', $carId)->max('odometer');
         }
-        
         $totalDistance = ($maxOdometer ?? $car->initial_odometer) - $car->initial_odometer;
-        
-        if ($totalDistance <= 0 || $totalExpenses <= 0) {
-            return 0;
-        }
-        
+        if ($totalDistance <= 0 || $totalExpenses <= 0) return 0;
         return round($totalExpenses / $totalDistance, 2);
     }
     
-    /**
-     * Данные для графика сравнения (столбчатая диаграмма)
-     */
     private function getComparisonChartData($carIds)
     {
         $data = [];
-        
         foreach ($carIds as $carId) {
             $car = Car::find($carId);
             if (!$car) continue;
@@ -178,70 +135,56 @@ class CompareController extends Controller
             
             $data[] = [
                 'name' => $car->brand . ' ' . $car->model,
-                'expenses' => round($expensesSum + $refuelingsSum, 2),
-                'fuel' => round($refuelingsSum, 2),
+                'expenses' => $this->convertCurrency($expensesSum + $refuelingsSum, $car),
+                'fuel' => $this->convertCurrency($refuelingsSum, $car),
+                'currency' => $this->getCurrencySymbol($car),
             ];
         }
-        
         return $data;
     }
     
-    /**
-     * Распределение расходов по категориям для круговой диаграммы
-     */
     private function getExpenseDistribution($carId)
     {
-        // Расходы по категориям
+        $car = Car::find($carId);
         $expensesByCat = Expense::where('car_id', $carId)
             ->select('category_id', DB::raw('SUM(amount) as total'))
             ->with('category')
             ->groupBy('category_id')
             ->get();
         
-        // Заправки как отдельная категория
         $fuelTotal = Refueling::where('car_id', $carId)->sum('total_amount');
         
         $result = [];
-        
         foreach ($expensesByCat as $item) {
             if ($item->category) {
                 $result[] = [
                     'name' => $item->category->name,
-                    'amount' => round($item->total, 2),
+                    'amount' => round($this->convertCurrency($item->total, $car), 2),
                 ];
             }
         }
-        
         if ($fuelTotal > 0) {
             $result[] = [
                 'name' => 'Топливо',
-                'amount' => round($fuelTotal, 2),
+                'amount' => round($this->convertCurrency($fuelTotal, $car), 2),
             ];
         }
-        
         return $result;
     }
     
-    /**
-     * Динамика расходов по месяцам для сравнения
-     */
     private function getMonthlyTrendData($carIds)
     {
         $months = collect();
-        
-        // Последние 6 месяцев
         for ($i = 5; $i >= 0; $i--) {
             $months->push(now()->subMonths($i)->format('Y-m'));
         }
         
         $result = [];
-        
         foreach ($carIds as $carId) {
             $car = Car::find($carId);
             if (!$car) continue;
             
             $seriesData = [];
-            
             foreach ($months as $month) {
                 $year = substr($month, 0, 4);
                 $monthNum = substr($month, 5, 2);
@@ -250,15 +193,12 @@ class CompareController extends Controller
                     ->whereYear('date', $year)
                     ->whereMonth('date', $monthNum)
                     ->sum('amount');
-                
                 $refuelingsSum = Refueling::where('car_id', $carId)
                     ->whereYear('date', $year)
                     ->whereMonth('date', $monthNum)
                     ->sum('total_amount');
-                
-                $seriesData[] = round($expensesSum + $refuelingsSum, 2);
+                $seriesData[] = round($this->convertCurrency($expensesSum + $refuelingsSum, $car), 2);
             }
-            
             $result[] = [
                 'name' => $car->brand . ' ' . $car->model,
                 'data' => $seriesData,

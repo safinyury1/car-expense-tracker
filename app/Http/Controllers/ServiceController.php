@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Reminder;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
+    use ConvertsUnits;
+    
     public function create(Request $request)
     {
         $cars = Auth::user()->cars;
@@ -37,18 +40,21 @@ class ServiceController extends Controller
             abort(403);
         }
         
-        // Создаём запись в расходах
-        $expense = Expense::create([
+        $category = \App\Models\ExpenseCategory::where('name', 'Обслуживание')->first();
+        if (!$category) {
+            $category = \App\Models\ExpenseCategory::where('name', 'Ремонт')->first();
+        }
+        
+        Expense::create([
             'car_id' => $validated['car_id'],
-            'category_id' => $this->getCategoryId($validated['title']),
+            'category_id' => $category->id ?? 1,
             'date' => $validated['service_date'],
             'amount' => $validated['cost'] ?? 0,
             'odometer' => $validated['odometer'],
             'description' => 'Обслуживание: ' . $validated['title'] . ($validated['notes'] ? '. ' . $validated['notes'] : ''),
         ]);
         
-        // Создаём напоминание о выполненном обслуживании
-        $reminder = Reminder::create([
+        Reminder::create([
             'car_id' => $validated['car_id'],
             'title' => $validated['title'],
             'due_odometer' => $validated['odometer'],
@@ -62,7 +68,6 @@ class ServiceController extends Controller
             'next_due_date' => $validated['next_due_date'] ?? null,
         ]);
         
-        // Создаём напоминание для следующего ТО если указано
         if ($validated['next_due_odometer'] || $validated['next_due_date']) {
             Reminder::create([
                 'car_id' => $validated['car_id'],
@@ -78,26 +83,14 @@ class ServiceController extends Controller
             ->with('success', 'Обслуживание добавлено!');
     }
     
-    private function getCategoryId($title)
+    public function show(Reminder $reminder)
     {
-        // Пытаемся найти подходящую категорию
-        $categoryMap = [
-            'масло' => 'Ремонт',
-            'ТО' => 'Ремонт',
-            'шины' => 'Шины',
-            'страховка' => 'Страховка',
-            'налог' => 'Налог',
-        ];
-        
-        $categoryName = 'Ремонт';
-        foreach ($categoryMap as $key => $value) {
-            if (stripos($title, $key) !== false) {
-                $categoryName = $value;
-                break;
-            }
+        if ($reminder->car->user_id !== Auth::id()) {
+            abort(403);
         }
         
-        $category = \App\Models\ExpenseCategory::where('name', $categoryName)->first();
-        return $category?->id ?? 1; // 1 - дефолтная категория
+        $cars = Auth::user()->cars;
+        
+        return view('service.show', compact('reminder', 'cars'));
     }
 }

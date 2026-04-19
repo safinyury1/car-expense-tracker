@@ -6,12 +6,16 @@ use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
 use App\Models\Reminder;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
 class DashboardController extends Controller
 {
+    use ConvertsUnits;
+
     public function index(Request $request)
     {
         $cars = Auth::user()->cars;
@@ -152,6 +156,8 @@ class DashboardController extends Controller
     
     private function getSingleCarData($carId, $period, $dateFrom, $dateTo)
     {
+        $car = Car::find($carId);
+        
         $expensesQuery = Expense::where('car_id', $carId);
         $refuelingsQuery = Refueling::where('car_id', $carId);
         
@@ -166,7 +172,7 @@ class DashboardController extends Controller
         $avgFuelConsumption = $this->calculateAvgFuelConsumption($carId, $period, $dateFrom, $dateTo);
         $costPerKm = $this->calculateCostPerKm($carId, $totalExpenses, $period, $dateFrom, $dateTo);
         
-        // Пробег за период
+        // Пробег за период (конвертируем для отображения)
         if ($period === 'all') {
             $maxOdometer = max(
                 Expense::where('car_id', $carId)->max('odometer') ?? 0,
@@ -195,15 +201,26 @@ class DashboardController extends Controller
             );
         }
         
-        $car = Car::find($carId);
         $totalDistance = ($maxOdometer > 0 ? $maxOdometer : ($car->initial_odometer ?? 0)) - ($car->initial_odometer ?? 0);
         
+        // Конвертируем суммы в валюту
+        $convertedTotalExpenses = $this->convertCurrency($totalExpenses, $car);
+        $convertedTotalFuelCost = $this->convertCurrency($totalFuelCost, $car);
+        $convertedCostPerKm = $this->convertCurrency($costPerKm, $car);
+        
+        // Конвертируем расход топлива
+        $avgFuelConsumption = $this->calculateAvgFuelConsumption($carId, $period, $dateFrom, $dateTo);
+$convertedAvgFuelConsumption = $this->convertFuelConsumption($avgFuelConsumption, $car);
+        
         return [
-            'totalExpenses' => $totalExpenses,
-            'totalFuelCost' => $totalFuelCost,
-            'avgFuelConsumption' => $avgFuelConsumption,
-            'costPerKm' => $costPerKm,
+            'totalExpenses' => $convertedTotalExpenses,
+            'totalFuelCost' => $convertedTotalFuelCost,
+            'avgFuelConsumption' => $convertedAvgFuelConsumption,
+            'costPerKm' => $convertedCostPerKm,
             'totalDistance' => max($totalDistance, 0),
+            'currency' => $this->getCurrencySymbol($car),
+            'distance_unit' => $this->getDistanceUnit($car),
+            'fuel_unit' => $car->distance_unit === 'miles' && $car->volume_unit === 'gallons' ? 'mpg' : 'л/100 км',
         ];
     }
     
@@ -216,6 +233,7 @@ class DashboardController extends Controller
         } else {
             $expensesQuery = Expense::where('car_id', $selectedCarId);
             $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
+            $car = Car::find($selectedCarId);
         }
         
         $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
@@ -232,16 +250,25 @@ class DashboardController extends Controller
         $categories = [];
         $amounts = [];
         
+        // Конвертируем суммы в валюту если выбран конкретный автомобиль
         foreach ($expensesByCat as $item) {
             if ($item->category) {
                 $categories[] = $item->category->name;
-                $amounts[] = round($item->total, 2);
+                if (isset($car)) {
+                    $amounts[] = round($this->convertCurrency($item->total, $car), 2);
+                } else {
+                    $amounts[] = round($item->total, 2);
+                }
             }
         }
         
         if ($fuelTotal > 0) {
             $categories[] = 'Топливо';
-            $amounts[] = round($fuelTotal, 2);
+            if (isset($car)) {
+                $amounts[] = round($this->convertCurrency($fuelTotal, $car), 2);
+            } else {
+                $amounts[] = round($fuelTotal, 2);
+            }
         }
         
         return ['categories' => $categories, 'amounts' => $amounts];
@@ -252,56 +279,34 @@ class DashboardController extends Controller
         $months = [];
         $monthlyTotals = [];
         
-        // Для кастомного периода показываем только месяцы в диапазоне
-        if ($period === 'custom' && $dateFrom && $dateTo) {
-            $start = new \DateTime($dateFrom);
-            $end = new \DateTime($dateTo);
-            $interval = new \DateInterval('P1M');
-            $dateRange = new \DatePeriod($start, $interval, $end->modify('+1 month'));
-            
-            foreach ($dateRange as $date) {
-                $months[] = $date->format('M Y');
-                $monthlyTotals[] = 0;
-            }
-        } else {
-            for ($i = 5; $i >= 0; $i--) {
-                $month = now()->subMonths($i);
-                $months[] = $month->format('M Y');
-                $monthlyTotals[] = 0;
-            }
-        }
-        
-        // Заполняем данные по месяцам
-        foreach ($months as $index => $monthLabel) {
-            $monthDate = \DateTime::createFromFormat('M Y', $monthLabel);
-            if (!$monthDate) continue;
-            
-            $year = $monthDate->format('Y');
-            $monthNum = $monthDate->format('m');
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $months[] = $month->format('M Y');
             
             if ($selectedCarId === 'all') {
                 $carIds = Auth::user()->cars->pluck('id')->toArray();
-                $expensesQuery = Expense::whereIn('car_id', $carIds);
-                $refuelingsQuery = Refueling::whereIn('car_id', $carIds);
+                $expensesSum = Expense::whereIn('car_id', $carIds)
+                    ->whereYear('date', $month->year)
+                    ->whereMonth('date', $month->month)
+                    ->sum('amount');
+                $refuelingsSum = Refueling::whereIn('car_id', $carIds)
+                    ->whereYear('date', $month->year)
+                    ->whereMonth('date', $month->month)
+                    ->sum('total_amount');
+                $monthlyTotals[] = round($expensesSum + $refuelingsSum, 2);
             } else {
-                $expensesQuery = Expense::where('car_id', $selectedCarId);
-                $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
+                $car = Car::find($selectedCarId);
+                $expensesSum = Expense::where('car_id', $selectedCarId)
+                    ->whereYear('date', $month->year)
+                    ->whereMonth('date', $month->month)
+                    ->sum('amount');
+                $refuelingsSum = Refueling::where('car_id', $selectedCarId)
+                    ->whereYear('date', $month->year)
+                    ->whereMonth('date', $month->month)
+                    ->sum('total_amount');
+                $total = $expensesSum + $refuelingsSum;
+                $monthlyTotals[] = round($this->convertCurrency($total, $car), 2);
             }
-            
-            $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
-            $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
-            
-            $expensesSum = $expensesQuery
-                ->whereYear('date', $year)
-                ->whereMonth('date', $monthNum)
-                ->sum('amount');
-            
-            $refuelingsSum = $refuelingsQuery
-                ->whereYear('date', $year)
-                ->whereMonth('date', $monthNum)
-                ->sum('total_amount');
-            
-            $monthlyTotals[$index] = round($expensesSum + $refuelingsSum, 2);
         }
         
         return ['months' => $months, 'totals' => $monthlyTotals];
@@ -314,6 +319,7 @@ class DashboardController extends Controller
             $refuelingsQuery = Refueling::whereIn('car_id', $carIds);
         } else {
             $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
+            $car = Car::find($selectedCarId);
         }
         
         $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
@@ -324,10 +330,16 @@ class DashboardController extends Controller
         $prevCarId = null;
         
         foreach ($refuelings as $refueling) {
-            if ($prevOdometer !== null && $prevCarId === $refueling->car_id) {
+            if ($prevOdometer !== null && ($prevCarId === $refueling->car_id || $selectedCarId !== 'all')) {
                 $distance = $refueling->odometer - $prevOdometer;
                 if ($distance > 0) {
                     $consumption = round(($refueling->liters / $distance) * 100, 1);
+                    
+                    // Конвертируем расход топлива если выбран конкретный автомобиль
+                    if (isset($car)) {
+                        $consumption = $this->convertFuelConsumption($consumption, $car);
+                    }
+                    
                     $history[] = [
                         'date' => $refueling->date->format('d.m.Y'),
                         'consumption' => $consumption,
@@ -353,6 +365,7 @@ class DashboardController extends Controller
         } else {
             $expensesQuery = Expense::where('car_id', $selectedCarId);
             $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
+            $car = Car::find($selectedCarId);
         }
         
         $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
@@ -364,15 +377,17 @@ class DashboardController extends Controller
         $allTransactions = collect();
         
         foreach ($expenses as $expense) {
+            $amount = isset($car) ? $this->convertCurrency($expense->amount, $car) : $expense->amount;
             $allTransactions->push([
-                'amount' => $expense->amount,
+                'amount' => $amount,
                 'date' => $expense->date,
             ]);
         }
         
         foreach ($refuelings as $refueling) {
+            $amount = isset($car) ? $this->convertCurrency($refueling->total_amount, $car) : $refueling->total_amount;
             $allTransactions->push([
-                'amount' => $refueling->total_amount,
+                'amount' => $amount,
                 'date' => $refueling->date,
             ]);
         }
@@ -395,37 +410,94 @@ class DashboardController extends Controller
     }
     
     private function getTopExpenses($selectedCarId, $period, $dateFrom, $dateTo)
-    {
-        if ($selectedCarId === 'all') {
-            $carIds = Auth::user()->cars->pluck('id')->toArray();
-            if (empty($carIds)) {
-                return [];
-            }
-            $expensesQuery = Expense::whereIn('car_id', $carIds);
-        } else {
-            $expensesQuery = Expense::where('car_id', $selectedCarId);
+{
+    $allExpenses = collect();
+    
+    if ($selectedCarId === 'all') {
+        $carIds = Auth::user()->cars->pluck('id')->toArray();
+        if (empty($carIds)) {
+            return [];
         }
         
+        // Расходы из таблицы expenses
+        $expensesQuery = Expense::whereIn('car_id', $carIds);
         $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
-        $expenses = $expensesQuery->with('category', 'car')
-            ->orderBy('amount', 'desc')
-            ->limit(3)
-            ->get();
+        $expenses = $expensesQuery->with('category', 'car')->get();
         
-        return $expenses->map(function ($expense) use ($selectedCarId) {
-            $result = [
+        foreach ($expenses as $expense) {
+            $allExpenses->push([
                 'title' => $expense->description ?: $expense->category->name,
                 'amount' => $expense->amount,
                 'date' => $expense->date->format('d.m.Y'),
                 'odometer' => $expense->odometer,
                 'category' => $expense->category->name,
-            ];
-            if ($selectedCarId === 'all') {
-                $result['car'] = $expense->car->brand . ' ' . $expense->car->model;
-            }
-            return $result;
-        })->toArray();
+                'car' => $expense->car->brand . ' ' . $expense->car->model,
+                'type' => 'expense',
+            ]);
+        }
+        
+        // Заправки из таблицы refuelings
+        $refuelingsQuery = Refueling::whereIn('car_id', $carIds);
+        $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
+        $refuelings = $refuelingsQuery->with('car')->get();
+        
+        foreach ($refuelings as $refueling) {
+            $allExpenses->push([
+                'title' => 'Заправка',
+                'amount' => $refueling->total_amount,
+                'date' => $refueling->date->format('d.m.Y'),
+                'odometer' => $refueling->odometer,
+                'category' => 'Топливо',
+                'car' => $refueling->car->brand . ' ' . $refueling->car->model,
+                'type' => 'refueling',
+            ]);
+        }
+        
+    } else {
+        $car = Car::find($selectedCarId);
+        
+        // Расходы из таблицы expenses
+        $expensesQuery = Expense::where('car_id', $selectedCarId);
+        $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
+        $expenses = $expensesQuery->with('category')->get();
+        
+        foreach ($expenses as $expense) {
+            $allExpenses->push([
+                'title' => $expense->description ?: $expense->category->name,
+                'amount' => $this->convertCurrency($expense->amount, $car),
+                'currency' => $this->getCurrencySymbol($car),
+                'date' => $expense->date->format('d.m.Y'),
+                'odometer' => $this->convertDistance($expense->odometer, $car),
+                'distance_unit' => $this->getDistanceUnit($car),
+                'category' => $expense->category->name,
+                'type' => 'expense',
+            ]);
+        }
+        
+        // Заправки из таблицы refuelings
+        $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
+        $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
+        $refuelings = $refuelingsQuery->get();
+        
+        foreach ($refuelings as $refueling) {
+            $allExpenses->push([
+                'title' => 'Заправка',
+                'amount' => $this->convertCurrency($refueling->total_amount, $car),
+                'currency' => $this->getCurrencySymbol($car),
+                'date' => $refueling->date->format('d.m.Y'),
+                'odometer' => $this->convertDistance($refueling->odometer, $car),
+                'distance_unit' => $this->getDistanceUnit($car),
+                'category' => 'Топливо',
+                'type' => 'refueling',
+            ]);
+        }
     }
+    
+    // Сортируем по сумме и берём топ-3
+    $topExpenses = $allExpenses->sortByDesc('amount')->take(3)->values()->toArray();
+    
+    return $topExpenses;
+}
     
     private function calculateAvgFuelConsumption($carId, $period, $dateFrom, $dateTo)
     {

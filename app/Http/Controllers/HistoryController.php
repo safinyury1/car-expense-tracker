@@ -6,11 +6,15 @@ use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
 use App\Models\Income;
+use App\Models\Reminder;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class HistoryController extends Controller
 {
+    use ConvertsUnits;
+
     public function index(Request $request)
     {
         $cars = Auth::user()->cars;
@@ -21,125 +25,221 @@ class HistoryController extends Controller
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
         
-        $operations = collect();
+        $allOperations = collect();
         
         if ($selectedCarId === 'all') {
             $carIds = Auth::user()->cars->pluck('id')->toArray();
             
-            $expensesQuery = Expense::whereIn('car_id', $carIds)->with('category', 'car');
-            $refuelingsQuery = Refueling::whereIn('car_id', $carIds)->with('car');
-            $incomesQuery = Income::whereIn('car_id', $carIds)->with('car');
+            // Расходы (исключаем ручное обновление пробега)
+            $expenses = Expense::whereIn('car_id', $carIds)
+                ->where(function($q) {
+                    $q->where('description', '!=', 'Ручное обновление пробега')
+                      ->orWhereNull('description');
+                })
+                ->with('category', 'car')
+                ->get();
+            foreach ($expenses as $item) {
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'expense',
+                    'date' => $item->date,
+                    'title' => $item->category->name,
+                    'amount' => $item->amount,
+                    'odometer' => $item->odometer,
+                    'description' => $item->description,
+                    'car_name' => $item->car->brand . ' ' . $item->car->model,
+                    'category' => $item->category->name,
+                    'currency' => '₽',
+                    'distance_unit' => 'км',
+                    'sort_date' => $item->date->timestamp,
+                ]);
+            }
+            
+            // Заправки
+            $refuelings = Refueling::whereIn('car_id', $carIds)->with('car')->get();
+            foreach ($refuelings as $item) {
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'refueling',
+                    'date' => $item->date,
+                    'title' => 'Заправка',
+                    'amount' => $item->total_amount,
+                    'odometer' => $item->odometer,
+                    'description' => null,
+                    'car_name' => $item->car->brand . ' ' . $item->car->model,
+                    'category' => 'Топливо',
+                    'liters' => $item->liters,
+                    'price_per_liter' => $item->price_per_liter,
+                    'gas_station' => $item->gas_station,
+                    'currency' => '₽',
+                    'distance_unit' => 'км',
+                    'volume_unit' => 'л',
+                    'sort_date' => $item->date->timestamp,
+                ]);
+            }
+            
+            // Доходы
+            $incomes = Income::whereIn('car_id', $carIds)->with('car')->get();
+            foreach ($incomes as $item) {
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'income',
+                    'date' => $item->date,
+                    'title' => $item->title,
+                    'amount' => $item->amount,
+                    'odometer' => $item->odometer,
+                    'description' => $item->description,
+                    'car_name' => $item->car->brand . ' ' . $item->car->model,
+                    'category' => 'Доходы',
+                    'currency' => '₽',
+                    'distance_unit' => 'км',
+                    'sort_date' => $item->date->timestamp,
+                ]);
+            }
+            
+            // Обслуживание
+            $services = Reminder::whereIn('car_id', $carIds)
+                ->where('service_type', 'service')
+                ->where('is_completed', true)
+                ->with('car')
+                ->get();
+            foreach ($services as $item) {
+                $serviceDate = $item->service_date ?? $item->created_at;
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'service',
+                    'date' => $serviceDate,
+                    'title' => $item->title,
+                    'amount' => $item->service_cost ?? 0,
+                    'odometer' => $item->due_odometer,
+                    'description' => $item->service_notes,
+                    'car_name' => $item->car->brand . ' ' . $item->car->model,
+                    'category' => 'Обслуживание',
+                    'currency' => '₽',
+                    'distance_unit' => 'км',
+                    'sort_date' => $serviceDate->timestamp,
+                ]);
+            }
         } else {
-            $expensesQuery = Expense::where('car_id', $selectedCarId)->with('category', 'car');
-            $refuelingsQuery = Refueling::where('car_id', $selectedCarId)->with('car');
-            $incomesQuery = Income::where('car_id', $selectedCarId)->with('car');
+            $car = Car::find($selectedCarId);
+            
+            // Расходы (исключаем ручное обновление пробега)
+            $expenses = Expense::where('car_id', $selectedCarId)
+                ->where(function($q) {
+                    $q->where('description', '!=', 'Ручное обновление пробега')
+                      ->orWhereNull('description');
+                })
+                ->with('category', 'car')
+                ->get();
+            foreach ($expenses as $item) {
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'expense',
+                    'date' => $item->date,
+                    'title' => $item->category->name,
+                    'amount' => $this->convertCurrency($item->amount, $car),
+                    'odometer' => $this->convertDistance($item->odometer, $car),
+                    'description' => $item->description,
+                    'car_name' => null,
+                    'category' => $item->category->name,
+                    'currency' => $this->getCurrencySymbol($car),
+                    'distance_unit' => $this->getDistanceUnit($car),
+                    'sort_date' => $item->date->timestamp,
+                ]);
+            }
+            
+            // Заправки
+            $refuelings = Refueling::where('car_id', $selectedCarId)->with('car')->get();
+            foreach ($refuelings as $item) {
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'refueling',
+                    'date' => $item->date,
+                    'title' => 'Заправка',
+                    'amount' => $this->convertCurrency($item->total_amount, $car),
+                    'odometer' => $this->convertDistance($item->odometer, $car),
+                    'description' => null,
+                    'car_name' => null,
+                    'category' => 'Топливо',
+                    'liters' => $this->convertVolume($item->liters, $car),
+                    'price_per_liter' => $this->convertCurrency($item->price_per_liter, $car),
+                    'gas_station' => $item->gas_station,
+                    'currency' => $this->getCurrencySymbol($car),
+                    'distance_unit' => $this->getDistanceUnit($car),
+                    'volume_unit' => $this->getVolumeUnit($car),
+                    'sort_date' => $item->date->timestamp,
+                ]);
+            }
+            
+            // Доходы
+            $incomes = Income::where('car_id', $selectedCarId)->with('car')->get();
+            foreach ($incomes as $item) {
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'income',
+                    'date' => $item->date,
+                    'title' => $item->title,
+                    'amount' => $this->convertCurrency($item->amount, $car),
+                    'odometer' => $this->convertDistance($item->odometer ?? 0, $car),
+                    'description' => $item->description,
+                    'car_name' => null,
+                    'category' => 'Доходы',
+                    'currency' => $this->getCurrencySymbol($car),
+                    'distance_unit' => $this->getDistanceUnit($car),
+                    'sort_date' => $item->date->timestamp,
+                ]);
+            }
+            
+            // Обслуживание
+            $services = Reminder::where('car_id', $selectedCarId)
+                ->where('service_type', 'service')
+                ->where('is_completed', true)
+                ->get();
+            foreach ($services as $item) {
+                $serviceDate = $item->service_date ?? $item->created_at;
+                $allOperations->push([
+                    'id' => $item->id,
+                    'type' => 'service',
+                    'date' => $serviceDate,
+                    'title' => $item->title,
+                    'amount' => $this->convertCurrency($item->service_cost ?? 0, $car),
+                    'odometer' => $this->convertDistance($item->due_odometer, $car),
+                    'description' => $item->service_notes,
+                    'car_name' => null,
+                    'category' => 'Обслуживание',
+                    'currency' => $this->getCurrencySymbol($car),
+                    'distance_unit' => $this->getDistanceUnit($car),
+                    'sort_date' => $serviceDate->timestamp,
+                ]);
+            }
         }
         
-        // Применяем фильтр по дате
+        // Фильтр по дате
         if ($period === 'today') {
-            $expensesQuery->whereDate('date', today());
-            $refuelingsQuery->whereDate('date', today());
-            $incomesQuery->whereDate('date', today());
+            $allOperations = $allOperations->filter(fn($item) => \Carbon\Carbon::parse($item['date'])->isToday());
         } elseif ($period === 'week') {
-            $expensesQuery->whereDate('date', '>=', now()->subWeek());
-            $refuelingsQuery->whereDate('date', '>=', now()->subWeek());
-            $incomesQuery->whereDate('date', '>=', now()->subWeek());
+            $allOperations = $allOperations->filter(fn($item) => \Carbon\Carbon::parse($item['date']) >= now()->subWeek());
         } elseif ($period === 'month') {
-            $expensesQuery->whereDate('date', '>=', now()->subMonth());
-            $refuelingsQuery->whereDate('date', '>=', now()->subMonth());
-            $incomesQuery->whereDate('date', '>=', now()->subMonth());
+            $allOperations = $allOperations->filter(fn($item) => \Carbon\Carbon::parse($item['date']) >= now()->subMonth());
         } elseif ($period === 'custom' && $dateFrom && $dateTo) {
-            $expensesQuery->whereDate('date', '>=', $dateFrom)->whereDate('date', '<=', $dateTo);
-            $refuelingsQuery->whereDate('date', '>=', $dateFrom)->whereDate('date', '<=', $dateTo);
-            $incomesQuery->whereDate('date', '>=', $dateFrom)->whereDate('date', '<=', $dateTo);
+            $allOperations = $allOperations->filter(fn($item) => \Carbon\Carbon::parse($item['date']) >= $dateFrom && \Carbon\Carbon::parse($item['date']) <= $dateTo);
         }
-        
-        $expenses = $expensesQuery->get()->map(function ($item) use ($selectedCarId) {
-            return [
-                'id' => $item->id,
-                'type' => 'expense',
-                'date' => $item->date,
-                'title' => $item->category->name,
-                'amount' => $item->amount,
-                'odometer' => $item->odometer,
-                'description' => $item->description,
-                'car_name' => $selectedCarId === 'all' ? $item->car->brand . ' ' . $item->car->model : null,
-                'category' => $item->category->name,
-                'liters' => null,
-                'price_per_liter' => null,
-                'gas_station' => null,
-            ];
-        });
-        
-        $refuelings = $refuelingsQuery->get()->map(function ($item) use ($selectedCarId) {
-            return [
-                'id' => $item->id,
-                'type' => 'refueling',
-                'date' => $item->date,
-                'title' => 'Заправка',
-                'amount' => $item->total_amount,
-                'odometer' => $item->odometer,
-                'description' => null,
-                'car_name' => $selectedCarId === 'all' ? $item->car->brand . ' ' . $item->car->model : null,
-                'category' => 'Топливо',
-                'liters' => $item->liters,
-                'price_per_liter' => $item->price_per_liter,
-                'gas_station' => $item->gas_station,
-            ];
-        });
-        
-        $incomes = $incomesQuery->get()->map(function ($item) use ($selectedCarId) {
-            return [
-                'id' => $item->id,
-                'type' => 'income',
-                'date' => $item->date,
-                'title' => $item->title,
-                'amount' => $item->amount,
-                'odometer' => $item->odometer,
-                'description' => $item->description,
-                'car_name' => $selectedCarId === 'all' ? $item->car->brand . ' ' . $item->car->model : null,
-                'category' => $item->category,
-                'liters' => null,
-                'price_per_liter' => null,
-                'gas_station' => null,
-            ];
-        });
-        
-        $allOperations = $expenses->concat($refuelings)->concat($incomes);
         
         // Фильтр по категории
         if ($categoryFilter !== 'all') {
-            if ($categoryFilter === 'Топливо') {
-                $allOperations = $allOperations->filter(function ($item) {
-                    return $item['type'] === 'refueling';
-                });
-            } elseif ($categoryFilter === 'Доходы') {
-                $allOperations = $allOperations->filter(function ($item) {
-                    return $item['type'] === 'income';
-                });
-            } else {
-                $allOperations = $allOperations->filter(function ($item) use ($categoryFilter) {
-                    return $item['type'] === 'expense' && $item['category'] === $categoryFilter;
-                });
-            }
+            $allOperations = $allOperations->filter(fn($item) => $item['category'] === $categoryFilter);
         }
         
-        $operations = $allOperations->sortByDesc('date')->values();
+        // Сортировка
+        $operations = $allOperations->sortByDesc('sort_date')->values();
         
-        // Уникальные категории для фильтра
+        // Категории для фильтра
         $categories = collect();
-        foreach ($expenses as $expense) {
-            if (!$categories->contains($expense['category'])) {
-                $categories->push($expense['category']);
+        foreach ($allOperations as $op) {
+            if (!$categories->contains($op['category'])) {
+                $categories->push($op['category']);
             }
         }
-        if ($refuelings->count() > 0 && !$categories->contains('Топливо')) {
-            $categories->push('Топливо');
-        }
-        if ($incomes->count() > 0 && !$categories->contains('Доходы')) {
-            $categories->push('Доходы');
-        }
-        
         $sortedCategories = $categories->sort()->values();
         
         return view('history.index', compact('cars', 'selectedCarId', 'operations', 'sortedCategories', 'categoryFilter', 'period', 'dateFrom', 'dateTo'));
@@ -165,6 +265,12 @@ class HistoryController extends Controller
                 abort(403);
             }
             $income->delete();
+        } elseif ($type === 'service') {
+            $service = Reminder::findOrFail($id);
+            if ($service->car->user_id !== Auth::id()) {
+                abort(403);
+            }
+            $service->delete();
         }
         
         return redirect()->route('history.index')

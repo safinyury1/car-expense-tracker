@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Income;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IncomeController extends Controller
 {
+    use ConvertsUnits;
+
     public function create(Request $request)
     {
         $cars = Auth::user()->cars;
@@ -39,6 +42,17 @@ class IncomeController extends Controller
         
         return redirect()->route('overview.index', ['car_id' => $validated['car_id']])
             ->with('success', 'Доход добавлен!');
+    }
+    
+    public function show(Income $income)
+    {
+        if ($income->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $cars = Auth::user()->cars;
+        
+        return view('incomes.show', compact('income', 'cars'));
     }
     
     public function destroy(Income $income)

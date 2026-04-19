@@ -24,21 +24,26 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        // Проверяем, существует ли уже категория с таким названием у пользователя
+        $existingCategory = ExpenseCategory::where('name', $request->name)
+            ->where(function($query) {
+                $query->where('user_id', Auth::id())
+                      ->orWhere('is_default', true);
+            })
+            ->first();
+        
+        if ($existingCategory) {
+            return redirect()->back()
+                ->with('error', 'Категория с таким названием уже существует!')
+                ->withInput();
+        }
+        
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('expense_categories', 'name')->where(function ($query) {
-                    return $query->where('user_id', Auth::id());
-                }),
-            ],
-            'icon' => 'nullable|string|max:10',
+            'name' => 'required|string|max:100',
         ]);
 
         ExpenseCategory::create([
             'name' => $validated['name'],
-            'icon' => $validated['icon'] ?? '📌',
             'user_id' => Auth::id(),
             'is_default' => false,
         ]);
@@ -61,22 +66,28 @@ class CategoryController extends Controller
         if ($category->user_id !== Auth::id()) {
             abort(403);
         }
+        
+        // Проверяем, существует ли уже категория с таким названием (исключая текущую)
+        $existingCategory = ExpenseCategory::where('name', $request->name)
+            ->where('id', '!=', $category->id)
+            ->where(function($query) {
+                $query->where('user_id', Auth::id())
+                      ->orWhere('is_default', true);
+            })
+            ->first();
+        
+        if ($existingCategory) {
+            return redirect()->back()
+                ->with('error', 'Категория с таким названием уже существует!')
+                ->withInput();
+        }
 
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('expense_categories', 'name')->where(function ($query) {
-                    return $query->where('user_id', Auth::id());
-                })->ignore($category->id),
-            ],
-            'icon' => 'nullable|string|max:10',
+            'name' => 'required|string|max:100',
         ]);
 
         $category->update([
             'name' => $validated['name'],
-            'icon' => $validated['icon'] ?? $category->icon,
         ]);
 
         return redirect()->route('categories.index')

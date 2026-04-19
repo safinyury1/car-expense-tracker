@@ -3,19 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Expense;
 use App\Models\Refueling;
-use App\Traits\ValidatesOdometer;
+use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class RefuelingController extends Controller
 {
-    use ValidatesOdometer;
+    use ConvertsUnits;
 
-    /**
-     * Список заправок с поиском и фильтрацией
-     */
     public function index(Request $request)
     {
         $carId = $request->get('car_id');
@@ -25,7 +23,6 @@ class RefuelingController extends Controller
         $sortBy = $request->get('sort_by', 'date');
         $sortOrder = $request->get('sort_order', 'desc');
         
-        // Разрешённые поля для сортировки
         $allowedSortFields = ['date', 'liters', 'total_amount', 'odometer', 'created_at'];
         if (!in_array($sortBy, $allowedSortFields)) {
             $sortBy = 'date';
@@ -36,12 +33,11 @@ class RefuelingController extends Controller
                 $q->where('user_id', Auth::id());
             });
         
-        // Фильтр по автомобилю
         if ($carId) {
             $query->where('car_id', $carId);
+            $car = Car::find($carId);
         }
         
-        // Фильтр по диапазону дат
         if ($dateFrom) {
             $query->whereDate('date', '>=', $dateFrom);
         }
@@ -49,7 +45,6 @@ class RefuelingController extends Controller
             $query->whereDate('date', '<=', $dateTo);
         }
         
-        // Поиск по АЗС, автомобилю
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('gas_station', 'like', "%{$search}%")
@@ -60,38 +55,55 @@ class RefuelingController extends Controller
             });
         }
         
-        // Сортировка
         $query->orderBy($sortBy, $sortOrder);
         
         $refuelings = $query->paginate(20)->appends($request->all());
+        
+        foreach ($refuelings as $refueling) {
+            if (isset($car)) {
+                $refueling->converted_amount = $this->convertCurrency($refueling->total_amount, $car);
+                $refueling->converted_odometer = $this->convertDistance($refueling->odometer, $car);
+                $refueling->converted_liters = $this->convertVolume($refueling->liters, $car);
+                $refueling->converted_price = $this->convertCurrency($refueling->price_per_liter, $car);
+                $refueling->currency = $this->getCurrencySymbol($car);
+                $refueling->distance_unit = $this->getDistanceUnit($car);
+                $refueling->volume_unit = $this->getVolumeUnit($car);
+            } else {
+                $refueling->converted_amount = $refueling->total_amount;
+                $refueling->converted_odometer = $refueling->odometer;
+                $refueling->converted_liters = $refueling->liters;
+                $refueling->converted_price = $refueling->price_per_liter;
+                $refueling->currency = '₽';
+                $refueling->distance_unit = 'км';
+                $refueling->volume_unit = 'л';
+            }
+        }
+        
         $cars = Auth::user()->cars;
         
         return view('refuelings.index', compact('refuelings', 'cars', 'carId', 'search', 'dateFrom', 'dateTo', 'sortBy', 'sortOrder'));
     }
 
-    /**
-     * Форма создания заправки
-     */
     public function create(Request $request)
     {
         $cars = Auth::user()->cars;
         $selectedCar = $request->get('car_id');
         
-        // Получаем максимальный пробег для выбранного авто
         $maxOdometer = 0;
         if ($selectedCar) {
-            $maxOdometer = max(
-                \App\Models\Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
-            );
+            $car = Car::find($selectedCar);
+            if ($car) {
+                $maxOdometerKm = max(
+                    Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
+                    Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
+                );
+                $maxOdometer = $this->convertDistance($maxOdometerKm, $car);
+            }
         }
         
         return view('refuelings.create', compact('cars', 'selectedCar', 'maxOdometer'));
     }
 
-    /**
-     * Сохранение заправки
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -103,17 +115,12 @@ class RefuelingController extends Controller
             'gas_station' => 'nullable|string|max:255',
         ]);
         
-        // Автоматический расчёт общей суммы
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
         
-        // Проверяем, что автомобиль принадлежит пользователю
         $car = Car::findOrFail($validated['car_id']);
         if ($car->user_id !== Auth::id()) {
             abort(403);
         }
-        
-        // Валидация пробега
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'refueling');
         
         Refueling::create($validated);
         
@@ -121,9 +128,17 @@ class RefuelingController extends Controller
             ->with('success', 'Заправка успешно добавлена!');
     }
 
-    /**
-     * Форма редактирования заправки
-     */
+    public function show(Refueling $refueling)
+    {
+        if ($refueling->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $cars = Auth::user()->cars;
+        
+        return view('refuelings.show', compact('refueling', 'cars'));
+    }
+
     public function edit(Refueling $refueling)
     {
         if ($refueling->car->user_id !== Auth::id()) {
@@ -132,18 +147,15 @@ class RefuelingController extends Controller
         
         $cars = Auth::user()->cars;
         
-        // Получаем максимальный пробег для этого авто (исключая текущую запись)
-        $maxOdometer = max(
-            \App\Models\Expense::where('car_id', $refueling->car_id)->max('odometer') ?? 0,
+        $maxOdometerKm = max(
+            Expense::where('car_id', $refueling->car_id)->max('odometer') ?? 0,
             Refueling::where('car_id', $refueling->car_id)->where('id', '!=', $refueling->id)->max('odometer') ?? 0
         );
+        $maxOdometer = $this->convertDistance($maxOdometerKm, $refueling->car);
         
         return view('refuelings.edit', compact('refueling', 'cars', 'maxOdometer'));
     }
 
-    /**
-     * Обновление заправки
-     */
     public function update(Request $request, Refueling $refueling)
     {
         if ($refueling->car->user_id !== Auth::id()) {
@@ -161,18 +173,12 @@ class RefuelingController extends Controller
         
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
         
-        // Валидация пробега (исключаем текущую запись)
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], $refueling->id, 'refueling');
-        
         $refueling->update($validated);
         
         return redirect()->route('refuelings.index', ['car_id' => $refueling->car_id])
             ->with('success', 'Заправка успешно обновлена!');
     }
 
-    /**
-     * Удаление заправки
-     */
     public function destroy(Refueling $refueling)
     {
         if ($refueling->car->user_id !== Auth::id()) {
@@ -186,9 +192,6 @@ class RefuelingController extends Controller
             ->with('success', 'Заправка успешно удалена!');
     }
 
-    /**
-     * Экспорт заправок в CSV
-     */
     public function exportCsv(Request $request)
     {
         $carId = $request->get('car_id');
@@ -227,13 +230,9 @@ class RefuelingController extends Controller
         $filename = 'refuelings_' . date('Y-m-d_H-i-s') . '.csv';
         $handle = fopen('php://temp', 'w+');
         
-        // Добавляем BOM для правильного отображения кириллицы
         fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-        
-        // Заголовки
         fputcsv($handle, ['ID', 'Дата', 'Автомобиль', 'Литры', 'Цена/л (₽)', 'Сумма (₽)', 'Пробег (км)', 'АЗС'], ';');
         
-        // Данные
         foreach ($refuelings as $refueling) {
             fputcsv($handle, [
                 $refueling->id,
