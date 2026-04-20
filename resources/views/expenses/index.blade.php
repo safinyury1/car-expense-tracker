@@ -67,10 +67,10 @@
                             <div class="flex justify-between items-center">
                                 <div class="flex gap-2">
                                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                        🔍 Применить фильтры
+                                        Применить фильтры
                                     </button>
                                     <a href="{{ route('expenses.index', ['car_id' => $carId ?? '']) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                                        🗑️ Сбросить
+                                        Сбросить
                                     </a>
                                 </div>
                                 <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -81,11 +81,8 @@
                     </div>
 
                     <div class="mb-4 flex justify-end gap-2">
-                        <a href="{{ route('expenses.export-csv', request()->all()) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                            📥 Экспорт CSV
-                        </a>
                         <a href="{{ route('expenses.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить расход
+                            Добавить расход
                         </a>
                     </div>
 
@@ -127,13 +124,19 @@
                                                 {{ $expense->description ?: '—' }}
                                             </td>
                                             <td class="px-4 py-2">
-                                                <a href="{{ route('expenses.edit', $expense) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">✏️</a>
-                                                <form action="{{ route('expenses.destroy', $expense) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">🗑️</button>
-                                                </form>
-                                            </td>
+    <div class="flex gap-2">
+        <a href="{{ route('expenses.edit', $expense) }}" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition">
+            Ред.
+        </a>
+        <form action="{{ route('expenses.destroy', $expense) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
+                Удалить
+            </button>
+        </form>
+    </div>
+</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

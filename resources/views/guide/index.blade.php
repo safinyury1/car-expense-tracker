@@ -24,7 +24,7 @@
                             <!-- Раздел 2 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">2. Добавление автомобиля</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-500 text-white px-2 py-0.5 rounded text-sm">+ Добавить автомобиль</span> или на круглую синюю кнопку с плюсом в центре шапки. Заполните марку, модель, год и пробег. При необходимости добавьте фото автомобиля.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-500 text-white px-2 py-0.5 rounded text-sm">Добавить автомобиль</span> или на круглую синюю кнопку с плюсом в центре шапки. Заполните марку, модель, год и пробег. При необходимости добавьте фото автомобиля.</p>
                                 <p class="text-gray-500 dark:text-gray-500 text-sm mt-1">Все добавленные автомобили хранятся в разделе <strong>«Мои автомобили» (Гараж)</strong>.</p>
                             </div>
                             

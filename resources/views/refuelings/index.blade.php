@@ -73,10 +73,9 @@
 
                     <div class="mb-4 flex justify-end gap-2">
                         <a href="{{ route('refuelings.export-csv', request()->all()) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                            📥 Экспорт CSV
                         </a>
                         <a href="{{ route('refuelings.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить заправку
+                            Добавить заправку
                         </a>
                     </div>
 

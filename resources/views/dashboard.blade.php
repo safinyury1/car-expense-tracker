@@ -25,7 +25,7 @@
                             <label class="font-medium text-gray-700 dark:text-gray-300">Автомобиль:</label>
                             <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" onchange="this.form.submit()">
                                 <option value="all" {{ $selectedCarId === 'all' ? 'selected' : '' }}>
-                                    🚗 Все автомобили
+                                    Все автомобили
                                 </option>
                                 @foreach($cars as $car)
                                     <option value="{{ $car->id }}" {{ $selectedCarId == $car->id ? 'selected' : '' }}>
@@ -36,7 +36,7 @@
                         </div>
                         
                         <div class="flex items-center gap-2">
-                            <label class="font-medium text-gray-700 dark:text-gray-300">📅 Период:</label>
+                            <label class="font-medium text-gray-700 dark:text-gray-300">Период:</label>
                             <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
                                 <option value="all" {{ $period == 'all' ? 'selected' : '' }}>Всё время</option>
                                 <option value="today" {{ $period == 'today' ? 'selected' : '' }}>Сегодня</option>
@@ -131,7 +131,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-                        <h3 class="font-semibold text-gray-700 dark:text-gray-300">📊 Расходы в день</h3>
+                        <h3 class="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+    <img src="{{ asset('images/icons/schedule.png') }}" alt="Расходы" class="w-5 h-5">
+    Расходы в день
+</h3>
                     </div>
                     <div class="p-4">
                         <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ number_format($insights['dailyAverage'], 2) }} {{ $data['currency'] ?? '₽' }}</p>
@@ -153,7 +156,7 @@
             <!-- ТОП-3 расходов -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">🏆 Топ-3 самых больших расходов</h3>
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">Топ-3 самых больших расходов</h3>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($topExpenses as $index => $expense)

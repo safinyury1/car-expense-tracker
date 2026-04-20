@@ -55,6 +55,39 @@ class IncomeController extends Controller
         return view('incomes.show', compact('income', 'cars'));
     }
     
+    public function edit(Income $income)
+    {
+        if ($income->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $cars = Auth::user()->cars;
+        
+        return view('incomes.edit', compact('income', 'cars'));
+    }
+    
+    public function update(Request $request, Income $income)
+    {
+        if ($income->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $validated = $request->validate([
+            'car_id' => 'required|exists:cars,id',
+            'date' => 'required|date',
+            'title' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'odometer' => 'nullable|integer|min:0',
+            'description' => 'nullable|string',
+            'category' => 'required|string',
+        ]);
+        
+        $income->update($validated);
+        
+        return redirect()->route('overview.index', ['car_id' => $income->car_id])
+            ->with('success', 'Доход обновлён!');
+    }
+    
     public function destroy(Income $income)
     {
         if ($income->car->user_id !== Auth::id()) {

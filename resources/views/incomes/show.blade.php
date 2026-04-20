@@ -59,19 +59,23 @@
                         @endif
                     </div>
                     
-                    <div class="flex justify-between mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <a href="{{ route('overview.index', ['car_id' => $income->car_id]) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            Назад
-                        </a>
-                        <form action="{{ route('incomes.destroy', $income) }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить этот доход?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                🗑️ Удалить
-                            </button>
-                        </form>
-                    </div>
-                </div>
+               <div class="flex justify-between mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+    <a href="{{ route('overview.index', ['car_id' => $income->car_id]) }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition">
+        Назад
+    </a>
+    <div class="flex gap-2">
+        <a href="{{ route('incomes.edit', $income) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition">
+            Редактировать
+        </a>
+        <form action="{{ route('incomes.destroy', $income) }}" method="POST" onsubmit="return confirm('Вы уверены?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition cursor-pointer">
+                Удалить
+            </button>
+        </form>
+    </div>
+</div>
             </div>
         </div>
     </div>

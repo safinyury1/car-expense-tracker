@@ -12,7 +12,7 @@
                     
                     <div class="mb-4 flex justify-end">
                         <a href="{{ route('cars.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            + Добавить автомобиль
+                            Добавить автомобиль
                         </a>
                     </div>
 
@@ -39,35 +39,39 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($cars as $car)
-                                        <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <td class="px-4 py-2">
-                                                @if($car->photo)
-                                                    <img src="{{ Storage::url($car->photo) }}" class="w-10 h-10 rounded-full object-cover">
-                                                @else
-                                                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                                                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m0-3H4.5m16.5-3h-9m-6 0H3m9-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m-6 0H3" />
-                                                        </svg>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td class="px-4 py-2">{{ $car->brand }}</td>
-                                            <td class="px-4 py-2">{{ $car->model }}</td>
-                                            <td class="px-4 py-2">{{ $car->year ?? '—' }}</td>
-                                            <td class="px-4 py-2">{{ number_format($car->converted_initial_odometer) }} {{ $car->distance_unit }}</td>
-                                            <td class="px-4 py-2 font-semibold">{{ number_format($car->converted_current_odometer) }} {{ $car->distance_unit }}</td>
-                                            <td class="px-4 py-2">
-                                                <a href="{{ route('cars.edit', $car) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">✏️ Редактировать</a>
-                                                <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить этот автомобиль?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">🗑️ Удалить</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
+    @foreach($cars as $car)
+        <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td class="px-4 py-2">
+                @if($car->photo)
+                    <img src="{{ Storage::url($car->photo) }}" class="w-10 h-10 rounded-full object-cover">
+                @else
+                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m0-3H4.5m16.5-3h-9m-6 0H3m9-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m-6 0H3" />
+                        </svg>
+                    </div>
+                @endif
+            </td>
+            <td class="px-4 py-2">{{ $car->brand }}</td>
+            <td class="px-4 py-2">{{ $car->model }}</td>
+            <td class="px-4 py-2">{{ $car->year ?? '—' }}</td>
+            <td class="px-4 py-2">{{ number_format($car->converted_initial_odometer) }} {{ $car->distance_unit }}</td>
+            <td class="px-4 py-2 font-semibold">{{ number_format($car->converted_current_odometer) }} {{ $car->distance_unit }}</td>
+            <td class="px-4 py-2">
+                <a href="{{ route('cars.edit', $car) }}" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition mr-2">
+                    Редактировать
+                </a>
+                <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить этот автомобиль?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
+                        Удалить
+                    </button>
+                </form>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
                             </table>
                         </div>
                     @endif

@@ -40,6 +40,12 @@
                             {{ __('Мои автомобили') }}
                         </x-nav-link>
                     @endif
+                    
+                    @if(Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                            {{ __('Админка') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -47,11 +53,9 @@
             <div class="hidden sm:flex sm:items-center mr-20">
                 <div class="relative">
                     <button @click="showMenu = !showMenu" 
-                            class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
+        class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300">
+    <img src="{{ asset('images/icons/plus.png') }}" alt="Добавить" class="w-5 h-5">
+</button>
                     
                     <div x-show="showMenu" 
                          @click.away="showMenu = false"
@@ -59,43 +63,33 @@
                          class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
                          style="display: none;">
                         <div class="py-1">
-                            <a href="{{ route('refuelings.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                Добавить заправку
-                            </a>
-                            <a href="{{ route('expenses.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Добавить расход
-                            </a>
-                            <a href="{{ route('cars.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m0-3H4.5m16.5-3h-9m-6 0H3m9-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m-6 0H3" />
-                                </svg>
-                                Добавить автомобиль
-                            </a>
-                            <a href="{{ route('service.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Добавить обслуживание
-                            </a>
-                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                            <a href="{{ route('incomes.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Добавить доход
-                            </a>
-                        </div>
+    <a href="{{ route('refuelings.create') }}" 
+       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+        <img src="{{ asset('images/icons/zapravka.png') }}" alt="Заправка" class="w-4 h-4">
+        Добавить заправку
+    </a>
+    <a href="{{ route('expenses.create') }}" 
+       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+        <img src="{{ asset('images/icons/money.png') }}" alt="Расход" class="w-4 h-4">
+        Добавить расход
+    </a>
+    <a href="{{ route('cars.index') }}" 
+       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+        <img src="{{ asset('images/icons/car.png') }}" alt="Автомобиль" class="w-4 h-4">
+        Добавить автомобиль
+    </a>
+    <a href="{{ route('service.create') }}" 
+       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+        <img src="{{ asset('images/icons/wrench.png') }}" alt="Обслуживание" class="w-4 h-4">
+        Добавить обслуживание
+    </a>
+    <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+    <a href="{{ route('incomes.create') }}" 
+       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+        <img src="{{ asset('images/icons/income1.png') }}" alt="Доход" class="w-4 h-4">
+        Добавить доход
+    </a>
+</div>
                     </div>
                 </div>
             </div>
@@ -179,6 +173,12 @@
                 
                 <x-responsive-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
                     {{ __('Мои автомобили') }}
+                </x-responsive-nav-link>
+            @endif
+            
+            @if(Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                    {{ __('Админка') }}
                 </x-responsive-nav-link>
             @endif
         </div>

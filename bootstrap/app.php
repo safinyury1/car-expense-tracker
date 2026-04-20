@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\HasCar;
 use App\Http\Middleware\LanguageMiddleware;
+use App\Http\Middleware\AdminMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,9 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'has.car' => HasCar::class,
+            'admin' => AdminMiddleware::class,
         ]);
         
-        // Добавляем LanguageMiddleware во все веб-запросы
         $middleware->web(append: [
             LanguageMiddleware::class,
         ]);

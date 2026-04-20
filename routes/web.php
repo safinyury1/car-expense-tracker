@@ -15,6 +15,7 @@ use App\Http\Controllers\CarSettingsController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\GuideController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -89,10 +90,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/compare', [CompareController::class, 'index'])->name('compare.index')->middleware('has.car');
     
     // Доходы
-    Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create')->middleware('has.car');
-    Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store')->middleware('has.car');
-    Route::get('/incomes/{income}', [IncomeController::class, 'show'])->name('incomes.show')->middleware('has.car');
-    Route::delete('/incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy')->middleware('has.car');
+Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create')->middleware('has.car');
+Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store')->middleware('has.car');
+Route::get('/incomes/{income}', [IncomeController::class, 'show'])->name('incomes.show')->middleware('has.car');
+Route::get('/incomes/{income}/edit', [IncomeController::class, 'edit'])->name('incomes.edit')->middleware('has.car');
+Route::put('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update')->middleware('has.car');
+Route::delete('/incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy')->middleware('has.car');
     
     // Обслуживание
     Route::get('/service/create', [ServiceController::class, 'create'])->name('service.create')->middleware('has.car');
@@ -101,6 +104,19 @@ Route::middleware('auth')->group(function () {
     
     // Руководство
     Route::get('/guide', [GuideController::class, 'index'])->name('guide.index')->middleware('auth');
+});
+
+// Админ-панель
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/{id}', [AdminController::class, 'userShow'])->name('user.show');
+    Route::get('/cars', [AdminController::class, 'cars'])->name('cars');
+    Route::get('/cars/{id}', [AdminController::class, 'carShow'])->name('car.show');
+    Route::get('/expenses', [AdminController::class, 'expenses'])->name('expenses');
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
+    Route::get('/users/{id}/make-admin', [AdminController::class, 'makeAdmin'])->name('make.admin');
+    Route::get('/users/{id}/make-user', [AdminController::class, 'makeUser'])->name('make.user');
 });
 
 require __DIR__.'/auth.php';

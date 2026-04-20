@@ -37,7 +37,7 @@
                             </div>
                             
                             <div class="flex items-center gap-2">
-                                <label class="font-medium text-gray-700 dark:text-gray-300">📅 Период:</label>
+                                <label class="font-medium text-gray-700 dark:text-gray-300">Период:</label>
                                 <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
                                     <option value="all" {{ $period == 'all' ? 'selected' : '' }}>Всё время</option>
                                     <option value="today" {{ $period == 'today' ? 'selected' : '' }}>Сегодня</option>
@@ -100,24 +100,16 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $operation['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : ($operation['type'] === 'service' ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-red-100 dark:bg-red-900/50') }}">
-                                            @if($operation['type'] === 'expense')
-                                                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            @elseif($operation['type'] === 'refueling')
-                                                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                </svg>
-                                            @elseif($operation['type'] === 'service')
-                                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            @else
-                                                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                                </svg>
-                                            @endif
-                                        </div>
+    @if($operation['type'] === 'expense')
+        <img src="{{ asset('images/icons/consumption2.png') }}" alt="Расход" class="w-5 h-5">
+    @elseif($operation['type'] === 'refueling')
+        <img src="{{ asset('images/icons/gas_station2.png') }}" alt="Заправка" class="w-5 h-5">
+    @elseif($operation['type'] === 'service')
+        <img src="{{ asset('images/icons/service.png') }}" alt="Обслуживание" class="w-5 h-5">
+    @else
+        <img src="{{ asset('images/icons/income.png') }}" alt="Доход" class="w-5 h-5">
+    @endif
+</div>
                                         
                                         <div>
                                             <div class="flex items-center gap-2">

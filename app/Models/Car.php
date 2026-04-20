@@ -18,7 +18,7 @@ class Car extends Model
         'initial_odometer',
         'photo',
         'distance_unit',
-        'volume_init',
+        'volume_unit',
         'currency',
     ];
 
@@ -27,27 +27,28 @@ class Car extends Model
         'initial_odometer' => 'integer',
     ];
 
-    // Связь: автомобиль принадлежит пользователю
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Связь: автомобиль имеет много расходов
     public function expenses()
     {
         return $this->hasMany(Expense::class);
     }
 
-    // Связь: автомобиль имеет много заправок
     public function refuelings()
     {
         return $this->hasMany(Refueling::class);
     }
 
-    // Связь: автомобиль имеет много напоминаний
     public function reminders()
     {
         return $this->hasMany(Reminder::class);
+    }
+
+    public function incomes()
+    {
+        return $this->hasMany(Income::class);
     }
 }
