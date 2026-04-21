@@ -26,11 +26,11 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Категория</label>
                             <select name="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
-                                <option value="salary">Зарплата</option>
-                                <option value="business">Бизнес</option>
-                                <option value="gift">Подарок</option>
-                                <option value="refund">Возврат</option>
-                                <option value="other">Прочее</option>
+                                <option value="salary">💰 Зарплата</option>
+                                <option value="business">🏢 Бизнес</option>
+                                <option value="gift">🎁 Подарок</option>
+                                <option value="refund">↩️ Возврат</option>
+                                <option value="other">📦 Прочее</option>
                             </select>
                         </div>
                         
@@ -59,6 +59,11 @@
                             <input type="number" name="odometer"
                                    placeholder="Текущий пробег (опционально)"
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
+                            @if(isset($maxOdometer) && $maxOdometer > 0)
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Последний зафиксированный пробег: {{ number_format($maxOdometer) }} км
+                                </p>
+                            @endif
                         </div>
                         
                         <div>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Расходы') }}
+            {{ __('Обслуживание') }}
         </h2>
     </x-slot>
 
@@ -10,9 +10,8 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    <!-- Фильтр по автомобилям -->
                     <div class="mb-4 flex justify-between items-center">
-                        <form method="GET" action="{{ route('expenses.index') }}" class="flex gap-2">
+                        <form method="GET" action="{{ route('service.index') }}" class="flex gap-2">
                             <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
                                 <option value="">Все автомобили</option>
                                 @foreach($cars as $car)
@@ -22,11 +21,11 @@
                                 @endforeach
                             </select>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Применить</button>
-                            <a href="{{ route('expenses.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Сбросить</a>
+                            <a href="{{ route('service.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Сбросить</a>
                         </form>
                         
-                        <a href="{{ route('expenses.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Добавить расход
+                        <a href="{{ route('service.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            + Добавить обслуживание
                         </a>
                     </div>
 
@@ -36,8 +35,8 @@
                         </div>
                     @endif
 
-                    @if($expenses->isEmpty())
-                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">Нет данных о расходах.</p>
+                    @if($services->isEmpty())
+                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">Нет данных об обслуживании.</p>
                     @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
@@ -45,34 +44,30 @@
                                     <tr class="bg-gray-100 dark:bg-gray-700">
                                         <th class="px-4 py-2 text-left">Дата</th>
                                         <th class="px-4 py-2 text-left">Автомобиль</th>
-                                        <th class="px-4 py-2 text-left">Категория</th>
-                                        <th class="px-4 py-2 text-left">Сумма</th>
+                                        <th class="px-4 py-2 text-left">Название</th>
+                                        <th class="px-4 py-2 text-left">Стоимость</th>
                                         <th class="px-4 py-2 text-left">Пробег</th>
-                                        <th class="px-4 py-2 text-left">Описание</th>
                                         <th class="px-4 py-2 text-left">Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($expenses as $expense)
+                                    @foreach($services as $service)
                                         <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <td class="px-4 py-2">{{ $expense->date->format('d.m.Y') }}</td>
-                                            <td class="px-4 py-2">{{ $expense->car->brand }} {{ $expense->car->model }}</td>
+                                            <td class="px-4 py-2">{{ $service->service_date ? \Carbon\Carbon::parse($service->service_date)->format('d.m.Y') : '—' }}</td>
+                                            <td class="px-4 py-2">{{ $service->car->brand }} {{ $service->car->model }}</td>
                                             <td class="px-4 py-2">
-                                                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded-full text-xs">
-                                                    {{ $expense->category->name }}
-                                                </span>
+                                                <a href="{{ route('service.show', $service) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                                    {{ $service->title }}
+                                                </a>
                                             </td>
-                                            <td class="px-4 py-2 text-red-600">{{ number_format($expense->converted_amount, 2) }} {{ $expense->currency }}</td>
-                                            <td class="px-4 py-2">{{ number_format($expense->converted_odometer) }} {{ $expense->distance_unit }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                                                {{ $expense->description ?: '—' }}
-                                            </td>
+                                            <td class="px-4 py-2">{{ number_format($service->converted_cost, 2) }} {{ $service->currency }}</td>
+                                            <td class="px-4 py-2">{{ number_format($service->converted_odometer) }} {{ $service->distance_unit }}</td>
                                             <td class="px-4 py-2">
                                                 <div class="flex gap-2">
-                                                    <a href="{{ route('expenses.show', $expense) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
+                                                    <a href="{{ route('service.show', $service) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
                                                         Просмотр
                                                     </a>
-                                                    <form action="{{ route('expenses.destroy', $expense) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
+                                                    <form action="{{ route('service.destroy', $service) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
@@ -88,7 +83,7 @@
                         </div>
                         
                         <div class="mt-4">
-                            {{ $expenses->appends(['car_id' => $carId ?? ''])->links() }}
+                            {{ $services->appends(['car_id' => $carId ?? ''])->links() }}
                         </div>
                     @endif
                 </div>

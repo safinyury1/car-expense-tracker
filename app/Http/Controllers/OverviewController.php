@@ -48,21 +48,18 @@ class OverviewController extends Controller
         $convertedOdometer = $this->convertDistance($maxOdometerKm, $selectedCar);
         $distanceUnit = $this->getDistanceUnit($selectedCar);
         
-        // Последнее обновление - берём MAX дату из всех записей И из обновления пробега
+        // Последнее обновление
         $lastExpense = Expense::where('car_id', $selectedCarId)->latest('date')->first();
         $lastRefueling = Refueling::where('car_id', $selectedCarId)->latest('date')->first();
         $lastIncome = Income::where('car_id', $selectedCarId)->latest('date')->first();
         $lastService = Reminder::where('car_id', $selectedCarId)->where('service_type', 'service')->latest('service_date')->first();
-        
-        // Также проверяем дату последнего обновления автомобиля (изменение пробега)
-        $lastCarUpdate = $selectedCar->updated_at;
         
         $latestDate = null;
         if ($lastExpense) $latestDate = $lastExpense->date;
         if ($lastRefueling && (!$latestDate || $lastRefueling->date > $latestDate)) $latestDate = $lastRefueling->date;
         if ($lastIncome && (!$latestDate || $lastIncome->date > $latestDate)) $latestDate = $lastIncome->date;
         if ($lastService && $lastService->service_date && (!$latestDate || $lastService->service_date > $latestDate)) $latestDate = $lastService->service_date;
-        if ($lastCarUpdate && (!$latestDate || $lastCarUpdate > $latestDate)) $latestDate = $lastCarUpdate;
+        if ($selectedCar->updated_at && (!$latestDate || $selectedCar->updated_at > $latestDate)) $latestDate = $selectedCar->updated_at;
         
         $lastUpdate = $latestDate;
         
@@ -78,6 +75,7 @@ class OverviewController extends Controller
         // Лента событий
         $allEvents = collect();
         
+        // Расходы
         $expenses = Expense::where('car_id', $selectedCarId)->with('category')->get();
         foreach ($expenses as $item) {
             $allEvents->push([
@@ -94,6 +92,7 @@ class OverviewController extends Controller
             ]);
         }
         
+        // Заправки
         $refuelings = Refueling::where('car_id', $selectedCarId)->get();
         foreach ($refuelings as $item) {
             $allEvents->push([
@@ -112,6 +111,7 @@ class OverviewController extends Controller
             ]);
         }
         
+        // Доходы
         $incomes = Income::where('car_id', $selectedCarId)->get();
         foreach ($incomes as $item) {
             $allEvents->push([
@@ -128,12 +128,17 @@ class OverviewController extends Controller
             ]);
         }
         
+        // Обслуживание
         $services = Reminder::where('car_id', $selectedCarId)
             ->where('service_type', 'service')
             ->where('is_completed', true)
             ->get();
         foreach ($services as $item) {
             $serviceDate = $item->service_date ?? $item->created_at;
+            // Преобразуем в Carbon если это строка
+            if (!$serviceDate instanceof \Carbon\Carbon) {
+                $serviceDate = \Carbon\Carbon::parse($serviceDate);
+            }
             $allEvents->push([
                 'id' => $item->id,
                 'type' => 'service',
@@ -148,6 +153,7 @@ class OverviewController extends Controller
             ]);
         }
         
+        // Сортируем и берём последние 10
         $events = $allEvents->sortByDesc('sort_date')->take(10)->values();
         
         return view('overview.index', compact('cars', 'selectedCar', 'selectedCarId', 'maxOdometerKm', 'convertedOdometer', 'distanceUnit', 'lastUpdate', 'activeReminders', 'events'));

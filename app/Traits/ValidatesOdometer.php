@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Expense;
 use App\Models\Refueling;
+use App\Models\Income;
 use Illuminate\Validation\ValidationException;
 
 trait ValidatesOdometer
@@ -14,7 +15,7 @@ trait ValidatesOdometer
      * @param int $carId
      * @param int $newOdometer
      * @param int|null $excludeId ID записи при редактировании (исключаем её из проверки)
-     * @param string $type 'expense' или 'refueling'
+     * @param string $type 'expense', 'refueling', 'income' или 'service'
      * @return void
      * @throws ValidationException
      */
@@ -22,25 +23,26 @@ trait ValidatesOdometer
     {
         // Получаем максимальный пробег из расходов
         $maxOdometerExpense = Expense::where('car_id', $carId)
-            ->when($excludeId, function ($query) use ($excludeId, $type) {
-                if ($type === 'expense') {
-                    return $query->where('id', '!=', $excludeId);
-                }
-                return $query;
+            ->when($excludeId && $type === 'expense', function ($query) use ($excludeId) {
+                return $query->where('id', '!=', $excludeId);
             })
             ->max('odometer');
         
         // Получаем максимальный пробег из заправок
         $maxOdometerRefueling = Refueling::where('car_id', $carId)
-            ->when($excludeId, function ($query) use ($excludeId, $type) {
-                if ($type === 'refueling') {
-                    return $query->where('id', '!=', $excludeId);
-                }
-                return $query;
+            ->when($excludeId && $type === 'refueling', function ($query) use ($excludeId) {
+                return $query->where('id', '!=', $excludeId);
             })
             ->max('odometer');
         
-        $maxOdometer = max($maxOdometerExpense, $maxOdometerRefueling);
+        // Получаем максимальный пробег из доходов
+        $maxOdometerIncome = Income::where('car_id', $carId)
+            ->when($excludeId && $type === 'income', function ($query) use ($excludeId) {
+                return $query->where('id', '!=', $excludeId);
+            })
+            ->max('odometer');
+        
+        $maxOdometer = max($maxOdometerExpense, $maxOdometerRefueling, $maxOdometerIncome);
         
         // Если есть записи с пробегом, проверяем
         if ($maxOdometer !== null && $newOdometer < $maxOdometer) {

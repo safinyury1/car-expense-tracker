@@ -118,9 +118,9 @@
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                     <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <img src="{{ asset('images/icons/notification.png') }}" alt="Напоминания" class="w-5 h-5">
-                Напоминания
-                </h3>
+                            <img src="{{ asset('images/icons/notification.png') }}" alt="Напоминания" class="w-5 h-5">
+                            Напоминания
+                        </h3>
                         <a href="{{ route('reminders.index', ['car_id' => $selectedCarId]) }}" class="text-sm text-blue-500 hover:underline">Все</a>
                     </div>
                     <div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -152,33 +152,31 @@
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                     <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-    <img src="{{ asset('images/icons/fast_action.png') }}" alt="Быстрые действия" class="w-5 h-5">
-    Быстрые действия
-</h3>
+                            <img src="{{ asset('images/icons/fast_action.png') }}" alt="Быстрые действия" class="w-5 h-5">
+                            Быстрые действия
+                        </h3>
                     </div>
                     <div class="p-4 space-y-2">
                         <a href="{{ route('expenses.create', ['car_id' => $selectedCarId]) }}" 
-   class="flex items-center gap-3 p-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition">
-    <img src="{{ asset('images/icons/consumption.png') }}" alt="Расход" class="w-5 h-5">
-    <span class="text-sm text-gray-700 dark:text-gray-300">Добавить расход</span>
-</a>
-
-<a href="{{ route('refuelings.create', ['car_id' => $selectedCarId]) }}" 
-   class="flex items-center gap-3 p-2 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-lg transition">
-    <img src="{{ asset('images/icons/gas_station.png') }}" alt="Заправка" class="w-5 h-5">
-    <span class="text-sm text-gray-700 dark:text-gray-300">Добавить заправку</span>
-</a>
-
-<a href="{{ route('reminders.create', ['car_id' => $selectedCarId]) }}" 
-   class="flex items-center gap-3 p-2 bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 rounded-lg transition">
-    <img src="{{ asset('images/icons/reminder.png') }}" alt="Напоминание" class="w-5 h-5">
-    <span class="text-sm text-gray-700 dark:text-gray-300">Добавить напоминание</span>
-</a>
+                           class="flex items-center gap-3 p-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition">
+                            <img src="{{ asset('images/icons/consumption.png') }}" alt="Расход" class="w-5 h-5">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Добавить расход</span>
+                        </a>
+                        <a href="{{ route('refuelings.create', ['car_id' => $selectedCarId]) }}" 
+                           class="flex items-center gap-3 p-2 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-lg transition">
+                            <img src="{{ asset('images/icons/gas_station.png') }}" alt="Заправка" class="w-5 h-5">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Добавить заправку</span>
+                        </a>
+                        <a href="{{ route('reminders.create', ['car_id' => $selectedCarId]) }}" 
+                           class="flex items-center gap-3 p-2 bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 rounded-lg transition">
+                            <img src="{{ asset('images/icons/reminder.png') }}" alt="Напоминание" class="w-5 h-5">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Добавить напоминание</span>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Лента событий (фильтруем ручное обновление пробега) -->
+            <!-- Лента событий -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
                 <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300">📋 Последние события</h3>
@@ -186,20 +184,29 @@
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($events as $event)
                         @if($event['title'] !== 'Прочее' || ($event['title'] === 'Прочее' && $event['description'] !== 'Ручное обновление пробега'))
-                            <a href="{{ route($event['type'] . 's.show', $event['id']) }}" 
+                            @php
+                                $routeName = match($event['type']) {
+                                    'expense' => 'expenses.show',
+                                    'refueling' => 'refuelings.show',
+                                    'income' => 'incomes.show',
+                                    'service' => 'service.show',
+                                    default => '#',
+                                };
+                            @endphp
+                            <a href="{{ $routeName !== '#' ? route($routeName, $event['id']) : '#' }}" 
                                class="block px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <div class="flex justify-between items-center">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $event['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : ($event['type'] === 'service' ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-red-100 dark:bg-red-900/50') }}">
                                             @if($event['type'] === 'expense')
-    <img src="{{ asset('images/icons/consumption2.png') }}" alt="Расход" class="w-5 h-5">
-@elseif($event['type'] === 'refueling')
-    <img src="{{ asset('images/icons/gas_station2.png') }}" alt="Заправка" class="w-5 h-5">
-@elseif($event['type'] === 'income')
-    <img src="{{ asset('images/icons/income.png') }}" alt="Доход" class="w-5 h-5">
-@else
-    <img src="{{ asset('images/icons/service.png') }}" alt="Обслуживание" class="w-5 h-5">
-@endif
+                                                <img src="{{ asset('images/icons/consumption2.png') }}" alt="Расход" class="w-5 h-5">
+                                            @elseif($event['type'] === 'refueling')
+                                                <img src="{{ asset('images/icons/gas_station2.png') }}" alt="Заправка" class="w-5 h-5">
+                                            @elseif($event['type'] === 'income')
+                                                <img src="{{ asset('images/icons/income.png') }}" alt="Доход" class="w-5 h-5">
+                                            @else
+                                                <img src="{{ asset('images/icons/service.png') }}" alt="Обслуживание" class="w-5 h-5">
+                                            @endif
                                         </div>
                                         <div>
                                             <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $event['title'] }}</p>

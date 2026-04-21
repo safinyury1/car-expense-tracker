@@ -22,7 +22,7 @@ class CarController extends Controller
         $cars = Auth::user()->cars()->orderBy('id', 'desc')->get();
         
         if ($cars->isEmpty()) {
-            return redirect()->route('cars.create')->with('warning', 'Сначала добавьте автомобиль!');
+            return redirect()->route('cars.create');
         }
         
         foreach ($cars as $car) {
@@ -188,7 +188,6 @@ class CarController extends Controller
             'odometer' => 'required|integer|min:0',
         ]);
         
-        // Просто обновляем начальный пробег автомобиля, НЕ создаём запись в расходах
         $car->initial_odometer = $request->odometer;
         $car->save();
         

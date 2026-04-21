@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Расходы') }}
+            {{ __('Доходы') }}
         </h2>
     </x-slot>
 
@@ -12,7 +12,7 @@
                     
                     <!-- Фильтр по автомобилям -->
                     <div class="mb-4 flex justify-between items-center">
-                        <form method="GET" action="{{ route('expenses.index') }}" class="flex gap-2">
+                        <form method="GET" action="{{ route('incomes-list.index') }}" class="flex gap-2">
                             <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
                                 <option value="">Все автомобили</option>
                                 @foreach($cars as $car)
@@ -22,11 +22,10 @@
                                 @endforeach
                             </select>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Применить</button>
-                            <a href="{{ route('expenses.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Сбросить</a>
                         </form>
                         
-                        <a href="{{ route('expenses.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Добавить расход
+                        <a href="{{ route('incomes.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Добавить доход
                         </a>
                     </div>
 
@@ -36,8 +35,8 @@
                         </div>
                     @endif
 
-                    @if($expenses->isEmpty())
-                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">Нет данных о расходах.</p>
+                    @if($incomes->isEmpty())
+                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">Нет данных о доходах.</p>
                     @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
@@ -45,34 +44,40 @@
                                     <tr class="bg-gray-100 dark:bg-gray-700">
                                         <th class="px-4 py-2 text-left">Дата</th>
                                         <th class="px-4 py-2 text-left">Автомобиль</th>
+                                        <th class="px-4 py-2 text-left">Название</th>
                                         <th class="px-4 py-2 text-left">Категория</th>
                                         <th class="px-4 py-2 text-left">Сумма</th>
                                         <th class="px-4 py-2 text-left">Пробег</th>
-                                        <th class="px-4 py-2 text-left">Описание</th>
                                         <th class="px-4 py-2 text-left">Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($expenses as $expense)
+                                    @foreach($incomes as $income)
                                         <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <td class="px-4 py-2">{{ $expense->date->format('d.m.Y') }}</td>
-                                            <td class="px-4 py-2">{{ $expense->car->brand }} {{ $expense->car->model }}</td>
+                                            <td class="px-4 py-2">{{ $income->date->format('d.m.Y') }}</td>
+                                            <td class="px-4 py-2">{{ $income->car->brand }} {{ $income->car->model }}</td>
                                             <td class="px-4 py-2">
-                                                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded-full text-xs">
-                                                    {{ $expense->category->name }}
-                                                </span>
+                                                <a href="{{ route('incomes.show', $income) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                                    {{ $income->title }}
+                                                </a>
                                             </td>
-                                            <td class="px-4 py-2 text-red-600">{{ number_format($expense->converted_amount, 2) }} {{ $expense->currency }}</td>
-                                            <td class="px-4 py-2">{{ number_format($expense->converted_odometer) }} {{ $expense->distance_unit }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                                                {{ $expense->description ?: '—' }}
+                                            <td class="px-4 py-2">
+                                                @switch($income->category)
+                                                    @case('salary') Зарплата @break
+                                                    @case('business') Бизнес @break
+                                                    @case('gift') Подарок @break
+                                                    @case('refund') Возврат @break
+                                                    @default Прочее
+                                                @endswitch
                                             </td>
+                                            <td class="px-4 py-2 text-green-600">+{{ number_format($income->converted_amount, 2) }} {{ $income->currency }}</td>
+                                            <td class="px-4 py-2">{{ number_format($income->converted_odometer) }} {{ $income->distance_unit }}</td>
                                             <td class="px-4 py-2">
                                                 <div class="flex gap-2">
-                                                    <a href="{{ route('expenses.show', $expense) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
+                                                    <a href="{{ route('incomes.show', $income) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
                                                         Просмотр
                                                     </a>
-                                                    <form action="{{ route('expenses.destroy', $expense) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
+                                                    <form action="{{ route('incomes-list.destroy', $income) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
@@ -88,7 +93,7 @@
                         </div>
                         
                         <div class="mt-4">
-                            {{ $expenses->appends(['car_id' => $carId ?? ''])->links() }}
+                            {{ $incomes->appends(['car_id' => $carId ?? ''])->links() }}
                         </div>
                     @endif
                 </div>

@@ -16,6 +16,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\GuideController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\IncomeListController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -89,18 +90,24 @@ Route::middleware('auth')->group(function () {
     // Сравнение
     Route::get('/compare', [CompareController::class, 'index'])->name('compare.index')->middleware('has.car');
     
-    // Доходы
-Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create')->middleware('has.car');
-Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store')->middleware('has.car');
-Route::get('/incomes/{income}', [IncomeController::class, 'show'])->name('incomes.show')->middleware('has.car');
-Route::get('/incomes/{income}/edit', [IncomeController::class, 'edit'])->name('incomes.edit')->middleware('has.car');
-Route::put('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update')->middleware('has.car');
-Route::delete('/incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy')->middleware('has.car');
+    // Доходы (CRUD)
+    Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create')->middleware('has.car');
+    Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store')->middleware('has.car');
+    Route::get('/incomes/{income}', [IncomeController::class, 'show'])->name('incomes.show')->middleware('has.car');
+    Route::get('/incomes/{income}/edit', [IncomeController::class, 'edit'])->name('incomes.edit')->middleware('has.car');
+    Route::put('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update')->middleware('has.car');
+    Route::delete('/incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy')->middleware('has.car');
     
-    // Обслуживание
+    // Доходы (список)
+    Route::get('/incomes-list', [IncomeListController::class, 'index'])->name('incomes-list.index')->middleware('has.car');
+    Route::delete('/incomes-list/{income}', [IncomeListController::class, 'destroy'])->name('incomes-list.destroy')->middleware('has.car');
+    
+    // Обслуживание (все маршруты в одном контроллере)
+    Route::get('/service', [ServiceController::class, 'index'])->name('service.index')->middleware('has.car');
     Route::get('/service/create', [ServiceController::class, 'create'])->name('service.create')->middleware('has.car');
     Route::post('/service', [ServiceController::class, 'store'])->name('service.store')->middleware('has.car');
     Route::get('/service/{reminder}', [ServiceController::class, 'show'])->name('service.show')->middleware('has.car');
+    Route::delete('/service/{service}', [ServiceController::class, 'destroy'])->name('service.destroy')->middleware('has.car');
     
     // Руководство
     Route::get('/guide', [GuideController::class, 'index'])->name('guide.index')->middleware('auth');

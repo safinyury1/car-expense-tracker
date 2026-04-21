@@ -6,14 +6,16 @@ use App\Models\Car;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Refueling;
+use App\Models\Income;
 use App\Traits\ConvertsUnits;
+use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class ExpenseController extends Controller
 {
-    use ConvertsUnits;
+    use ConvertsUnits, ValidatesOdometer;
 
     public function index(Request $request)
     {
@@ -100,7 +102,8 @@ class ExpenseController extends Controller
             if ($car) {
                 $maxOdometerKm = max(
                     Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                    Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0
+                    Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0,
+                    Income::where('car_id', $selectedCar)->max('odometer') ?? 0
                 );
                 $maxOdometer = $this->convertDistance($maxOdometerKm, $car);
             }
@@ -124,6 +127,9 @@ class ExpenseController extends Controller
         if ($car->user_id !== Auth::id()) {
             abort(403);
         }
+        
+        // Валидация пробега
+        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'expense');
         
         Expense::create($validated);
         
@@ -153,7 +159,8 @@ class ExpenseController extends Controller
         
         $maxOdometerKm = max(
             Expense::where('car_id', $expense->car_id)->where('id', '!=', $expense->id)->max('odometer') ?? 0,
-            Refueling::where('car_id', $expense->car_id)->max('odometer') ?? 0
+            Refueling::where('car_id', $expense->car_id)->max('odometer') ?? 0,
+            Income::where('car_id', $expense->car_id)->max('odometer') ?? 0
         );
         $maxOdometer = $this->convertDistance($maxOdometerKm, $expense->car);
         
@@ -174,6 +181,9 @@ class ExpenseController extends Controller
             'odometer' => 'required|integer|min:0',
             'description' => 'nullable|string',
         ]);
+        
+        // Валидация пробега (исключаем текущую запись)
+        $this->validateOdometer($validated['car_id'], $validated['odometer'], $expense->id, 'expense');
         
         $expense->update($validated);
         

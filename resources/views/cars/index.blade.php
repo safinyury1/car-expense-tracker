@@ -11,10 +11,10 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     <div class="mb-4 flex justify-end">
-                        <a href="{{ route('cars.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Добавить автомобиль
-                        </a>
-                    </div>
+    <a href="{{ route('cars.create.form') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Добавить автомобиль
+    </a>
+</div>
 
                     @if(session('success'))
                         <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-300 p-4 mb-4">

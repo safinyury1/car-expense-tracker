@@ -12,9 +12,10 @@
                     @csrf
                     
                     <div class="p-6 space-y-5">
+                        <!-- Выбор автомобиля -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Автомобиль</label>
-                            <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
+                            <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
                                 @foreach($cars as $car)
                                     <option value="{{ $car->id }}" {{ $selectedCar?->id == $car->id ? 'selected' : '' }}>
                                         {{ $car->brand }} {{ $car->model }}
@@ -23,6 +24,7 @@
                             </select>
                         </div>
                         
+                        <!-- Тип обслуживания -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Тип обслуживания</label>
                             <input type="text" name="title" value="{{ old('title') }}" 
@@ -30,19 +32,27 @@
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
                         </div>
                         
+                        <!-- Дата -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Дата</label>
                             <input type="date" name="service_date" value="{{ old('service_date', date('Y-m-d')) }}" 
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
                         </div>
                         
+                        <!-- Пробег -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Пробег</label>
                             <input type="number" name="odometer" value="{{ old('odometer') }}" 
                                    placeholder="Текущий пробег"
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm" required>
+                            @if(isset($maxOdometer) && $maxOdometer > 0)
+                                <p class="text-sm text-red-500 mt-1">
+                                    ⚠️ Последний зафиксированный пробег: {{ number_format($maxOdometer) }} км
+                                </p>
+                            @endif
                         </div>
                         
+                        <!-- Сумма -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Сумма</label>
                             <input type="number" name="cost" value="{{ old('cost') }}" step="0.01"
@@ -50,6 +60,7 @@
                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm">
                         </div>
                         
+                        <!-- Примечания -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Примечания</label>
                             <textarea name="notes" rows="3" placeholder="Дополнительная информация..."
@@ -58,6 +69,7 @@
                         
                         <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
                         
+                        <!-- Следующее ТО -->
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                             <h3 class="font-medium text-gray-800 dark:text-gray-200 mb-3">Следующее ТО</h3>
                             
@@ -79,7 +91,7 @@
                     </div>
                     
                     <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-end gap-3">
-                        <a href="{{ route('overview.index') }}" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition">
+                        <a href="{{ route('service.index') }}" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition">
                             Отмена
                         </a>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition">

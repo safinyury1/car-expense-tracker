@@ -83,11 +83,10 @@
                             <label for="odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Пробег (км) *</label>
                             <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $expense->odometer) }}" min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" required>
                             @if(isset($maxOdometer) && $maxOdometer > 0)
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-        <img src="{{ asset('images/icons/warning.png') }}" alt="Внимание" class="w-4 h-4">
-        Последний зафиксированный пробег (без учёта этой записи): {{ number_format($maxOdometer) }} км
-    </p>
-@endif
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Последний зафиксированный пробег: {{ number_format($maxOdometer) }} км
+                                </p>
+                            @endif
                             @error('odometer')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror

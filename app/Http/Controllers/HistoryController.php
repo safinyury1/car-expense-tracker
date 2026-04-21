@@ -105,6 +105,10 @@ class HistoryController extends Controller
                 ->get();
             foreach ($services as $item) {
                 $serviceDate = $item->service_date ?? $item->created_at;
+                // Преобразуем в Carbon если это строка
+                if (!$serviceDate instanceof \Carbon\Carbon) {
+                    $serviceDate = \Carbon\Carbon::parse($serviceDate);
+                }
                 $allOperations->push([
                     'id' => $item->id,
                     'type' => 'service',
@@ -197,6 +201,10 @@ class HistoryController extends Controller
                 ->get();
             foreach ($services as $item) {
                 $serviceDate = $item->service_date ?? $item->created_at;
+                // Преобразуем в Carbon если это строка
+                if (!$serviceDate instanceof \Carbon\Carbon) {
+                    $serviceDate = \Carbon\Carbon::parse($serviceDate);
+                }
                 $allOperations->push([
                     'id' => $item->id,
                     'type' => 'service',

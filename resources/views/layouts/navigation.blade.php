@@ -1,4 +1,4 @@
-<nav x-data="{ open: false, showMenu: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false, showMenu: false, showPagesMenu: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -49,50 +49,82 @@
                 </div>
             </div>
 
-            <!-- Центральная часть с кнопкой -->
-            <div class="hidden sm:flex sm:items-center mr-20">
+            <!-- Две круглые кнопки -->
+            <div class="hidden sm:flex sm:items-center gap-3">
+                <!-- Первая кнопка: Добавить (плюс) -->
                 <div class="relative">
                     <button @click="showMenu = !showMenu" 
-        class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300">
-    <img src="{{ asset('images/icons/plus.png') }}" alt="Добавить" class="w-5 h-5">
-</button>
+                            class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <img src="{{ asset('images/icons/plus.png') }}" alt="Добавить" class="w-5 h-5">
+                    </button>
                     
                     <div x-show="showMenu" 
                          @click.away="showMenu = false"
                          x-cloak
-                         class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
+                         class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
                          style="display: none;">
                         <div class="py-1">
-    <a href="{{ route('refuelings.create') }}" 
-       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-        <img src="{{ asset('images/icons/zapravka.png') }}" alt="Заправка" class="w-4 h-4">
-        Добавить заправку
-    </a>
-    <a href="{{ route('expenses.create') }}" 
-       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-        <img src="{{ asset('images/icons/money.png') }}" alt="Расход" class="w-4 h-4">
-        Добавить расход
-    </a>
-    <a href="{{ route('cars.index') }}" 
-       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-        <img src="{{ asset('images/icons/car.png') }}" alt="Автомобиль" class="w-4 h-4">
-        Добавить автомобиль
-    </a>
-    <a href="{{ route('service.create') }}" 
-       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-        <img src="{{ asset('images/icons/wrench.png') }}" alt="Обслуживание" class="w-4 h-4">
-        Добавить обслуживание
-    </a>
-    <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-    <a href="{{ route('incomes.create') }}" 
-       class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-        <img src="{{ asset('images/icons/income1.png') }}" alt="Доход" class="w-4 h-4">
-        Добавить доход
-    </a>
-</div>
+                            <a href="{{ route('refuelings.create') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/zapravka.png') }}" alt="Заправка" class="w-4 h-4">
+                                Добавить заправку
+                            </a>
+                            <a href="{{ route('expenses.create') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/money.png') }}" alt="Расход" class="w-4 h-4">
+                                Добавить расход
+                            </a>
+                            <a href="{{ route('cars.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/car.png') }}" alt="Автомобиль" class="w-4 h-4">
+                                Добавить автомобиль
+                            </a>
+                            <a href="{{ route('service.create') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/wrench.png') }}" alt="Обслуживание" class="w-4 h-4">
+                                Добавить обслуживание
+                            </a>
+                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                            <a href="{{ route('incomes.create') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/income1.png') }}" alt="Доход" class="w-4 h-4">
+                                Добавить доход
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Вторая кнопка: Страницы (меню) -->
+                <div class="relative">
+    <button @click="showPagesMenu = !showPagesMenu" 
+            class="w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+        <img src="{{ asset('images/icons/menu2.png') }}" alt="Меню" class="w-5 h-5">
+    </button>
+    
+    <div x-show="showPagesMenu" 
+         @click.away="showPagesMenu = false"
+         x-cloak
+         class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
+         style="display: none;">
+        <div class="py-1">
+            <a href="{{ route('refuelings.index') }}" 
+               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <img src="{{ asset('images/icons/zapravka1.png') }}" alt="Заправки" class="w-4 h-4">
+                Заправки
+            </a>
+            <a href="{{ route('expenses.index') }}" 
+               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <img src="{{ asset('images/icons/consumption3.png') }}" alt="Расходы" class="w-4 h-4">
+                Расходы
+            </a>
+            <a href="{{ route('incomes-list.index') }}" 
+               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <img src="{{ asset('images/icons/income2.png') }}" alt="Доходы" class="w-4 h-4">
+                Доходы
+            </a>
+        </div>
+    </div>
+</div>
 
             <!-- Правая часть -->
             <div class="hidden sm:flex sm:items-center">
@@ -174,6 +206,10 @@
                 <x-responsive-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
                     {{ __('Мои автомобили') }}
                 </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('incomes-list.index')" :active="request()->routeIs('incomes-list.*')">
+                    {{ __('Доходы') }}
+                </x-responsive-nav-link>
             @endif
             
             @if(Auth::user()->role === 'admin')
@@ -217,4 +253,44 @@
 
 <style>
     [x-cloak] { display: none !important; }
+    
+    /* Неоновая подсветка для ссылок навигации */
+    .nav-link {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+        color: #3b82f6 !important;
+        text-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6;
+    }
+    
+    /* Для тёмной темы */
+    .dark .nav-link:hover {
+        color: #60a5fa !important;
+        text-shadow: 0 0 5px #60a5fa, 0 0 10px #3b82f6;
+    }
+    
+    /* Неон для кнопок в дропдауне */
+    .dropdown-item:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #3b82f6 !important;
+        text-shadow: 0 0 3px #3b82f6;
+    }
+    
+    /* Неон для круглых кнопок */
+    .rounded-full:hover {
+        box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+        transform: scale(1.05);
+    }
+    
+    /* Синяя кнопка */
+    .bg-blue-500:hover {
+        box-shadow: 0 0 15px #3b82f6, 0 0 25px #3b82f6;
+    }
+    
+    /* Серая кнопка */
+    .bg-gray-500:hover {
+        box-shadow: 0 0 15px #6b7280, 0 0 25px #6b7280;
+    }
 </style>

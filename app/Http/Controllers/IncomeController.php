@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\Expense;
 use App\Models\Income;
+use App\Models\Refueling;
 use App\Traits\ConvertsUnits;
+use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IncomeController extends Controller
 {
-    use ConvertsUnits;
+    use ConvertsUnits, ValidatesOdometer;
 
     public function create(Request $request)
     {
@@ -18,7 +21,17 @@ class IncomeController extends Controller
         $selectedCarId = $request->get('car_id', $cars->first()?->id);
         $selectedCar = $cars->find($selectedCarId);
         
-        return view('incomes.create', compact('cars', 'selectedCar'));
+        $maxOdometer = 0;
+        if ($selectedCar) {
+            $maxOdometerKm = max(
+                Expense::where('car_id', $selectedCarId)->max('odometer') ?? 0,
+                Refueling::where('car_id', $selectedCarId)->max('odometer') ?? 0,
+                Income::where('car_id', $selectedCarId)->max('odometer') ?? 0
+            );
+            $maxOdometer = $this->convertDistance($maxOdometerKm, $selectedCar);
+        }
+        
+        return view('incomes.create', compact('cars', 'selectedCar', 'maxOdometer'));
     }
     
     public function store(Request $request)
@@ -36,6 +49,11 @@ class IncomeController extends Controller
         $car = Car::findOrFail($validated['car_id']);
         if ($car->user_id !== Auth::id()) {
             abort(403);
+        }
+        
+        // Валидация пробега (если указан)
+        if (!empty($validated['odometer'])) {
+            $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'income');
         }
         
         Income::create($validated);
@@ -63,7 +81,14 @@ class IncomeController extends Controller
         
         $cars = Auth::user()->cars;
         
-        return view('incomes.edit', compact('income', 'cars'));
+        $maxOdometerKm = max(
+            Expense::where('car_id', $income->car_id)->max('odometer') ?? 0,
+            Refueling::where('car_id', $income->car_id)->max('odometer') ?? 0,
+            Income::where('car_id', $income->car_id)->where('id', '!=', $income->id)->max('odometer') ?? 0
+        );
+        $maxOdometer = $this->convertDistance($maxOdometerKm, $income->car);
+        
+        return view('incomes.edit', compact('income', 'cars', 'maxOdometer'));
     }
     
     public function update(Request $request, Income $income)
@@ -81,6 +106,11 @@ class IncomeController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|string',
         ]);
+        
+        // Валидация пробега (если указан, исключаем текущую запись)
+        if (!empty($validated['odometer'])) {
+            $this->validateOdometer($validated['car_id'], $validated['odometer'], $income->id, 'income');
+        }
         
         $income->update($validated);
         

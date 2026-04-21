@@ -10,70 +10,21 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <form method="GET" action="{{ route('refuelings.index') }}" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Поиск</label>
-                                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="АЗС, автомобиль..." class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Автомобиль</label>
-                                    <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm">
-                                        <option value="">Все автомобили</option>
-                                        @foreach($cars as $car)
-                                            <option value="{{ $car->id }}" {{ ($carId ?? '') == $car->id ? 'selected' : '' }}>
-                                                {{ $car->brand }} {{ $car->model }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Сортировка</label>
-                                    <select name="sort_by" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm">
-                                        <option value="date" {{ ($sortBy ?? '') == 'date' ? 'selected' : '' }}>По дате</option>
-                                        <option value="liters" {{ ($sortBy ?? '') == 'liters' ? 'selected' : '' }}>По литрам</option>
-                                        <option value="total_amount" {{ ($sortBy ?? '') == 'total_amount' ? 'selected' : '' }}>По сумме</option>
-                                        <option value="odometer" {{ ($sortBy ?? '') == 'odometer' ? 'selected' : '' }}>По пробегу</option>
-                                    </select>
-                                </div>
-                                
-                                <div></div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Дата от</label>
-                                    <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Дата до</label>
-                                    <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md shadow-sm">
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <div class="flex gap-2">
-                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                        🔍 Применить фильтры
-                                    </button>
-                                    <a href="{{ route('refuelings.index', ['car_id' => $carId ?? '']) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                                        🗑️ Сбросить
-                                    </a>
-                                </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    Найдено: {{ $refuelings->total() }} записей
-                                </div>
-                            </div>
+                    <!-- Фильтр по автомобилям -->
+                    <div class="mb-4 flex justify-between items-center">
+                        <form method="GET" action="{{ route('refuelings.index') }}" class="flex gap-2">
+                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                <option value="">Все автомобили</option>
+                                @foreach($cars as $car)
+                                    <option value="{{ $car->id }}" {{ ($carId ?? '') == $car->id ? 'selected' : '' }}>
+                                        {{ $car->brand }} {{ $car->model }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Применить</button>
+                            <a href="{{ route('refuelings.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Сбросить</a>
                         </form>
-                    </div>
-
-                    <div class="mb-4 flex justify-end gap-2">
-                        <a href="{{ route('refuelings.export-csv', request()->all()) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        </a>
+                        
                         <a href="{{ route('refuelings.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Добавить заправку
                         </a>
@@ -86,7 +37,7 @@
                     @endif
 
                     @if($refuelings->isEmpty())
-                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">Нет данных по заданным фильтрам.</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">Нет данных о заправках.</p>
                     @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
@@ -109,16 +60,22 @@
                                             <td class="px-4 py-2">{{ $refueling->car->brand }} {{ $refueling->car->model }}</td>
                                             <td class="px-4 py-2">{{ number_format($refueling->converted_liters, 2) }} {{ $refueling->volume_unit }}</td>
                                             <td class="px-4 py-2">{{ number_format($refueling->converted_price, 2) }} {{ $refueling->currency }}/{{ $refueling->volume_unit }}</td>
-                                            <td class="px-4 py-2 font-medium">{{ number_format($refueling->converted_amount, 2) }} {{ $refueling->currency }}</td>
+                                            <td class="px-4 py-2 text-red-600">{{ number_format($refueling->converted_amount, 2) }} {{ $refueling->currency }}</td>
                                             <td class="px-4 py-2">{{ number_format($refueling->converted_odometer) }} {{ $refueling->distance_unit }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{{ $refueling->gas_station ?: '—' }}</td>
+                                            <td class="px-4 py-2">{{ $refueling->gas_station ?: '—' }}</td>
                                             <td class="px-4 py-2">
-                                                <a href="{{ route('refuelings.edit', $refueling) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">✏️</a>
-                                                <form action="{{ route('refuelings.destroy', $refueling) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">🗑️</button>
-                                                </form>
+                                                <div class="flex gap-2">
+                                                    <a href="{{ route('refuelings.show', $refueling) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
+                                                        Просмотр
+                                                    </a>
+                                                    <form action="{{ route('refuelings.destroy', $refueling) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить эту заправку?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
+                                                            Удалить
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -127,7 +84,7 @@
                         </div>
                         
                         <div class="mt-4">
-                            {{ $refuelings->appends(request()->query())->links() }}
+                            {{ $refuelings->appends(['car_id' => $carId ?? ''])->links() }}
                         </div>
                     @endif
                 </div>

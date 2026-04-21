@@ -10,11 +10,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-8 text-center">
                     <div class="inline-block p-6 bg-blue-100 dark:bg-blue-900 rounded-full mb-6">
-                        <svg class="w-20 h-20 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M6 12l-2 5h16l-2-5M8 9h8M9 6h6M12 6v3" />
-                            <rect x="7" y="14" width="2" height="2" rx="1" />
-                            <rect x="15" y="14" width="2" height="2" rx="1" />
-                        </svg>
+                        <img src="{{ asset('images/car.svg') }}" alt="Автомобиль" class="w-25 h-20">
                     </div>
                     
                     <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">Добавьте свой первый автомобиль</h3>
