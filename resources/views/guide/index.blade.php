@@ -7,7 +7,7 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden">
                 <div class="p-6">
                     
                     <div class="prose max-w-none dark:prose-invert">

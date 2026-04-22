@@ -9,7 +9,7 @@
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Профиль -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-6">
+            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden mb-6">
                 <div class="p-6">
                     <div class="flex items-center gap-6">
                         <div class="relative">
@@ -32,9 +32,9 @@
                         
                         <div class="flex-1">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ Auth::user()->name }}</h3>
-                            <p class="text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">{{ Auth::user()->email }}</p>
+                            <p class="text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                             <div class="flex gap-3 mt-3">
-                                <a href="{{ route('profile.edit') }}" class="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg transition">
+                                <a href="{{ route('profile.edit') }}" class="text-sm bg-gray-100 dark:bg-[#6B727F] hover:bg-[#E5E7EB] dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg transition">
                                     Редактировать профиль
                                 </a>
                             </div>
@@ -50,15 +50,15 @@
             </form>
 
             <!-- Управление автомобилями -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-6">
-                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700">
+            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden mb-6">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-800 dark:text-white text-lg">Управление автомобилями</h3>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
                             <p class="font-medium text-gray-700 dark:text-gray-300">Настройки авто</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">Единицы измерения, валюта, категории</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Единицы измерения, валюта, категории</p>
                         </div>
                         <a href="{{ route('car-settings.index') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
                             Перейти →
@@ -68,7 +68,7 @@
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
                             <p class="font-medium text-gray-700 dark:text-gray-300">Мой гараж</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">Список ваших автомобилей</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Список ваших автомобилей</p>
                         </div>
                         <a href="{{ route('cars.index') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">
                             Перейти →
@@ -78,38 +78,38 @@
             </div>
 
             <!-- Внешний вид -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-6">
-                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700">
+            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden mb-6">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-800 dark:text-white text-lg">Внешний вид</h3>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     <div class="px-6 py-4 flex items-center justify-between">
                         <div>
                             <p class="font-medium text-gray-700 dark:text-gray-300">Тёмная тема</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 dark:text-gray-400">Переключение между светлой и тёмной темой</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Переключение между светлой и тёмной темой</p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="themeToggle" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer dark:bg-[#6B727F] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                         </label>
                     </div>
                 </div>
             </div>
 
             <!-- Помощь -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 dark:border-gray-700">
+            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-800 dark:text-white text-lg">Помощь</h3>
                 </div>
                 <div class="px-6 py-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <a href="{{ route('guide.index') }}" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <a href="{{ route('guide.index') }}" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#6B727F]/50 rounded-xl hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
                             <span class="text-gray-700 dark:text-gray-300">Руководство пользователя</span>
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
                         </a>
-                        <a href="#" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <a href="#" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#6B727F]/50 rounded-xl hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
                             <span class="text-gray-700 dark:text-gray-300">Связаться с поддержкой</span>
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -126,13 +126,14 @@
             const themeToggle = document.getElementById('themeToggle');
             if (!themeToggle) return;
             
-            const savedTheme = localStorage.getItem('theme');
-            themeToggle.checked = (savedTheme === 'dark');
+            // Проверяем текущее состояние темы
+            const isDark = document.documentElement.classList.contains('dark');
+            themeToggle.checked = isDark;
             
             themeToggle.addEventListener('change', function() {
                 if (this.checked) {
                     document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
+                    localStorage.setItem('darkMode', 'true');
                     fetch('{{ route("settings.theme") }}', {
                         method: 'POST',
                         headers: {
@@ -143,7 +144,7 @@
                     });
                 } else {
                     document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
+                    localStorage.setItem('darkMode', 'false');
                     fetch('{{ route("settings.theme") }}', {
                         method: 'POST',
                         headers: {

@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     
                     @if(session('success'))
@@ -25,7 +25,7 @@
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-auto border-collapse">
                             <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">ID</th>
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">Имя</th>
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">Email</th>
@@ -36,12 +36,12 @@
                             </thead>
                             <tbody>
                                 @foreach($users as $user)
-                                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="window.location.href='{{ route('admin.user.show', $user->id) }}'">
+                                    <tr class="border-b dark:border-gray-700 hover:bg-[#1D1D1D] dark:hover:bg-[#1D1D1D] cursor-pointer" onclick="window.location.href='{{ route('admin.user.show', $user->id) }}'">
                                         <td class="px-4 py-3 border dark:border-gray-600">{{ $user->id }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400">{{ $user->name }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600">{{ $user->email }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600">
-                                            <span class="px-2 py-1 rounded text-xs {{ $user->role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
+                                            <span class="px-2 py-1 rounded text-xs {{ $user->role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-[#6B727F] dark:text-gray-300' }}">
                                                 {{ $user->role === 'admin' ? 'Админ' : 'Пользователь' }}
                                             </span>
                                         </td>

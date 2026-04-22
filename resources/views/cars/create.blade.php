@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-8 text-center">
                     <div class="inline-block p-6 bg-blue-100 dark:bg-blue-900 rounded-full mb-6">
                         <img src="{{ asset('images/car.svg') }}" alt="Автомобиль" class="w-25 h-20">

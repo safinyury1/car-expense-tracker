@@ -32,7 +32,7 @@
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-1 block w-3/4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    class="mt-1 block w-3/4 dark:bg-[#6B727F] dark:text-white dark:border-gray-600"
                     placeholder="{{ __('Пароль') }}"
                 />
 

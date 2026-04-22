@@ -10,27 +10,27 @@
             
             <!-- Статистика -->
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow p-4 text-center">
                     <p class="text-2xl font-bold text-blue-600">{{ $stats['users'] }}</p>
                     <p class="text-sm text-gray-500">Пользователей</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow p-4 text-center">
                     <p class="text-2xl font-bold text-green-600">{{ $stats['cars'] }}</p>
                     <p class="text-sm text-gray-500">Автомобилей</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow p-4 text-center">
                     <p class="text-2xl font-bold text-red-600">{{ $stats['expenses'] }}</p>
                     <p class="text-sm text-gray-500">Расходов</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow p-4 text-center">
                     <p class="text-2xl font-bold text-yellow-600">{{ $stats['refuelings'] }}</p>
                     <p class="text-sm text-gray-500">Заправок</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow p-4 text-center">
                     <p class="text-2xl font-bold text-green-600">{{ $stats['incomes'] }}</p>
                     <p class="text-sm text-gray-500">Доходов</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow p-4 text-center">
                     <p class="text-2xl font-bold text-purple-600">{{ $stats['services'] }}</p>
                     <p class="text-sm text-gray-500">Обслуживаний</p>
                 </div>
@@ -38,7 +38,7 @@
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Последние пользователи -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow">
                     <div class="p-4 border-b dark:border-gray-700">
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">Последние пользователи</h3>
                     </div>
@@ -59,7 +59,7 @@
                 </div>
                 
                 <!-- Последние автомобили -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="bg-white dark:bg-[#222222] rounded-lg shadow">
                     <div class="p-4 border-b dark:border-gray-700">
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">Последние автомобили</h3>
                     </div>

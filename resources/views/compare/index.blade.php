@@ -7,17 +7,17 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     <!-- Форма выбора автомобилей для сравнения -->
-                    <div class="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="mb-8 p-4 bg-gray-50 dark:bg-[#6B727F] rounded-lg">
                         <form method="GET" action="{{ route('compare.index') }}" class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Выберите автомобили для сравнения (максимум 4)</label>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     @foreach($cars as $car)
-                                        <label class="flex items-center space-x-2 p-2 border dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer">
+                                        <label class="flex items-center space-x-2 p-2 border dark:border-gray-600 rounded-lg hover:bg-[#E5E7EB] dark:hover:bg-gray-600 cursor-pointer transition">
                                             <input type="checkbox" name="cars[]" value="{{ $car->id }}" 
                                                 {{ in_array($car->id, $selectedCarIds) ? 'checked' : '' }}
                                                 class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
@@ -27,7 +27,7 @@
                                 </div>
                             </div>
                             <div class="flex justify-center">
-                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">
                                     Сравнить выбранные
                                 </button>
                             </div>
@@ -44,7 +44,7 @@
                         <div class="overflow-x-auto mb-8">
                             <table class="min-w-full border-collapse">
                                 <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                         <th class="px-4 py-3 text-left border dark:border-gray-600">Показатель</th>
                                         @foreach($selectedCars as $car)
                                             <th class="px-4 py-3 text-center border dark:border-gray-600">
@@ -65,7 +65,7 @@
                                             </td>
                                         @endforeach
                                     </tr>
-                                    <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                    <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-[#6B727F]/50">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Затраты на топливо</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
@@ -81,38 +81,38 @@
                                             </td>
                                         @endforeach
                                     </tr>
-                                    <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                    <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-[#6B727F]/50">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Стоимость 1 км</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ number_format($comparisonData[$car->id]['costPerKm'], 2) }} {{ $comparisonData[$car->id]['currency'] }} / {{ $comparisonData[$car->id]['distance_unit'] }}
-                                            </td>
+                                             </td>
                                         @endforeach
-                                    </tr>
+                                     </tr>
                                     <tr class="border-b dark:border-gray-700">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Общий пробег</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ number_format($comparisonData[$car->id]['totalDistance']) }} {{ $comparisonData[$car->id]['distance_unit'] }}
-                                            </td>
+                                             </td>
                                         @endforeach
-                                    </tr>
-                                    <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                     </tr>
+                                    <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-[#6B727F]/50">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Количество расходов</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ $comparisonData[$car->id]['expensesCount'] }}
-                                            </td>
+                                             </td>
                                         @endforeach
-                                    </tr>
+                                     </tr>
                                     <tr class="border-b dark:border-gray-700">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Количество заправок</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ $comparisonData[$car->id]['refuelingsCount'] }}
-                                            </td>
+                                             </td>
                                         @endforeach
-                                    </tr>
+                                     </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -120,7 +120,7 @@
                         <!-- График сравнения расходов (столбчатая диаграмма) -->
                         <div class="mb-8">
                             <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Сравнение расходов</h3>
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700">
+                            <div class="bg-white dark:bg-[#222222] p-4 rounded-lg border dark:border-gray-700">
                                 <div id="comparisonChart" style="height: 400px;"></div>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
                         <!-- Динамика расходов по месяцам -->
                         <div class="mb-8">
                             <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Динамика расходов по месяцам</h3>
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700">
+                            <div class="bg-white dark:bg-[#222222] p-4 rounded-lg border dark:border-gray-700">
                                 <div id="trendChart" style="height: 400px;"></div>
                             </div>
                         </div>
@@ -138,7 +138,7 @@
                             <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Структура расходов</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 @foreach($selectedCars as $car)
-                                    <div class="border dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                                    <div class="border dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-[#222222]">
                                         <h4 class="font-medium text-center mb-2 text-gray-800 dark:text-gray-200">{{ $car->brand }} {{ $car->model }}</h4>
                                         <div id="pieChart_{{ $car->id }}" style="height: 350px;"></div>
                                     </div>

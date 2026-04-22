@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
+use App\Models\Income;
 use App\Models\Reminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class CarSettingsController extends Controller
 {
@@ -18,125 +18,127 @@ class CarSettingsController extends Controller
         $selectedCarId = $request->get('car_id', $cars->first()?->id);
         $selectedCar = $cars->find($selectedCarId);
         
-        return view('car-settings.index', compact('cars', 'selectedCar'));
+        return view('car-settings.index', compact('cars', 'selectedCar', 'selectedCarId'));
     }
     
+    /**
+     * Обновить единицу измерения расстояния
+     */
     public function updateDistanceUnit(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'car_id' => 'required|exists:cars,id',
-            'unit' => 'required|in:km,miles'
+            'distance_unit' => 'required|in:km,miles',
         ]);
         
-        $car = Car::findOrFail($request->car_id);
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $car = Car::where('id', $validated['car_id'])
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
         
-        $car->distance_unit = $request->unit;
+        $car->distance_unit = $validated['distance_unit'];
         $car->save();
         
-        return redirect()->route('car-settings.index', ['car_id' => $car->id])
-            ->with('success', 'Единица расстояния обновлена!');
+        return redirect()->back()->with('success', 'Единица измерения расстояния обновлена!');
     }
     
+    /**
+     * Обновить единицу измерения объёма
+     */
     public function updateVolumeUnit(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'car_id' => 'required|exists:cars,id',
-            'unit' => 'required|in:liters,gallons'
+            'volume_unit' => 'required|in:liters,gallons',
         ]);
         
-        $car = Car::findOrFail($request->car_id);
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $car = Car::where('id', $validated['car_id'])
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
         
-        $car->volume_unit = $request->unit;
+        $car->volume_unit = $validated['volume_unit'];
         $car->save();
         
-        return redirect()->route('car-settings.index', ['car_id' => $car->id])
-            ->with('success', 'Единица объема обновлена!');
+        return redirect()->back()->with('success', 'Единица измерения объёма обновлена!');
     }
     
+    /**
+     * Обновить валюту
+     */
     public function updateCurrency(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'car_id' => 'required|exists:cars,id',
-            'currency' => 'required|in:RUB,USD,EUR'
+            'currency' => 'required|in:rub,usd,eur',
         ]);
         
-        $car = Car::findOrFail($request->car_id);
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $car = Car::where('id', $validated['car_id'])
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
         
-        $car->currency = $request->currency;
+        $car->currency = $validated['currency'];
         $car->save();
         
-        return redirect()->route('car-settings.index', ['car_id' => $car->id])
-            ->with('success', 'Валюта обновлена!');
+        return redirect()->back()->with('success', 'Валюта обновлена!');
     }
     
+    /**
+     * Удалить все данные (расходы, заправки, напоминания, доходы)
+     */
     public function deleteAllData(Request $request)
     {
-        $request->validate([
-            'car_id' => 'required|exists:cars,id'
-        ]);
+        $carId = $request->get('car_id');
         
-        $car = Car::findOrFail($request->car_id);
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
+        if (!$carId) {
+            return redirect()->back()->with('error', 'Выберите автомобиль');
         }
         
-        // Удаляем все расходы автомобиля
-        Expense::where('car_id', $car->id)->delete();
+        $car = Car::where('id', $carId)->where('user_id', Auth::id())->first();
         
-        // Удаляем все заправки автомобиля
-        Refueling::where('car_id', $car->id)->delete();
-        
-        // Удаляем все напоминания автомобиля
-        Reminder::where('car_id', $car->id)->delete();
-        
-        // Удаляем фото автомобиля если есть
-        if ($car->photo && Storage::disk('public')->exists($car->photo)) {
-            Storage::disk('public')->delete($car->photo);
+        if (!$car) {
+            return redirect()->back()->with('error', 'Автомобиль не найден');
         }
         
-        // Сбрасываем настройки и пробег автомобиля
-        $car->initial_odometer = 0;
-        $car->photo = null;
-        $car->save();
+        // Удаляем расходы
+        Expense::where('car_id', $carId)->delete();
         
-        return redirect()->route('car-settings.index', ['car_id' => $car->id])
-            ->with('success', 'Все данные автомобиля удалены');
+        // Удаляем заправки
+        Refueling::where('car_id', $carId)->delete();
+        
+        // Удаляем доходы
+        Income::where('car_id', $carId)->delete();
+        
+        // Удаляем напоминания (обслуживание и т.д.)
+        Reminder::where('car_id', $carId)->delete();
+        
+        return redirect()->back()->with('success', 'Все данные (расходы, заправки, доходы, напоминания) успешно удалены!');
     }
     
+    /**
+     * Удалить автомобиль
+     */
     public function deleteCar(Request $request)
     {
-        $request->validate([
-            'car_id' => 'required|exists:cars,id'
-        ]);
+        $carId = $request->get('car_id');
         
-        $car = Car::findOrFail($request->car_id);
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
+        if (!$carId) {
+            return redirect()->back()->with('error', 'Выберите автомобиль');
+        }
+        
+        $car = Car::where('id', $carId)->where('user_id', Auth::id())->first();
+        
+        if (!$car) {
+            return redirect()->back()->with('error', 'Автомобиль не найден');
         }
         
         // Удаляем все связанные данные
-        Expense::where('car_id', $car->id)->delete();
-        Refueling::where('car_id', $car->id)->delete();
-        Reminder::where('car_id', $car->id)->delete();
+        Expense::where('car_id', $carId)->delete();
+        Refueling::where('car_id', $carId)->delete();
+        Income::where('car_id', $carId)->delete();
+        Reminder::where('car_id', $carId)->delete();
         
-        // Удаляем фото
-        if ($car->photo && Storage::disk('public')->exists($car->photo)) {
-            Storage::disk('public')->delete($car->photo);
-        }
-        
-        // Удаляем сам автомобиль
+        // Удаляем автомобиль
         $car->delete();
         
-        return redirect()->route('car-settings.index')
-            ->with('success', 'Автомобиль удален');
+        return redirect()->route('cars.index')->with('success', 'Автомобиль и все связанные данные удалены!');
     }
 }

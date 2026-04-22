@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     
                     <div class="mb-6">
@@ -45,7 +45,7 @@
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
                                 <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                         <th class="px-3 py-2 text-left">Дата</th>
                                         <th class="px-3 py-2 text-left">Категория</th>
                                         <th class="px-3 py-2 text-left">Сумма</th>
@@ -75,7 +75,7 @@
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
                                 <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                         <th class="px-3 py-2 text-left">Дата</th>
                                         <th class="px-3 py-2 text-left">Литры</th>
                                         <th class="px-3 py-2 text-left">Сумма</th>
@@ -105,7 +105,7 @@
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
                                 <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                         <th class="px-3 py-2 text-left">Дата</th>
                                         <th class="px-3 py-2 text-left">Название</th>
                                         <th class="px-3 py-2 text-left">Сумма</th>

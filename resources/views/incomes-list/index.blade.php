@@ -7,13 +7,13 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     <!-- Фильтр по автомобилям -->
                     <div class="mb-4 flex justify-between items-center">
                         <form method="GET" action="{{ route('incomes-list.index') }}" class="flex gap-2">
-                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                                 <option value="">Все автомобили</option>
                                 @foreach($cars as $car)
                                     <option value="{{ $car->id }}" {{ ($carId ?? '') == $car->id ? 'selected' : '' }}>
@@ -41,19 +41,19 @@
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
                                 <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                         <th class="px-4 py-2 text-left">Дата</th>
                                         <th class="px-4 py-2 text-left">Автомобиль</th>
                                         <th class="px-4 py-2 text-left">Название</th>
                                         <th class="px-4 py-2 text-left">Категория</th>
                                         <th class="px-4 py-2 text-left">Сумма</th>
                                         <th class="px-4 py-2 text-left">Пробег</th>
-                                        <th class="px-4 py-2 text-left">Действия</th>
+                                        <th class="px-4 py-2 text-left w-32">Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($incomes as $income)
-                                        <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
                                             <td class="px-4 py-2">{{ $income->date->format('d.m.Y') }}</td>
                                             <td class="px-4 py-2">{{ $income->car->brand }} {{ $income->car->model }}</td>
                                             <td class="px-4 py-2">
@@ -72,15 +72,15 @@
                                             </td>
                                             <td class="px-4 py-2 text-green-600">+{{ number_format($income->converted_amount, 2) }} {{ $income->currency }}</td>
                                             <td class="px-4 py-2">{{ number_format($income->converted_odometer) }} {{ $income->distance_unit }}</td>
-                                            <td class="px-4 py-2">
-                                                <div class="flex gap-2">
-                                                    <a href="{{ route('incomes.show', $income) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
+                                            <td class="px-4 py-2 text-right">
+                                                <div class="flex justify-end gap-2">
+                                                    <a href="{{ route('incomes.show', $income) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
                                                         Просмотр
                                                     </a>
-                                                    <form action="{{ route('incomes-list.destroy', $income) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены?')">
+                                                    <form action="{{ route('incomes-list.destroy', $income) }}" method="POST" onsubmit="return confirm('Вы уверены?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
+                                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition cursor-pointer">
                                                             Удалить
                                                         </button>
                                                     </form>

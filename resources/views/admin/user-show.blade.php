@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     
                     <div class="mb-6">
@@ -59,7 +59,7 @@
                         <div class="overflow-x-auto">
                             <table class="min-w-full table-auto">
                                 <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                         <th class="px-3 py-2 text-left">ID</th>
                                         <th class="px-3 py-2 text-left">Автомобиль</th>
                                         <th class="px-3 py-2 text-left">Год</th>
@@ -68,7 +68,7 @@
                                 </thead>
                                 <tbody>
                                     @forelse($user->cars as $car)
-                                        <tr class="border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="window.location.href='{{ route('admin.car.show', $car->id) }}'">
+                                        <tr class="border-b dark:border-gray-700 cursor-pointer hover:bg-[#1D1D1D] dark:hover:bg-[#1D1D1D]" onclick="window.location.href='{{ route('admin.car.show', $car->id) }}'">
                                             <td class="px-3 py-2">{{ $car->id }}</td>
                                             <td class="px-3 py-2 text-blue-600 dark:text-blue-400">{{ $car->brand }} {{ $car->model }}</td>
                                             <td class="px-3 py-2">{{ $car->year ?? '—' }}</td>

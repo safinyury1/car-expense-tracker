@@ -14,7 +14,7 @@
             @if(Auth::user()->avatar)
                 <img class="h-20 w-20 rounded-full object-cover" src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
             @else
-                <div class="h-20 w-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 text-2xl">
+                <div class="h-20 w-20 rounded-full bg-gray-200 dark:bg-[#6B727F] flex items-center justify-center text-gray-500 dark:text-gray-400 text-2xl">
                     {{ substr(Auth::user()->name, 0, 1) }}
                 </div>
             @endif

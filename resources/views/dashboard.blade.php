@@ -18,12 +18,12 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Выбор автомобиля -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-4">
                     <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-4">
                         <div class="flex items-center gap-2">
                             <label class="font-medium text-gray-700 dark:text-gray-300">Автомобиль:</label>
-                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" onchange="this.form.submit()">
+                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" onchange="this.form.submit()">
                                 <option value="all" {{ $selectedCarId === 'all' ? 'selected' : '' }}>
                                     Все автомобили
                                 </option>
@@ -37,7 +37,7 @@
                         
                         <div class="flex items-center gap-2">
                             <label class="font-medium text-gray-700 dark:text-gray-300">Период:</label>
-                            <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
+                            <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
                                 <option value="all" {{ $period == 'all' ? 'selected' : '' }}>Всё время</option>
                                 <option value="today" {{ $period == 'today' ? 'selected' : '' }}>Сегодня</option>
                                 <option value="week" {{ $period == 'week' ? 'selected' : '' }}>Последняя неделя</option>
@@ -47,9 +47,9 @@
                         </div>
                         
                         <div id="customDateRange" class="flex items-center gap-2 {{ $period != 'custom' ? 'hidden' : '' }}">
-                            <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                            <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                             <span class="text-gray-500 dark:text-gray-400">—</span>
-                            <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                            <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                         </div>
                         
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm">
@@ -62,31 +62,31 @@
                     </form>
                 </div>
             </div>
-
+            
             <!-- Карточки с показателями -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400">Общие расходы</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ number_format($data['totalExpenses'], 2) }} {{ $data['currency'] ?? '₽' }}</p>
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400">Затраты на топливо</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ number_format($data['totalFuelCost'], 2) }} {{ $data['currency'] ?? '₽' }}</p>
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400">Средний расход топлива</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ $data['avgFuelConsumption'] }} <span class="text-sm font-normal">{{ $data['fuel_unit'] ?? 'л/100 км' }}</span></p>
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400">Стоимость 1 км</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ number_format($data['costPerKm'], 2) }} {{ $data['currency'] ?? '₽' }} / {{ $data['distance_unit'] ?? 'км' }}</p>
@@ -96,7 +96,7 @@
 
             <!-- Графики -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300">Структура расходов</h3>
                     </div>
@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300">Динамика расходов по месяцам</h3>
                     </div>
@@ -117,7 +117,7 @@
 
             <!-- График расхода топлива -->
             @if(count($fuelHistory) >= 2)
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300">История расхода топлива</h3>
                 </div>
@@ -129,12 +129,12 @@
 
             <!-- ИНСАЙТЫ -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                         <h3 class="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-    <img src="{{ asset('images/icons/schedule.png') }}" alt="Расходы" class="w-5 h-5">
-    Расходы в день
-</h3>
+                            <img src="{{ asset('images/icons/schedule.png') }}" alt="Расходы" class="w-5 h-5">
+                            Расходы в день
+                        </h3>
                     </div>
                     <div class="p-4">
                         <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ number_format($insights['dailyAverage'], 2) }} {{ $data['currency'] ?? '₽' }}</p>
@@ -142,9 +142,12 @@
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-                        <h3 class="font-semibold text-gray-700 dark:text-gray-300">💰 Средняя трата</h3>
+                       <h3 class="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <img src="{{ asset('images/icons/consumption3.png') }}" alt="Средняя трата" class="w-5 h-5">
+                            Средняя трата
+                        </h3>
                     </div>
                     <div class="p-4">
                         <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ number_format($insights['averageExpense'], 2) }} {{ $data['currency'] ?? '₽' }}</p>
@@ -154,13 +157,13 @@
             </div>
 
             <!-- ТОП-3 расходов -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                     <h3 class="font-semibold text-gray-700 dark:text-gray-300">Топ-3 самых больших расходов</h3>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($topExpenses as $index => $expense)
-                        <div class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <div class="p-4 flex items-center justify-between hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
                             <div class="flex items-center gap-4">
                                 <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm 
                                     {{ $index == 0 ? 'bg-yellow-500' : ($index == 1 ? 'bg-gray-400' : 'bg-orange-500') }}">

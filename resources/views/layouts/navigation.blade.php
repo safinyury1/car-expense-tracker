@@ -1,4 +1,4 @@
-<nav x-data="{ open: false, showMenu: false, showPagesMenu: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false, showMenu: false, showPagesMenu: false }" class="bg-white dark:bg-[#222222] border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -61,32 +61,32 @@
                     <div x-show="showMenu" 
                          @click.away="showMenu = false"
                          x-cloak
-                         class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
+                         class="absolute right-0 mt-2 w-56 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
                          style="display: none;">
                         <div class="py-1">
                             <a href="{{ route('refuelings.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/zapravka.png') }}" alt="Заправка" class="w-4 h-4">
                                 Добавить заправку
                             </a>
                             <a href="{{ route('expenses.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/money.png') }}" alt="Расход" class="w-4 h-4">
                                 Добавить расход
                             </a>
                             <a href="{{ route('cars.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/car.png') }}" alt="Автомобиль" class="w-4 h-4">
                                 Добавить автомобиль
                             </a>
                             <a href="{{ route('service.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/wrench.png') }}" alt="Обслуживание" class="w-4 h-4">
                                 Добавить обслуживание
                             </a>
                             <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                             <a href="{{ route('incomes.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/income1.png') }}" alt="Доход" class="w-4 h-4">
                                 Добавить доход
                             </a>
@@ -96,81 +96,82 @@
 
                 <!-- Вторая кнопка: Страницы (меню) -->
                 <div class="relative">
-    <button @click="showPagesMenu = !showPagesMenu" 
-            class="w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
-        <img src="{{ asset('images/icons/menu2.png') }}" alt="Меню" class="w-5 h-5">
-    </button>
-    
-    <div x-show="showPagesMenu" 
-         @click.away="showPagesMenu = false"
-         x-cloak
-         class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
-         style="display: none;">
-        <div class="py-1">
-            <a href="{{ route('refuelings.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                <img src="{{ asset('images/icons/zapravka1.png') }}" alt="Заправки" class="w-4 h-4">
-                Заправки
-            </a>
-            <a href="{{ route('expenses.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                <img src="{{ asset('images/icons/consumption3.png') }}" alt="Расходы" class="w-4 h-4">
-                Расходы
-            </a>
-            <a href="{{ route('incomes-list.index') }}" 
-               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                <img src="{{ asset('images/icons/income2.png') }}" alt="Доходы" class="w-4 h-4">
-                Доходы
-            </a>
-        </div>
-    </div>
-</div>
+                    <button @click="showPagesMenu = !showPagesMenu" 
+                            class="w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        <img src="{{ asset('images/icons/menu2.png') }}" alt="Меню" class="w-5 h-5">
+                    </button>
+                    
+                    <div x-show="showPagesMenu" 
+                         @click.away="showPagesMenu = false"
+                         x-cloak
+                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
+                         style="display: none;">
+                        <div class="py-1">
+                            <a href="{{ route('refuelings.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/zapravka1.png') }}" alt="Заправки" class="w-4 h-4">
+                                Заправки
+                            </a>
+                            <a href="{{ route('expenses.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/consumption3.png') }}" alt="Расходы" class="w-4 h-4">
+                                Расходы
+                            </a>
+                            <a href="{{ route('incomes-list.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/income2.png') }}" alt="Доходы" class="w-4 h-4">
+                                Доходы
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Правая часть -->
-            <div class="hidden sm:flex sm:items-center">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition duration-150 ease-in-out">
-                            @if(Auth::user()->avatar)
-                                <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
-                            @else
-                                <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm mr-2">
-                                    {{ substr(Auth::user()->name, 0, 1) }}
+                <!-- Правая часть -->
+                <div class="hidden sm:flex sm:items-center">
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="flex items-center text-sm font-medium text-gray-900 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition duration-150 ease-in-out">
+                                @if(Auth::user()->avatar)
+                                    <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm mr-2">
+                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                    </div>
+                                @endif
+                                <div class="text-gray-900 dark:text-gray-300">{{ Auth::user()->name }}</div>
+                                <div class="ml-1">
+                                    <svg class="fill-current h-4 w-4 text-gray-900 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
                                 </div>
-                            @endif
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="ml-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                            </button>
+                        </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('settings.index')">
-                            {{ __('Настройки') }}
-                        </x-dropdown-link>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Выйти') }}
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('settings.index')">
+                                {{ __('Настройки') }}
                             </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
 
-            <!-- Hamburger -->
-            <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')"
+                                        onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Выйти') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                </div>
+
+                <!-- Hamburger -->
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -254,43 +255,63 @@
 <style>
     [x-cloak] { display: none !important; }
     
-    /* Неоновая подсветка для ссылок навигации */
+    /* Стили для навигационных ссылок */
     .nav-link {
         position: relative;
         transition: all 0.3s ease;
+        color: #374151 !important;
     }
     
     .nav-link:hover {
-        color: #3b82f6 !important;
-        text-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6;
+        color: #1f2937 !important;
+    }
+    
+    /* Подсветка снизу для активной ссылки */
+    .nav-link-active {
+        color: #1f2937 !important;
+    }
+    
+    .nav-link-active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #017CFA;
+        border-radius: 2px;
     }
     
     /* Для тёмной темы */
+    .dark .nav-link {
+        color: #9ca3af !important;
+    }
+    
     .dark .nav-link:hover {
-        color: #60a5fa !important;
-        text-shadow: 0 0 5px #60a5fa, 0 0 10px #3b82f6;
+        color: #f3f4f6 !important;
     }
     
-    /* Неон для кнопок в дропдауне */
-    .dropdown-item:hover {
-        background-color: rgba(59, 130, 246, 0.1);
-        color: #3b82f6 !important;
-        text-shadow: 0 0 3px #3b82f6;
+    .dark .nav-link-active {
+        color: #f3f4f6 !important;
     }
     
-    /* Неон для круглых кнопок */
-    .rounded-full:hover {
-        box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
-        transform: scale(1.05);
+    /* Убираем белый квадрат при клике */
+    button:focus,
+    button:active,
+    a:focus,
+    a:active,
+    .nav-link:focus,
+    .nav-link:active,
+    .rounded-full:focus,
+    .rounded-full:active {
+        outline: none !important;
+        box-shadow: none !important;
+        ring: none !important;
+        -webkit-tap-highlight-color: transparent !important;
     }
     
-    /* Синяя кнопка */
-    .bg-blue-500:hover {
-        box-shadow: 0 0 15px #3b82f6, 0 0 25px #3b82f6;
-    }
-    
-    /* Серая кнопка */
-    .bg-gray-500:hover {
-        box-shadow: 0 0 15px #6b7280, 0 0 25px #6b7280;
+    *:focus {
+        outline: none !important;
+        box-shadow: none !important;
     }
 </style>

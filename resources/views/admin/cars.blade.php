@@ -7,11 +7,11 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     
                     <form method="GET" class="mb-4 flex gap-2 flex-wrap">
-                        <select name="user_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                        <select name="user_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                             <option value="">Все пользователи</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ $userId == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
@@ -24,7 +24,7 @@
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-auto border-collapse">
                             <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">ID</th>
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">Автомобиль</th>
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">Владелец</th>
@@ -35,7 +35,7 @@
                             </thead>
                             <tbody>
                                 @foreach($cars as $car)
-                                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="window.location.href='{{ route('admin.car.show', $car->id) }}'">
+                                    <tr class="border-b dark:border-gray-700 hover:bg-[#1D1D1D] dark:hover:bg-[#1D1D1D] cursor-pointer" onclick="window.location.href='{{ route('admin.car.show', $car->id) }}'">
                                         <td class="px-4 py-3 border dark:border-gray-600">{{ $car->id }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400">{{ $car->brand }} {{ $car->model }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600">{{ $car->user->name }}</td>

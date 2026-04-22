@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     @if(session('success'))
@@ -34,10 +34,10 @@
                             <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">Стандартные категории</h3>
                             <div class="space-y-2">
                                 @forelse($categories as $category)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#6B727F] rounded-lg">
                                         <div class="flex items-center gap-3">
                                             <span class="text-gray-700 dark:text-gray-300">{{ $category->name }}</span>
-                                            <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">по умолчанию</span>
+                                            <span class="text-xs text-white bg-blue-500 dark:bg-blue-600 px-2 py-1 rounded">по умолчанию</span>
                                         </div>
                                         <div class="text-gray-400 dark:text-gray-500 text-sm">
                                             нельзя редактировать
@@ -57,16 +57,20 @@
                             @else
                                 <div class="space-y-2">
                                     @foreach($userCategories as $category)
-                                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#6B727F] rounded-lg">
                                             <div class="flex items-center gap-3">
                                                 <span class="text-gray-700 dark:text-gray-300">{{ $category->name }}</span>
                                             </div>
-                                            <div class="flex gap-2">
-                                                <a href="{{ route('categories.edit', $category) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">✏️</a>
-                                                <form action="{{ route('categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Удалить категорию?')">
+                                            <div class="flex gap-3">
+                                                <a href="{{ route('categories.edit', $category) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm font-medium">
+                                                    Редактировать
+                                                </a>
+                                                <form action="{{ route('categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Удалить категорию?')" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">🗑️</button>
+                                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm font-medium">
+                                                        Удалить
+                                                    </button>
                                                 </form>
                                             </div>
                                         </div>

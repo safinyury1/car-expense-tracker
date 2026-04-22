@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('cars.update', $car) }}" method="POST">
                         @csrf
@@ -19,7 +19,7 @@
                                     Марка <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="brand" id="brand" value="{{ old('brand', $car->brand) }}" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" required>
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" required>
                                 @error('brand')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -30,7 +30,7 @@
                                     Модель <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="model" id="model" value="{{ old('model', $car->model) }}" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" required>
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" required>
                                 @error('model')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -40,7 +40,7 @@
                                 <label for="year" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Год выпуска</label>
                                 <input type="number" name="year" id="year" value="{{ old('year', $car->year) }}" 
                                     min="1900" max="{{ date('Y') }}" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                                 @error('year')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -50,7 +50,7 @@
                                 <label for="vin" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">VIN-код</label>
                                 <input type="text" name="vin" id="vin" value="{{ old('vin', $car->vin) }}" 
                                     maxlength="17" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                                 @error('vin')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -60,7 +60,7 @@
                                 <label for="initial_odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Начальный пробег (км)</label>
                                 <input type="number" name="initial_odometer" id="initial_odometer" value="{{ old('initial_odometer', $car->initial_odometer) }}" 
                                     min="0" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                                 @error('initial_odometer')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror

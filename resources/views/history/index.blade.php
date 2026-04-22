@@ -18,13 +18,13 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Фильтры -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden mb-6">
+            <div class="bg-white dark:bg-[#222222] rounded-xl shadow-sm overflow-hidden mb-6">
                 <div class="p-4">
                     <form method="GET" action="{{ route('history.index') }}" class="space-y-4">
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="flex items-center gap-2">
                                 <label class="font-medium text-gray-700 dark:text-gray-300">Фильтр авто:</label>
-                                <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm text-sm" onchange="this.form.submit()">
+                                <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm" onchange="this.form.submit()">
                                     <option value="all" {{ $selectedCarId === 'all' ? 'selected' : '' }}>
                                         Все автомобили
                                     </option>
@@ -38,7 +38,7 @@
                             
                             <div class="flex items-center gap-2">
                                 <label class="font-medium text-gray-700 dark:text-gray-300">Период:</label>
-                                <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
+                                <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
                                     <option value="all" {{ $period == 'all' ? 'selected' : '' }}>Всё время</option>
                                     <option value="today" {{ $period == 'today' ? 'selected' : '' }}>Сегодня</option>
                                     <option value="week" {{ $period == 'week' ? 'selected' : '' }}>Последняя неделя</option>
@@ -48,9 +48,9 @@
                             </div>
                             
                             <div id="customDateRange" class="flex items-center gap-2 {{ $period != 'custom' ? 'hidden' : '' }}">
-                                <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                                 <span class="text-gray-500 dark:text-gray-400">—</span>
-                                <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                             </div>
                             
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm">
@@ -66,12 +66,12 @@
                             <label class="font-medium text-gray-700 dark:text-gray-300">Категория:</label>
                             <div class="flex flex-wrap gap-1">
                                 <a href="{{ route('history.index', array_merge(request()->all(), ['category' => 'all'])) }}" 
-                                   class="px-3 py-1 rounded-full text-sm {{ $categoryFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                                   class="px-3 py-1 rounded-full text-sm {{ $categoryFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                     Все
                                 </a>
                                 @foreach($sortedCategories as $cat)
                                     <a href="{{ route('history.index', array_merge(request()->all(), ['category' => $cat])) }}" 
-                                       class="px-3 py-1 rounded-full text-sm {{ $categoryFilter === $cat ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                                       class="px-3 py-1 rounded-full text-sm {{ $categoryFilter === $cat ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                         {{ $cat }}
                                     </a>
                                 @endforeach
@@ -82,7 +82,7 @@
             </div>
             
             <!-- Список операций (кликабельный) -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-[#222222] rounded-xl shadow-sm overflow-hidden">
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($operations as $operation)
                         @php
@@ -96,20 +96,20 @@
                         @endphp
                         @if($routeName)
                             <a href="{{ route($routeName, $operation['id']) }}" 
-                               class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                               class="block p-4 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $operation['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : ($operation['type'] === 'service' ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-red-100 dark:bg-red-900/50') }}">
-    @if($operation['type'] === 'expense')
-        <img src="{{ asset('images/icons/consumption2.png') }}" alt="Расход" class="w-5 h-5">
-    @elseif($operation['type'] === 'refueling')
-        <img src="{{ asset('images/icons/gas_station2.png') }}" alt="Заправка" class="w-5 h-5">
-    @elseif($operation['type'] === 'service')
-        <img src="{{ asset('images/icons/service.png') }}" alt="Обслуживание" class="w-5 h-5">
-    @else
-        <img src="{{ asset('images/icons/income.png') }}" alt="Доход" class="w-5 h-5">
-    @endif
-</div>
+                                            @if($operation['type'] === 'expense')
+                                                <img src="{{ asset('images/icons/consumption2.png') }}" alt="Расход" class="w-5 h-5">
+                                            @elseif($operation['type'] === 'refueling')
+                                                <img src="{{ asset('images/icons/gas_station2.png') }}" alt="Заправка" class="w-5 h-5">
+                                            @elseif($operation['type'] === 'service')
+                                                <img src="{{ asset('images/icons/service.png') }}" alt="Обслуживание" class="w-5 h-5">
+                                            @else
+                                                <img src="{{ asset('images/icons/income.png') }}" alt="Доход" class="w-5 h-5">
+                                            @endif
+                                        </div>
                                         
                                         <div>
                                             <div class="flex items-center gap-2">

@@ -16,6 +16,7 @@ class Car extends Model
         'year',
         'vin',
         'initial_odometer',
+        'current_odometer',
         'photo',
         'distance_unit',
         'volume_unit',
@@ -25,6 +26,7 @@ class Car extends Model
     protected $casts = [
         'year' => 'integer',
         'initial_odometer' => 'integer',
+        'current_odometer' => 'integer',
     ];
 
     public function user()
