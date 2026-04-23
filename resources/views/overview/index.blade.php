@@ -8,8 +8,8 @@
     <div class="py-6 bg-[#EDEEF0] dark:bg-[#141414]">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             
-            <!-- Карточка автомобиля с фото на весь блок -->
-            <div class="relative rounded-xl shadow-md overflow-hidden mb-6 min-h-[200px]">
+            <!-- Карточка автомобиля с фото на весь блок и неоном снизу -->
+            <div class="relative rounded-xl shadow-md overflow-hidden mb-8 min-h-[200px]">
                 <!-- Фоновая фотография -->
                 @if($selectedCar->photo)
                     <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -77,6 +77,12 @@
                         <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/jpg" onchange="this.form.submit()">
                     </form>
                 </div>
+            </div>
+            
+            <!-- Неоновая подсветка снизу карточки -->
+            <div class="relative -mt-4 mb-6 flex justify-center">
+                <div class="w-3/4 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent rounded-full blur-sm"></div>
+                <div class="absolute w-1/2 h-2 bg-blue-500/50 rounded-full blur-md"></div>
             </div>
 
             <!-- Отдельная карточка пробега -->
@@ -242,6 +248,26 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* Неоновая подсветка снизу карточки */
+        .neon-glow {
+            position: relative;
+        }
+        
+        .neon-glow::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #3b82f6, #3b82f6, transparent);
+            border-radius: 50%;
+            filter: blur(3px);
+            box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
+        }
+    </style>
 
     <script>
         function toggleCarDropdown() {

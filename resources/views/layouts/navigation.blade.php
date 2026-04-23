@@ -6,7 +6,11 @@
             <div class="flex">
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('overview.index') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <img class="theme-logo block h-9 w-auto"
+     data-light-src="{{ asset('images/logo.png') }}"
+     data-dark-src="{{ asset('images/logo1.png') }}"
+     src="{{ asset('images/logo.png') }}"
+     alt="Logo">
                     </a>
                 </div>
 

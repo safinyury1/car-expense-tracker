@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Car Expense Tracker') }}</title>
+    <title>{{ config('app.name', 'AutoCost') }}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -19,112 +22,152 @@
         if (localStorage.getItem('darkMode') === 'true') {
             document.documentElement.classList.add('dark');
         }
+        
+        // Смена логотипа при переключении темы
+        function updateLogo() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const logos = document.querySelectorAll('.theme-logo');
+            logos.forEach(logo => {
+                if (isDark) {
+                    logo.src = logo.dataset.darkSrc;
+                } else {
+                    logo.src = logo.dataset.lightSrc;
+                }
+            });
+        }
+        
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    updateLogo();
+                }
+            });
+        });
+        observer.observe(document.documentElement, { attributes: true });
+        document.addEventListener('DOMContentLoaded', updateLogo);
     </script>
     
     <style>
-        /* Глобальные анимации для всех интерактивных элементов */
-        a, button, .nav-link, .dropdown-item, tbody tr, .hover-transition, .rounded-full {
-            transition: all 0.2s ease-in-out !important;
+        /* Убираем синие квадраты при наведении и клике */
+        * {
+            -webkit-tap-highlight-color: transparent !important;
         }
-        
-        /* Убираем фоновую подсветку (квадраты) */
-        a:hover,
-        button:hover,
-        .nav-link:hover,
-        .dropdown-item:hover,
-        tbody tr:hover,
-        .responsive-nav-link:hover,
-        .bg-blue-500:hover,
-        .bg-green-500:hover,
-        .bg-yellow-500:hover,
-        .bg-red-500:hover,
-        .bg-gray-500:hover,
-        .rounded-full:hover {
-            background-color: transparent !important;
+
+        *:focus,
+        *:active,
+        *:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            ring: none !important;
         }
-        
-        /* НЕОН для светлой темы - только свечение, без фона */
-        a:not(.no-hover):hover,
-        button:not(.no-hover):hover,
-        .nav-link:hover,
-        .dropdown-item:hover,
-        tbody tr:hover,
-        .hover-light:hover,
-        .responsive-nav-link:hover {
-            box-shadow: 0 0 10px #017CFA, 0 0 20px #017CFA !important;
-            text-shadow: 0 0 5px #017CFA !important;
-        }
-        
-        /* НЕОН для тёмной темы */
-        .dark a:not(.no-hover):hover,
-        .dark button:not(.no-hover):hover,
-        .dark .nav-link:hover,
-        .dark .dropdown-item:hover,
-        .dark tbody tr:hover,
-        .dark .hover-dark:hover,
-        .dark .responsive-nav-link:hover {
-            box-shadow: 0 0 10px #017CFA, 0 0 20px #017CFA !important;
-            text-shadow: 0 0 5px #017CFA !important;
-        }
-        
-        /* Неон для синей кнопки */
-        .bg-blue-500:hover {
-            box-shadow: 0 0 15px #3b82f6, 0 0 25px #3b82f6 !important;
-        }
-        
-        /* Неон для зелёной кнопки */
-        .bg-green-500:hover {
-            box-shadow: 0 0 15px #10b981, 0 0 25px #10b981 !important;
-        }
-        
-        /* Неон для жёлтой кнопки */
-        .bg-yellow-500:hover {
-            box-shadow: 0 0 15px #eab308, 0 0 25px #eab308 !important;
-        }
-        
-        /* Неон для красной кнопки */
-        .bg-red-500:hover {
-            box-shadow: 0 0 15px #ef4444, 0 0 25px #ef4444 !important;
-        }
-        
-        /* Неон для серой кнопки */
-        .bg-gray-500:hover {
-            box-shadow: 0 0 15px #6b7280, 0 0 25px #6b7280 !important;
-        }
-        
-        /* Неон для круглых кнопок */
-        .rounded-full:hover {
-            box-shadow: 0 0 10px currentColor, 0 0 20px currentColor !important;
-            transform: scale(1.05);
-        }
-        
-        /* Неон для ссылок в навигации - только свечение текста */
-        .nav-link:hover {
-            text-shadow: 0 0 5px #017CFA, 0 0 10px #017CFA !important;
-        }
-        
-        /* Убираем белый квадрат при клике */
+
         button:focus,
         button:active,
         a:focus,
         a:active,
         .nav-link:focus,
         .nav-link:active,
-        .dropdown-item:focus,
-        .dropdown-item:active,
         .rounded-full:focus,
         .rounded-full:active,
-        *:focus {
+        [x-nav-link]:focus,
+        [x-nav-link]:active {
             outline: none !important;
             box-shadow: none !important;
-            ring: none !important;
-            -webkit-tap-highlight-color: transparent !important;
+            ring: 0 !important;
+            ring-offset: 0 !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            ring: 0 !important;
         }
         
-        /* Убираем фон у строк таблицы при наведении */
-        tbody tr:hover td,
-        tbody tr:hover {
+        /* Неон для круглых кнопок */
+        .rounded-full {
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        .rounded-full:hover {
+            box-shadow: 0 0 10px currentColor, 0 0 20px currentColor !important;
+            transform: scale(1.05);
+        }
+        
+        .bg-blue-500.rounded-full:hover {
+            box-shadow: 0 0 15px #3b82f6, 0 0 25px #3b82f6 !important;
+        }
+        
+        .bg-gray-500.rounded-full:hover {
+            box-shadow: 0 0 15px #6b7280, 0 0 25px #6b7280 !important;
+        }
+        
+        .bg-blue-500:not(.rounded-full):hover {
+            box-shadow: 0 0 15px #3b82f6, 0 0 25px #3b82f6 !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        .bg-green-500:hover {
+            box-shadow: 0 0 15px #10b981, 0 0 25px #10b981 !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        .bg-yellow-500:hover {
+            box-shadow: 0 0 15px #eab308, 0 0 25px #eab308 !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        .bg-red-500:hover {
+            box-shadow: 0 0 15px #ef4444, 0 0 25px #ef4444 !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        .bg-gray-500:not(.rounded-full):hover {
+            box-shadow: 0 0 15px #6b7280, 0 0 25px #6b7280 !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        .nav-link:hover {
+            text-shadow: 0 0 5px #017CFA, 0 0 10px #017CFA !important;
+            color: #017CFA !important;
+            transition: all 0.2s ease-in-out !important;
             background-color: transparent !important;
+        }
+        
+        .dropdown-item:hover {
+            text-shadow: 0 0 5px #017CFA, 0 0 10px #017CFA !important;
+            color: #017CFA !important;
+            transition: all 0.2s ease-in-out !important;
+            background-color: transparent !important;
+        }
+        
+        .dark .nav-link:hover {
+            text-shadow: 0 0 5px #017CFA, 0 0 10px #017CFA !important;
+            color: #60a5fa !important;
+        }
+        
+        /* Неоновая подсветка снизу карточки */
+        .neon-glow-bottom {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #3b82f6, #3b82f6, #3b82f6, #3b82f6, transparent);
+            border-radius: 4px;
+            filter: blur(2px);
+            box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
+            animation: neonPulse 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes neonPulse {
+            0% {
+                box-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6;
+                opacity: 0.8;
+            }
+            100% {
+                box-shadow: 0 0 15px #3b82f6, 0 0 30px #3b82f6, 0 0 40px #3b82f6;
+                opacity: 1;
+            }
         }
     </style>
 </head>

@@ -11,7 +11,7 @@
                 <div class="p-6">
                     
                     <div class="prose max-w-none dark:prose-invert">
-                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Добро пожаловать в Car Expense Tracker!</h1>
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Добро пожаловать в AutoCost!</h1>
                         <p class="text-gray-600 dark:text-gray-400 mb-6">Это приложение поможет вам отслеживать расходы на автомобиль, заправки и многое другое.</p>
                         
                         <div class="space-y-6">
@@ -115,7 +115,7 @@
                     </div>
                     
                     <div class="mt-8 pt-4 border-t border-gray-100 dark:border-gray-700 text-center text-gray-400 dark:text-gray-500 text-sm">
-                        <p>© {{ date('Y') }} Car Expense Tracker. Все права защищены.</p>
+                        <p>© {{ date('Y') }} AutoCost. Все права защищены.</p>
                     </div>
                 </div>
             </div>

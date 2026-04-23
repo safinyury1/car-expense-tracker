@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
+use App\Models\Income;
 use App\Models\Reminder;
 use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
@@ -15,38 +16,40 @@ class CarController extends Controller
 {
     use ConvertsUnits;
 
+    /**
+     * Display a listing of the cars.
+     */
     public function index()
     {
         $cars = Auth::user()->cars;
         
         foreach ($cars as $car) {
+            // Получаем текущий пробег
+            $maxOdometerExpense = Expense::where('car_id', $car->id)->max('odometer');
+            $maxOdometerRefueling = Refueling::where('car_id', $car->id)->max('odometer');
+            $maxOdometerIncome = Income::where('car_id', $car->id)->max('odometer');
+            $maxOdometer = max($maxOdometerExpense, $maxOdometerRefueling, $maxOdometerIncome, $car->initial_odometer);
+            
+            $car->current_odometer = $maxOdometer;
             $car->converted_initial_odometer = $this->convertDistance($car->initial_odometer, $car);
-            
-            // Получаем текущий пробег из последней записи
-            $lastExpense = Expense::where('car_id', $car->id)->orderBy('date', 'desc')->first();
-            $lastRefueling = Refueling::where('car_id', $car->id)->orderBy('date', 'desc')->first();
-            $lastOdometer = 0;
-            
-            if ($lastExpense && $lastRefueling) {
-                $lastOdometer = max($lastExpense->odometer, $lastRefueling->odometer);
-            } elseif ($lastExpense) {
-                $lastOdometer = $lastExpense->odometer;
-            } elseif ($lastRefueling) {
-                $lastOdometer = $lastRefueling->odometer;
-            }
-            
-            $car->current_odometer = $lastOdometer > 0 ? $lastOdometer : $car->initial_odometer;
-            $car->converted_current_odometer = $this->convertDistance($car->current_odometer, $car);
+            $car->converted_current_odometer = $this->convertDistance($maxOdometer, $car);
+            $car->distance_unit = $this->getDistanceUnit($car);
         }
         
         return view('cars.index', compact('cars'));
     }
 
-    public function createForm()
+    /**
+     * Show the form for creating a new car.
+     */
+    public function create()
     {
         return view('cars.create');
     }
 
+    /**
+     * Store a newly created car in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -65,32 +68,20 @@ class CarController extends Controller
             ->with('success', 'Автомобиль успешно добавлен!');
     }
 
+    /**
+     * Show the form for editing the specified car.
+     */
     public function edit(Car $car)
     {
         if ($car->user_id !== Auth::id()) {
             abort(403);
         }
-        
-        // Получаем текущий пробег
-        $lastExpense = Expense::where('car_id', $car->id)->orderBy('date', 'desc')->first();
-        $lastRefueling = Refueling::where('car_id', $car->id)->orderBy('date', 'desc')->first();
-        $lastOdometer = 0;
-        
-        if ($lastExpense && $lastRefueling) {
-            $lastOdometer = max($lastExpense->odometer, $lastRefueling->odometer);
-        } elseif ($lastExpense) {
-            $lastOdometer = $lastExpense->odometer;
-        } elseif ($lastRefueling) {
-            $lastOdometer = $lastRefueling->odometer;
-        }
-        
-        $car->current_odometer = $lastOdometer > 0 ? $lastOdometer : $car->initial_odometer;
-        $car->converted_current_odometer = $this->convertDistance($car->current_odometer, $car);
-        $car->converted_initial_odometer = $this->convertDistance($car->initial_odometer, $car);
-        
         return view('cars.edit', compact('car'));
     }
 
+    /**
+     * Update the specified car in storage.
+     */
     public function update(Request $request, Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -103,7 +94,6 @@ class CarController extends Controller
             'year' => 'nullable|integer|min:1900|max:' . date('Y'),
             'vin' => 'nullable|string|max:17',
             'initial_odometer' => 'nullable|integer|min:0',
-            'current_odometer' => 'nullable|integer|min:0',
         ]);
 
         $car->update($validated);
@@ -112,28 +102,9 @@ class CarController extends Controller
             ->with('success', 'Автомобиль успешно обновлён!');
     }
 
-    public function destroy(Car $car)
-    {
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        // Удаляем фото если есть
-        if ($car->photo && Storage::disk('public')->exists($car->photo)) {
-            Storage::disk('public')->delete($car->photo);
-        }
-
-        // Удаляем связанные данные
-        Expense::where('car_id', $car->id)->delete();
-        Refueling::where('car_id', $car->id)->delete();
-        Reminder::where('car_id', $car->id)->delete();
-
-        $car->delete();
-
-        return redirect()->route('cars.index')
-            ->with('success', 'Автомобиль успешно удалён!');
-    }
-
+    /**
+     * Update the car photo.
+     */
     public function updatePhoto(Request $request, Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -144,41 +115,78 @@ class CarController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Удаляем старое фото
         if ($car->photo && Storage::disk('public')->exists($car->photo)) {
             Storage::disk('public')->delete($car->photo);
         }
 
-        // Сохраняем новое фото
         $path = $request->file('photo')->store('car-photos', 'public');
         $car->update(['photo' => $path]);
 
-        return redirect()->back()->with('success', 'Фото обновлено!');
+        return redirect()->route('overview.index', ['car_id' => $car->id])
+            ->with('success', 'Фото автомобиля обновлено!');
     }
 
+    /**
+     * Update the car odometer.
+     */
     public function updateOdometer(Request $request, Car $car)
     {
         if ($car->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'odometer' => 'required|integer|min:0',
         ]);
 
-        // Создаем запись в расходах для отслеживания изменения пробега
+        // Конвертируем обратно в км если нужно
+        $odometerInKm = $this->convertDistanceFrom($validated['odometer'], $car);
+
+        // Создаём запись в расходах как ручное обновление пробега
+        $category = \App\Models\ExpenseCategory::where('name', 'Прочее')->first();
+        
         Expense::create([
             'car_id' => $car->id,
-            'category_id' => 1, // категория "Прочее"
+            'category_id' => $category->id ?? 1,
             'date' => now(),
             'amount' => 0,
-            'odometer' => $request->odometer,
+            'odometer' => $odometerInKm,
             'description' => 'Ручное обновление пробега',
         ]);
 
-        return redirect()->back()->with('success', 'Пробег обновлён!');
+        return redirect()->route('overview.index', ['car_id' => $car->id])
+            ->with('success', 'Пробег обновлён!');
     }
 
+    /**
+     * Remove the specified car from storage.
+     */
+    public function destroy(Car $car)
+    {
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Удаляем фото
+        if ($car->photo && Storage::disk('public')->exists($car->photo)) {
+            Storage::disk('public')->delete($car->photo);
+        }
+
+        // Удаляем связанные данные
+        Expense::where('car_id', $car->id)->delete();
+        Refueling::where('car_id', $car->id)->delete();
+        Income::where('car_id', $car->id)->delete();
+        Reminder::where('car_id', $car->id)->delete();
+
+        $car->delete();
+
+        return redirect()->route('cars.index')
+            ->with('success', 'Автомобиль успешно удалён!');
+    }
+
+    /**
+     * Export cars to CSV.
+     */
     public function exportCsv()
     {
         $cars = Auth::user()->cars;

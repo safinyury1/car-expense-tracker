@@ -1,8 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Сравнение автомобилей') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Сравнение автомобилей') }}
+            </h2>
+            @if(!$selectedCars->isEmpty())
+                <button onclick="window.print()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Экспорт PDF
+                </button>
+            @endif
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -72,7 +83,7 @@
                                                 {{ number_format($comparisonData[$car->id]['totalFuelCost'], 2) }} {{ $comparisonData[$car->id]['currency'] }}
                                             </td>
                                         @endforeach
-                                    </tr>
+                                     </tr>
                                     <tr class="border-b dark:border-gray-700">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Средний расход топлива</td>
                                         @foreach($selectedCars as $car)
@@ -80,13 +91,13 @@
                                                 {{ $comparisonData[$car->id]['avgFuelConsumption'] }} {{ $comparisonData[$car->id]['fuel_unit'] }}
                                             </td>
                                         @endforeach
-                                    </tr>
+                                     </tr>
                                     <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-[#6B727F]/50">
                                         <td class="px-4 py-3 font-medium border dark:border-gray-600">Стоимость 1 км</td>
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ number_format($comparisonData[$car->id]['costPerKm'], 2) }} {{ $comparisonData[$car->id]['currency'] }} / {{ $comparisonData[$car->id]['distance_unit'] }}
-                                             </td>
+                                            </td>
                                         @endforeach
                                      </tr>
                                     <tr class="border-b dark:border-gray-700">
@@ -94,7 +105,7 @@
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ number_format($comparisonData[$car->id]['totalDistance']) }} {{ $comparisonData[$car->id]['distance_unit'] }}
-                                             </td>
+                                            </td>
                                         @endforeach
                                      </tr>
                                     <tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-[#6B727F]/50">
@@ -102,7 +113,7 @@
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ $comparisonData[$car->id]['expensesCount'] }}
-                                             </td>
+                                            </td>
                                         @endforeach
                                      </tr>
                                     <tr class="border-b dark:border-gray-700">
@@ -110,7 +121,7 @@
                                         @foreach($selectedCars as $car)
                                             <td class="px-4 py-3 text-center border dark:border-gray-600">
                                                 {{ $comparisonData[$car->id]['refuelingsCount'] }}
-                                             </td>
+                                            </td>
                                         @endforeach
                                      </tr>
                                 </tbody>
