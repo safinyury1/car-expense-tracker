@@ -11,6 +11,7 @@ use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 
 class CarController extends Controller
 {
@@ -24,7 +25,6 @@ class CarController extends Controller
         $cars = Auth::user()->cars;
         
         foreach ($cars as $car) {
-            // Получаем текущий пробег
             $maxOdometerExpense = Expense::where('car_id', $car->id)->max('odometer');
             $maxOdometerRefueling = Refueling::where('car_id', $car->id)->max('odometer');
             $maxOdometerIncome = Income::where('car_id', $car->id)->max('odometer');
@@ -48,6 +48,14 @@ class CarController extends Controller
     }
 
     /**
+     * Альтернативная форма для создания автомобиля.
+     */
+    public function createForm()
+    {
+        return view('cars.create-form');
+    }
+
+    /**
      * Store a newly created car in storage.
      */
     public function store(Request $request)
@@ -58,10 +66,17 @@ class CarController extends Controller
             'year' => 'nullable|integer|min:1900|max:' . date('Y'),
             'vin' => 'nullable|string|max:17',
             'initial_odometer' => 'nullable|integer|min:0',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $car = new Car($validated);
         $car->user_id = Auth::id();
+        
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('car-photos', 'public');
+            $car->photo = $path;
+        }
+        
         $car->save();
 
         return redirect()->route('cars.index')
@@ -139,10 +154,8 @@ class CarController extends Controller
             'odometer' => 'required|integer|min:0',
         ]);
 
-        // Конвертируем обратно в км если нужно
         $odometerInKm = $this->convertDistanceFrom($validated['odometer'], $car);
 
-        // Создаём запись в расходах как ручное обновление пробега
         $category = \App\Models\ExpenseCategory::where('name', 'Прочее')->first();
         
         Expense::create([
@@ -167,12 +180,10 @@ class CarController extends Controller
             abort(403);
         }
 
-        // Удаляем фото
         if ($car->photo && Storage::disk('public')->exists($car->photo)) {
             Storage::disk('public')->delete($car->photo);
         }
 
-        // Удаляем связанные данные
         Expense::where('car_id', $car->id)->delete();
         Refueling::where('car_id', $car->id)->delete();
         Income::where('car_id', $car->id)->delete();

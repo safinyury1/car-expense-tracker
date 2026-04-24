@@ -11,8 +11,8 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     <!-- Фильтр по автомобилям -->
-                    <div class="mb-4 flex justify-between items-center">
-                        <form method="GET" action="{{ route('reminders.index') }}" class="flex gap-2">
+                    <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <form method="GET" action="{{ route('reminders.index') }}" class="flex flex-col sm:flex-row gap-2">
                             <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
                                 <option value="">Все автомобили</option>
                                 @foreach($cars as $car)
@@ -21,10 +21,10 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Применить</button>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">Применить</button>
                         </form>
                         
-                        <a href="{{ route('reminders.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <a href="{{ route('reminders.create', ['car_id' => $carId ?? '']) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
                             Добавить напоминание
                         </a>
                     </div>

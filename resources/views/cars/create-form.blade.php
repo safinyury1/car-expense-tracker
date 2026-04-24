@@ -10,11 +10,11 @@
             <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
-                   <div class="text-center mb-6">
-    <div class="inline-block p-4 bg-[#6B727E] dark:bg-[#6B727E] rounded-full">
-        <img src="{{ asset('images/car.svg') }}" alt="Автомобиль" class="w-25 h-20">
-    </div>
-</div>
+                    <div class="text-center mb-6">
+                        <div class="inline-block p-4 bg-[#6B727E] dark:bg-[#6B727E] rounded-full">
+                            <img src="{{ asset('images/car.svg') }}" alt="Автомобиль" class="w-25 h-20">
+                        </div>
+                    </div>
 
                     <form action="{{ route('cars.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -26,12 +26,12 @@
                                     <img id="previewImage" class="w-32 h-32 object-cover rounded-lg border dark:border-gray-600">
                                 </div>
                                 <div class="flex items-center gap-4">
-    <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition">
-        Выбрать файл
-        <input type="file" name="photo" id="photo" class="hidden" accept="image/jpeg,image/png,image/jpg" onchange="previewPhoto(this)">
-    </label>
-    <span id="fileName" class="text-sm text-gray-500 dark:text-gray-400">Файл не выбран</span>
-</div>
+                                    <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition">
+                                        Выбрать файл
+                                        <input type="file" name="photo" id="photo" class="hidden" accept="image/jpeg,image/png,image/jpg" onchange="previewPhoto(this)">
+                                    </label>
+                                    <span id="fileName" class="text-sm text-gray-500 dark:text-gray-400">Файл не выбран</span>
+                                </div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Поддерживаются JPEG, PNG, JPG. Максимум 2 МБ</p>
                                 @error('photo')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -101,7 +101,7 @@
                         </div>
 
                         <div class="flex justify-between mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('cars.create') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition">
+                            <a href="{{ route('cars.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition">
                                 Назад
                             </a>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">

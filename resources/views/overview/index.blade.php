@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Карточка автомобиля с фото на весь блок и неоном снизу -->
-            <div class="relative rounded-xl shadow-md overflow-hidden mb-8 min-h-[200px]">
+            <div class="relative rounded-xl shadow-md overflow-hidden mb-8 min-h-[150px] sm:min-h-[200px]">
                 <!-- Фоновая фотография -->
                 @if($selectedCar->photo)
                     <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -21,11 +21,11 @@
                 @endif
                 
                 <!-- Контент поверх фона -->
-                <div class="relative p-5 z-10 h-full flex flex-col justify-between min-h-[200px]">
+                <div class="relative p-4 sm:p-5 z-10 h-full flex flex-col justify-between min-h-[150px] sm:min-h-[200px]">
                     <!-- Верхняя часть: название и год (правый верхний угол) -->
                     <div class="flex justify-end">
                         <div class="text-right">
-                            <h3 class="text-xl font-bold text-white drop-shadow-lg">{{ $selectedCar->brand }} {{ $selectedCar->model }}</h3>
+                            <h3 class="text-lg sm:text-xl font-bold text-white drop-shadow-lg">{{ $selectedCar->brand }} {{ $selectedCar->model }}</h3>
                             @if($selectedCar->year)
                                 <p class="text-sm text-white/80 drop-shadow">{{ $selectedCar->year }} г.</p>
                             @endif
@@ -44,27 +44,27 @@
                         </button>
                         
                         <!-- Кнопки (правый нижний угол) -->
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1 sm:gap-2">
                             <div class="relative">
                                 <button onclick="toggleCarDropdown()" 
-                                        class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg px-3 py-1.5 text-sm flex items-center gap-1 transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm flex items-center gap-1 transition">
+                                    <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
-                                    Сменить
+                                    <span class="hidden sm:inline">Сменить</span>
                                 </button>
-                                <div id="carDropdown" class="hidden absolute right-0 bottom-full mb-2 w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
+                                <div id="carDropdown" class="hidden absolute right-0 bottom-full mb-2 w-40 sm:w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
                                     @foreach($cars as $car)
                                         <a href="{{ route('overview.index', ['car_id' => $car->id]) }}" 
-                                           class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] {{ $selectedCarId == $car->id ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : '' }}">
+                                           class="block px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] {{ $selectedCarId == $car->id ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : '' }}">
                                             {{ $car->brand }} {{ $car->model }}
                                         </a>
                                     @endforeach
                                 </div>
                             </div>
                             <a href="{{ route('cars.edit', $selectedCar) }}" 
-                               class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg p-1.5 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg p-1 transition">
+                                <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                             </a>

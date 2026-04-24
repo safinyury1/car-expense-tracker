@@ -22,8 +22,8 @@
                         </div>
                     @endif
 
-                    <div class="mb-4 flex justify-end">
-                        <a href="{{ route('categories.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <div class="mb-4 flex flex-col sm:flex-row justify-end items-start sm:items-center gap-2">
+                        <a href="{{ route('categories.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
                             Создать категорию
                         </a>
                     </div>

@@ -11,13 +11,13 @@
             <!-- Профиль -->
             <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden mb-6">
                 <div class="p-6">
-                    <div class="flex items-center gap-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                         <div class="relative">
                             @if(Auth::user()->avatar)
                                 <img src="{{ Storage::url(Auth::user()->avatar) }}" 
-                                     class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow">
+                                     class="w-20 sm:w-24 h-20 sm:h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow">
                             @else
-                                <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-3xl font-bold shadow">
+                                <div class="w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow">
                                     {{ substr(Auth::user()->name, 0, 1) }}
                                 </div>
                             @endif
@@ -31,7 +31,7 @@
                         </div>
                         
                         <div class="flex-1">
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ Auth::user()->name }}</h3>
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{{ Auth::user()->name }}</h3>
                             <p class="text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                             <div class="flex gap-3 mt-3">
                                 <a href="{{ route('profile.edit') }}" class="text-sm bg-gray-100 dark:bg-[#6B727F] hover:bg-[#E5E7EB] dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg transition">

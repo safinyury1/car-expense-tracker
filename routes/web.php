@@ -23,7 +23,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Дашборд (статистика, графики)
+// Дашборд
 Route::middleware(['auth', 'has.car'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // Редирект после логина/регистрации
@@ -64,10 +64,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/car-settings/delete-car', [CarSettingsController::class, 'deleteCar'])->name('car-settings.delete-car');
     
     // Автомобили
+    Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
+    Route::get('/cars/create', [CarController::class, 'create'])->name('cars.create');
     Route::get('/cars/create-form', [CarController::class, 'createForm'])->name('cars.create.form');
-    Route::resource('cars', CarController::class)->except(['show']);
+    Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
+    Route::get('/cars/{car}/edit', [CarController::class, 'edit'])->name('cars.edit');
+    Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
+    Route::delete('/cars/{car}', [CarController::class, 'destroy'])->name('cars.destroy');
     Route::patch('/cars/{car}/update-photo', [CarController::class, 'updatePhoto'])->name('cars.update.photo');
     Route::patch('/cars/{car}/update-odometer', [CarController::class, 'updateOdometer'])->name('cars.update.odometer');
+    Route::get('/cars/export-csv', [CarController::class, 'exportCsv'])->name('cars.export-csv');
     
     // Расходы
     Route::resource('expenses', ExpenseController::class)->except(['show'])->middleware('has.car');
@@ -90,7 +96,7 @@ Route::middleware('auth')->group(function () {
     // Сравнение
     Route::get('/compare', [CompareController::class, 'index'])->name('compare.index')->middleware('has.car');
     
-    // Доходы (CRUD)
+    // Доходы
     Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create')->middleware('has.car');
     Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store')->middleware('has.car');
     Route::get('/incomes/{income}', [IncomeController::class, 'show'])->name('incomes.show')->middleware('has.car');
@@ -102,7 +108,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/incomes-list', [IncomeListController::class, 'index'])->name('incomes-list.index')->middleware('has.car');
     Route::delete('/incomes-list/{income}', [IncomeListController::class, 'destroy'])->name('incomes-list.destroy')->middleware('has.car');
     
-    // Обслуживание (все маршруты в одном контроллере)
+    // Обслуживание
     Route::get('/service', [ServiceController::class, 'index'])->name('service.index')->middleware('has.car');
     Route::get('/service/create', [ServiceController::class, 'create'])->name('service.create')->middleware('has.car');
     Route::post('/service', [ServiceController::class, 'store'])->name('service.store')->middleware('has.car');

@@ -1,15 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <h2 class="font-semibold text-lg sm:text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Статистика') }}
             </h2>
             <button onclick="window.print()" 
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition shadow-sm">
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Экспорт PDF
+                <span class="hidden sm:inline">Экспорт PDF</span>
             </button>
         </div>
     </x-slot>
@@ -20,10 +20,10 @@
             <!-- Выбор автомобиля -->
             <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-4">
-                    <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-4">
+                    <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-2 sm:gap-4">
                         <div class="flex items-center gap-2">
-                            <label class="font-medium text-gray-700 dark:text-gray-300">Автомобиль:</label>
-                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" onchange="this.form.submit()">
+                            <label class="font-medium text-gray-700 dark:text-gray-300 text-sm">Автомобиль:</label>
+                            <select name="car_id" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm" onchange="this.form.submit()">
                                 <option value="all" {{ $selectedCarId === 'all' ? 'selected' : '' }}>
                                     Все автомобили
                                 </option>
@@ -36,8 +36,8 @@
                         </div>
                         
                         <div class="flex items-center gap-2">
-                            <label class="font-medium text-gray-700 dark:text-gray-300">Период:</label>
-                            <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" onchange="toggleCustomDate()">
+                            <label class="font-medium text-gray-700 dark:text-gray-300 text-sm">Период:</label>
+                            <select name="period" id="period" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm" onchange="toggleCustomDate()">
                                 <option value="all" {{ $period == 'all' ? 'selected' : '' }}>Всё время</option>
                                 <option value="today" {{ $period == 'today' ? 'selected' : '' }}>Сегодня</option>
                                 <option value="week" {{ $period == 'week' ? 'selected' : '' }}>Последняя неделя</option>
@@ -47,12 +47,12 @@
                         </div>
                         
                         <div id="customDateRange" class="flex items-center gap-2 {{ $period != 'custom' ? 'hidden' : '' }}">
-                            <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
+                            <input type="date" name="date_from" value="{{ $dateFrom }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm">
                             <span class="text-gray-500 dark:text-gray-400">—</span>
-                            <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
+                            <input type="date" name="date_to" value="{{ $dateTo }}" class="border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm">
                         </div>
                         
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm transition shadow-sm">
                             Применить
                         </button>
                         
