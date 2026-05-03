@@ -8,9 +8,7 @@
     <div class="py-6 bg-[#EDEEF0] dark:bg-[#141414]">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             
-            <!-- Карточка автомобиля с фото на весь блок и неоном снизу -->
             <div class="relative rounded-xl shadow-md overflow-hidden mb-8 min-h-[150px] sm:min-h-[200px]">
-                <!-- Фоновая фотография -->
                 @if($selectedCar->photo)
                     <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
                          style="background-image: url('{{ Storage::url($selectedCar->photo) }}');">
@@ -19,10 +17,7 @@
                 @else
                     <div class="absolute inset-0 bg-gray-500 dark:bg-[#6B727F]"></div>
                 @endif
-                
-                <!-- Контент поверх фона -->
                 <div class="relative p-4 sm:p-5 z-10 h-full flex flex-col justify-between min-h-[150px] sm:min-h-[200px]">
-                    <!-- Верхняя часть: название и год (правый верхний угол) -->
                     <div class="flex justify-end">
                         <div class="text-right">
                             <h3 class="text-lg sm:text-xl font-bold text-white drop-shadow-lg">{{ $selectedCar->brand }} {{ $selectedCar->model }}</h3>
@@ -31,10 +26,7 @@
                             @endif
                         </div>
                     </div>
-                    
-                    <!-- Нижняя часть: кнопки (левый нижний угол) -->
                     <div class="flex justify-between items-end">
-                        <!-- Кнопка фотоаппарата (левый нижний угол) -->
                         <button onclick="document.getElementById('photoInput').click()" 
                                 class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -17,9 +17,6 @@ class CarController extends Controller
 {
     use ConvertsUnits;
 
-    /**
-     * Display a listing of the cars.
-     */
     public function index()
     {
         $cars = Auth::user()->cars;
@@ -39,25 +36,19 @@ class CarController extends Controller
         return view('cars.index', compact('cars'));
     }
 
-    /**
-     * Show the form for creating a new car.
-     */
+
     public function create()
     {
         return view('cars.create');
     }
 
-    /**
-     * Альтернативная форма для создания автомобиля.
-     */
+
     public function createForm()
     {
         return view('cars.create-form');
     }
 
-    /**
-     * Store a newly created car in storage.
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -83,9 +74,7 @@ class CarController extends Controller
             ->with('success', 'Автомобиль успешно добавлен!');
     }
 
-    /**
-     * Show the form for editing the specified car.
-     */
+
     public function edit(Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -94,9 +83,7 @@ class CarController extends Controller
         return view('cars.edit', compact('car'));
     }
 
-    /**
-     * Update the specified car in storage.
-     */
+
     public function update(Request $request, Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -117,9 +104,7 @@ class CarController extends Controller
             ->with('success', 'Автомобиль успешно обновлён!');
     }
 
-    /**
-     * Update the car photo.
-     */
+
     public function updatePhoto(Request $request, Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -141,9 +126,7 @@ class CarController extends Controller
             ->with('success', 'Фото автомобиля обновлено!');
     }
 
-    /**
-     * Update the car odometer.
-     */
+
     public function updateOdometer(Request $request, Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -171,9 +154,7 @@ class CarController extends Controller
             ->with('success', 'Пробег обновлён!');
     }
 
-    /**
-     * Remove the specified car from storage.
-     */
+
     public function destroy(Car $car)
     {
         if ($car->user_id !== Auth::id()) {
@@ -195,9 +176,7 @@ class CarController extends Controller
             ->with('success', 'Автомобиль успешно удалён!');
     }
 
-    /**
-     * Export cars to CSV.
-     */
+
     public function exportCsv()
     {
         $cars = Auth::user()->cars;

@@ -45,7 +45,6 @@ class DashboardController extends Controller
         $monthlyData = $this->getMonthlyData($selectedCarId, $period, $dateFrom, $dateTo);
         $fuelHistory = $this->getFuelHistory($selectedCarId, $period, $dateFrom, $dateTo);
         
-        // Инсайты
         $insights = $this->getInsights($selectedCarId, $period, $dateFrom, $dateTo);
         
         // Топ-3 расходов
@@ -172,7 +171,7 @@ class DashboardController extends Controller
         $avgFuelConsumption = $this->calculateAvgFuelConsumption($carId, $period, $dateFrom, $dateTo);
         $costPerKm = $this->calculateCostPerKm($carId, $totalExpenses, $period, $dateFrom, $dateTo);
         
-        // Пробег за период (конвертируем для отображения)
+        // Пробег за период 
         if ($period === 'all') {
             $maxOdometer = max(
                 Expense::where('car_id', $carId)->max('odometer') ?? 0,

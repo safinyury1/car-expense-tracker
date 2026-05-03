@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    // Конструктор удалён! Проверка admin теперь в маршрутах
 
     public function dashboard()
     {
