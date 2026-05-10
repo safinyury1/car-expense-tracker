@@ -13,14 +13,16 @@
                 <div class="p-6">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                         <div class="relative">
-                            @if(Auth::user()->avatar)
-                                <img src="{{ Storage::url(Auth::user()->avatar) }}" 
-                                     class="w-20 sm:w-24 h-20 sm:h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow">
-                            @else
-                                <div class="w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow">
-                                    {{ substr(Auth::user()->name, 0, 1) }}
-                                </div>
-                            @endif
+                            <div id="avatarContainer">
+                                @if(Auth::user()->avatar)
+                                    <img id="avatarPreview" src="{{ Storage::url(Auth::user()->avatar) }}" 
+                                         class="w-20 sm:w-24 h-20 sm:h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow">
+                                @else
+                                    <div id="avatarPreview" class="w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow">
+                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                    </div>
+                                @endif
+                            </div>
                             <button onclick="document.getElementById('avatarInput').click()" 
                                     class="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 shadow-md transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,10 +45,10 @@
                 </div>
             </div>
 
-            <form id="avatarForm" action="{{ route('profile.avatar.update') }}" method="POST" enctype="multipart/form-data" class="hidden">
+            <form id="avatarForm" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
-                <input type="file" name="avatar" id="avatarInput" accept="image/jpeg,image/png,image/jpg" onchange="this.form.submit()">
+                <input type="file" name="avatar" id="avatarInput" accept="image/jpeg,image/png,image/jpg" class="hidden">
             </form>
 
             <!-- Управление автомобилями -->
@@ -109,24 +111,151 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
                         </a>
-                        <a href="#" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#6B727F]/50 rounded-xl hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
+                        <button onclick="openSupportModal()" class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#6B727F]/50 rounded-xl hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition w-full text-left">
                             <span class="text-gray-700 dark:text-gray-300">Связаться с поддержкой</span>
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Модальное окно поддержки -->
+    <div id="supportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white dark:bg-[#222222] rounded-xl shadow-xl w-full max-w-md mx-4">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Связаться с поддержкой</h3>
+                <button onclick="closeSupportModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Email блок (более тёмный) -->
+                <div class="flex items-center gap-3 p-3 bg-gray-100 dark:bg-[#374151] rounded-lg hover:bg-gray-200 dark:hover:bg-[#4B5563] transition">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Email для связи</p>
+                        <a href="mailto:support@autocost.ru" class="text-blue-600 dark:text-blue-400 font-medium">support@autocost.ru</a>
+                    </div>
+                </div>
+                
+                <!-- Telegram блок (более тёмный) -->
+                <div class="flex items-center gap-3 p-3 bg-gray-100 dark:bg-[#374151] rounded-lg hover:bg-gray-200 dark:hover:bg-[#4B5563] transition">
+                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Telegram</p>
+                        <a href="https://t.me/autocost_support" target="_blank" class="text-blue-600 dark:text-blue-400 font-medium">@autocost_support</a>
+                    </div>
+                </div>
+                
+                <!-- Телефон блок (более тёмный) -->
+                <div class="flex items-center gap-3 p-3 bg-gray-100 dark:bg-[#374151] rounded-lg hover:bg-gray-200 dark:hover:bg-[#4B5563] transition">
+                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Телефон</p>
+                        <a href="tel:+79991234567" class="text-blue-600 dark:text-blue-400 font-medium">+7 (999) 123-45-67</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    Время ответа: обычно в течение 24 часов
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="fixed top-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg text-white bg-green-500 hidden transition-all">
+        <span id="notificationMessage"></span>
+    </div>
+
     <script>
+        // Уведомление
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const messageSpan = document.getElementById('notificationMessage');
+            messageSpan.textContent = message;
+            notification.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
+            if (type === 'success') {
+                notification.classList.add('bg-green-500');
+            } else {
+                notification.classList.add('bg-red-500');
+            }
+            notification.classList.remove('hidden');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Загрузка аватара через AJAX
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('_method', 'PATCH');
+            
+            // Показываем превью
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = document.getElementById('avatarPreview');
+                if (preview.tagName === 'IMG') {
+                    preview.src = event.target.result;
+                } else {
+                    const newImg = document.createElement('img');
+                    newImg.id = 'avatarPreview';
+                    newImg.src = event.target.result;
+                    newImg.className = 'w-20 sm:w-24 h-20 sm:h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow';
+                    preview.parentNode.replaceChild(newImg, preview);
+                }
+            }
+            reader.readAsDataURL(file);
+            
+            // Отправляем AJAX
+            fetch('{{ route("profile.avatar.update") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Фото профиля обновлено!', 'success');
+                } else {
+                    showNotification('Ошибка при загрузке фото', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Ошибка при загрузке фото', 'error');
+            });
+        });
+
+        // Тёмная тема
         document.addEventListener('DOMContentLoaded', function() {
             const themeToggle = document.getElementById('themeToggle');
             if (!themeToggle) return;
             
-            // Проверяем текущее состояние темы
             const isDark = document.documentElement.classList.contains('dark');
             themeToggle.checked = isDark;
             
@@ -156,5 +285,15 @@
                 }
             });
         });
+        
+        function openSupportModal() {
+            document.getElementById('supportModal').classList.remove('hidden');
+            document.getElementById('supportModal').classList.add('flex');
+        }
+        
+        function closeSupportModal() {
+            document.getElementById('supportModal').classList.add('hidden');
+            document.getElementById('supportModal').classList.remove('flex');
+        }
     </script>
 </x-app-layout>

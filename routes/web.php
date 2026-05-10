@@ -43,6 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/cars/{car}/update-photo', [CarController::class, 'updatePhoto'])->name('cars.update-photo');
     
     // Обзор
     Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index')->middleware('has.car');

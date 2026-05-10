@@ -13,7 +13,9 @@
                         @csrf
                         
                         <div class="mb-4">
-                            <label for="car_id" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Автомобиль *</label>
+                            <label for="car_id" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Автомобиль <span class="text-red-500">*</span>
+                            </label>
                             <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" required>
                                 <option value="">Выберите автомобиль</option>
                                 @foreach($cars as $car)
@@ -28,7 +30,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="title" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Что нужно сделать? *</label>
+                            <label for="title" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Что нужно сделать? <span class="text-red-500">*</span>
+                            </label>
                             <input type="text" name="title" id="title" value="{{ old('title') }}" placeholder="Пример: Замена масла, Замена ремня ГРМ, Шиномонтаж..." class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" required>
                             @error('title')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -36,7 +40,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="due_odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Пробег для напоминания (км) *</label>
+                            <label for="due_odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Пробег для напоминания (км) <span class="text-red-500">*</span>
+                            </label>
                             <input type="number" name="due_odometer" id="due_odometer" value="{{ old('due_odometer') }}" min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" required>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Напоминание появится, когда пробег достигнет этого значения</p>
                             @error('due_odometer')

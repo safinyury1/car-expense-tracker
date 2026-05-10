@@ -46,7 +46,7 @@ class ProfileController extends Controller
     /**
      * Update the user's avatar.
      */
-    public function updateAvatar(Request $request): RedirectResponse
+    public function updateAvatar(Request $request)
     {
         $request->validate([
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -63,6 +63,15 @@ class ProfileController extends Controller
         $path = $request->file('avatar')->store('avatars', 'public');
         
         $user->update(['avatar' => $path]);
+
+        // Если это AJAX запрос, возвращаем JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'avatar_url' => Storage::url($path),
+                'message' => 'Фото профиля обновлено!'
+            ]);
+        }
 
         return redirect()->route('profile.edit')->with('status', 'avatar-updated');
     }

@@ -51,7 +51,7 @@
                                         <th class="px-4 py-2 text-left">Сумма</th>
                                         <th class="px-4 py-2 text-left">Пробег</th>
                                         <th class="px-4 py-2 text-left">Описание</th>
-                                        <th class="px-4 py-2 text-left">Действия</th>
+                                        <th class="px-4 py-2 text-left w-36">Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -70,7 +70,7 @@
                                                 {{ $expense->description ?: '—' }}
                                             </td>
                                             <td class="px-4 py-2">
-                                                <div class="flex gap-2">
+                                                <div class="flex gap-2 justify-end">
                                                     <a href="{{ route('expenses.show', $expense) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
                                                         Просмотр
                                                     </a>

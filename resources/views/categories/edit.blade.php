@@ -29,7 +29,9 @@
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label for="name" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Название категории *</label>
+                            <label for="name" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Название категории <span class="text-red-500">*</span>
+                            </label>
                             <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm" required>
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

@@ -19,6 +19,7 @@
             
             @if($selectedCar)
                 <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden">
+                    
                     <!-- Единица расстояния -->
                     <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                         <p class="font-medium text-gray-800 dark:text-gray-200 mb-2">Единица расстояния</p>
@@ -26,11 +27,10 @@
                         <form action="{{ route('car-settings.distance-unit') }}" method="POST" class="flex gap-2">
                             @csrf
                             <input type="hidden" name="car_id" value="{{ $selectedCar->id }}">
-                            <input type="hidden" name="unit" id="distance_unit_input">
-                            <button type="submit" name="unit" value="km" class="distance-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'km' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="distance_unit" value="km" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'km' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 км
                             </button>
-                            <button type="submit" name="unit" value="miles" class="distance-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'miles' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="distance_unit" value="miles" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->distance_unit === 'miles' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 мили
                             </button>
                         </form>
@@ -43,29 +43,29 @@
                         <form action="{{ route('car-settings.volume-unit') }}" method="POST" class="flex gap-2">
                             @csrf
                             <input type="hidden" name="car_id" value="{{ $selectedCar->id }}">
-                            <button type="submit" name="unit" value="liters" class="volume-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'liters' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="volume_unit" value="liters" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'liters' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 литры
                             </button>
-                            <button type="submit" name="unit" value="gallons" class="volume-unit-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'gallons' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="volume_unit" value="gallons" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->volume_unit === 'gallons' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 галлоны
                             </button>
                         </form>
                     </div>
 
-                    <!-- Валюта -->
+                    <!-- Валюта (ИСПРАВЛЕНО) -->
                     <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                         <p class="font-medium text-gray-800 dark:text-gray-200 mb-2">Валюта</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Выберите валюту для отображения</p>
                         <form action="{{ route('car-settings.currency') }}" method="POST" class="flex gap-2">
                             @csrf
                             <input type="hidden" name="car_id" value="{{ $selectedCar->id }}">
-                            <button type="submit" name="currency" value="RUB" class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'RUB' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="currency" value="RUB" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'RUB' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 RUB ₽
                             </button>
-                            <button type="submit" name="currency" value="USD" class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'USD' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="currency" value="USD" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'USD' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 USD $
                             </button>
-                            <button type="submit" name="currency" value="EUR" class="currency-btn px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'EUR' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            <button type="submit" name="currency" value="EUR" class="px-4 py-1.5 rounded-lg text-sm transition {{ $selectedCar->currency === 'EUR' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-[#6B727F] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 EUR €
                             </button>
                         </form>

@@ -62,13 +62,13 @@ class CarSettingsController extends Controller
     }
     
     /**
-     * Обновить валюту
+     * Обновить валюту (ИСПРАВЛЕНО: значения RUB, USD, EUR)
      */
     public function updateCurrency(Request $request)
     {
         $validated = $request->validate([
             'car_id' => 'required|exists:cars,id',
-            'currency' => 'required|in:rub,usd,eur',
+            'currency' => 'required|in:RUB,USD,EUR',
         ]);
         
         $car = Car::where('id', $validated['car_id'])

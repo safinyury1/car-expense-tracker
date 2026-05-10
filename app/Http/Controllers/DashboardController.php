@@ -47,7 +47,7 @@ class DashboardController extends Controller
         
         $insights = $this->getInsights($selectedCarId, $period, $dateFrom, $dateTo);
         
-        // Топ-3 расходов
+        // Топ-3 расходов (ИСКЛЮЧАЕМ РУЧНОЕ ОБНОВЛЕНИЕ ПРОБЕГА)
         $topExpenses = $this->getTopExpenses($selectedCarId, $period, $dateFrom, $dateTo);
         
         return view('dashboard', compact(
@@ -209,7 +209,7 @@ class DashboardController extends Controller
         
         // Конвертируем расход топлива
         $avgFuelConsumption = $this->calculateAvgFuelConsumption($carId, $period, $dateFrom, $dateTo);
-$convertedAvgFuelConsumption = $this->convertFuelConsumption($avgFuelConsumption, $car);
+        $convertedAvgFuelConsumption = $this->convertFuelConsumption($avgFuelConsumption, $car);
         
         return [
             'totalExpenses' => $convertedTotalExpenses,
@@ -408,95 +408,103 @@ $convertedAvgFuelConsumption = $this->convertFuelConsumption($avgFuelConsumption
         ];
     }
     
+    /**
+     * Получение топ-3 самых больших расходов
+     * ИСКЛЮЧАЕТ записи с описанием "Ручное обновление пробега"
+     */
     private function getTopExpenses($selectedCarId, $period, $dateFrom, $dateTo)
-{
-    $allExpenses = collect();
-    
-    if ($selectedCarId === 'all') {
-        $carIds = Auth::user()->cars->pluck('id')->toArray();
-        if (empty($carIds)) {
-            return [];
+    {
+        $allExpenses = collect();
+        
+        if ($selectedCarId === 'all') {
+            $carIds = Auth::user()->cars->pluck('id')->toArray();
+            if (empty($carIds)) {
+                return [];
+            }
+            
+            // Расходы из таблицы expenses (исключаем ручное обновление пробега)
+            $expensesQuery = Expense::whereIn('car_id', $carIds)
+                ->where('description', '!=', 'Ручное обновление пробега')
+                ->where('amount', '>', 0);
+            $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
+            $expenses = $expensesQuery->with('category', 'car')->get();
+            
+            foreach ($expenses as $expense) {
+                $allExpenses->push([
+                    'title' => $expense->description ?: $expense->category->name,
+                    'amount' => $expense->amount,
+                    'date' => $expense->date->format('d.m.Y'),
+                    'odometer' => $expense->odometer,
+                    'category' => $expense->category->name,
+                    'car' => $expense->car->brand . ' ' . $expense->car->model,
+                    'type' => 'expense',
+                ]);
+            }
+            
+            // Заправки из таблицы refuelings
+            $refuelingsQuery = Refueling::whereIn('car_id', $carIds);
+            $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
+            $refuelings = $refuelingsQuery->with('car')->get();
+            
+            foreach ($refuelings as $refueling) {
+                $allExpenses->push([
+                    'title' => 'Заправка',
+                    'amount' => $refueling->total_amount,
+                    'date' => $refueling->date->format('d.m.Y'),
+                    'odometer' => $refueling->odometer,
+                    'category' => 'Топливо',
+                    'car' => $refueling->car->brand . ' ' . $refueling->car->model,
+                    'type' => 'refueling',
+                ]);
+            }
+            
+        } else {
+            $car = Car::find($selectedCarId);
+            
+            // Расходы из таблицы expenses (исключаем ручное обновление пробега)
+            $expensesQuery = Expense::where('car_id', $selectedCarId)
+                ->where('description', '!=', 'Ручное обновление пробега')
+                ->where('amount', '>', 0);
+            $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
+            $expenses = $expensesQuery->with('category')->get();
+            
+            foreach ($expenses as $expense) {
+                $allExpenses->push([
+                    'title' => $expense->description ?: $expense->category->name,
+                    'amount' => $this->convertCurrency($expense->amount, $car),
+                    'currency' => $this->getCurrencySymbol($car),
+                    'date' => $expense->date->format('d.m.Y'),
+                    'odometer' => $this->convertDistance($expense->odometer, $car),
+                    'distance_unit' => $this->getDistanceUnit($car),
+                    'category' => $expense->category->name,
+                    'type' => 'expense',
+                ]);
+            }
+            
+            // Заправки из таблицы refuelings
+            $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
+            $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
+            $refuelings = $refuelingsQuery->get();
+            
+            foreach ($refuelings as $refueling) {
+                $allExpenses->push([
+                    'title' => 'Заправка',
+                    'amount' => $this->convertCurrency($refueling->total_amount, $car),
+                    'currency' => $this->getCurrencySymbol($car),
+                    'date' => $refueling->date->format('d.m.Y'),
+                    'odometer' => $this->convertDistance($refueling->odometer, $car),
+                    'distance_unit' => $this->getDistanceUnit($car),
+                    'category' => 'Топливо',
+                    'type' => 'refueling',
+                ]);
+            }
         }
         
-        // Расходы из таблицы expenses
-        $expensesQuery = Expense::whereIn('car_id', $carIds);
-        $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
-        $expenses = $expensesQuery->with('category', 'car')->get();
+        // Сортируем по сумме и берём топ-3
+        $topExpenses = $allExpenses->sortByDesc('amount')->take(3)->values()->toArray();
         
-        foreach ($expenses as $expense) {
-            $allExpenses->push([
-                'title' => $expense->description ?: $expense->category->name,
-                'amount' => $expense->amount,
-                'date' => $expense->date->format('d.m.Y'),
-                'odometer' => $expense->odometer,
-                'category' => $expense->category->name,
-                'car' => $expense->car->brand . ' ' . $expense->car->model,
-                'type' => 'expense',
-            ]);
-        }
-        
-        // Заправки из таблицы refuelings
-        $refuelingsQuery = Refueling::whereIn('car_id', $carIds);
-        $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
-        $refuelings = $refuelingsQuery->with('car')->get();
-        
-        foreach ($refuelings as $refueling) {
-            $allExpenses->push([
-                'title' => 'Заправка',
-                'amount' => $refueling->total_amount,
-                'date' => $refueling->date->format('d.m.Y'),
-                'odometer' => $refueling->odometer,
-                'category' => 'Топливо',
-                'car' => $refueling->car->brand . ' ' . $refueling->car->model,
-                'type' => 'refueling',
-            ]);
-        }
-        
-    } else {
-        $car = Car::find($selectedCarId);
-        
-        // Расходы из таблицы expenses
-        $expensesQuery = Expense::where('car_id', $selectedCarId);
-        $expensesQuery = $this->applyDateFilter($expensesQuery, $period, $dateFrom, $dateTo);
-        $expenses = $expensesQuery->with('category')->get();
-        
-        foreach ($expenses as $expense) {
-            $allExpenses->push([
-                'title' => $expense->description ?: $expense->category->name,
-                'amount' => $this->convertCurrency($expense->amount, $car),
-                'currency' => $this->getCurrencySymbol($car),
-                'date' => $expense->date->format('d.m.Y'),
-                'odometer' => $this->convertDistance($expense->odometer, $car),
-                'distance_unit' => $this->getDistanceUnit($car),
-                'category' => $expense->category->name,
-                'type' => 'expense',
-            ]);
-        }
-        
-        // Заправки из таблицы refuelings
-        $refuelingsQuery = Refueling::where('car_id', $selectedCarId);
-        $refuelingsQuery = $this->applyDateFilter($refuelingsQuery, $period, $dateFrom, $dateTo);
-        $refuelings = $refuelingsQuery->get();
-        
-        foreach ($refuelings as $refueling) {
-            $allExpenses->push([
-                'title' => 'Заправка',
-                'amount' => $this->convertCurrency($refueling->total_amount, $car),
-                'currency' => $this->getCurrencySymbol($car),
-                'date' => $refueling->date->format('d.m.Y'),
-                'odometer' => $this->convertDistance($refueling->odometer, $car),
-                'distance_unit' => $this->getDistanceUnit($car),
-                'category' => 'Топливо',
-                'type' => 'refueling',
-            ]);
-        }
+        return $topExpenses;
     }
-    
-    // Сортируем по сумме и берём топ-3
-    $topExpenses = $allExpenses->sortByDesc('amount')->take(3)->values()->toArray();
-    
-    return $topExpenses;
-}
     
     private function calculateAvgFuelConsumption($carId, $period, $dateFrom, $dateTo)
     {

@@ -22,7 +22,7 @@
                     </form>
                     
                     <div class="overflow-x-auto">
-                        <table class="min-w-full table-auto border-collapse">
+                        <table class="min-w-full table-auto border-collapse admin-table">
                             <thead>
                                 <tr class="bg-gray-100 dark:bg-[#6B727F]">
                                     <th class="px-4 py-3 text-left border dark:border-gray-600">ID</th>
@@ -35,7 +35,7 @@
                             </thead>
                             <tbody>
                                 @foreach($cars as $car)
-                                    <tr class="border-b dark:border-gray-700 hover:bg-[#1D1D1D] dark:hover:bg-[#1D1D1D] cursor-pointer" onclick="window.location.href='{{ route('admin.car.show', $car->id) }}'">
+                                    <tr class="border-b dark:border-gray-700 admin-row cursor-pointer" onclick="window.location.href='{{ route('admin.car.show', $car->id) }}'">
                                         <td class="px-4 py-3 border dark:border-gray-600">{{ $car->id }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600 font-medium text-blue-600 dark:text-blue-400">{{ $car->brand }} {{ $car->model }}</td>
                                         <td class="px-4 py-3 border dark:border-gray-600">{{ $car->user->name }}</td>
@@ -55,4 +55,27 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* Убираем чёрное выделение при наведении */
+        .admin-table tbody tr {
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        /* Светлая тема - светло-серый фон при наведении */
+        .admin-table tbody tr:hover {
+            background-color: #f3f4f6 !important;
+        }
+        
+        /* Тёмная тема - тёмно-серый фон при наведении */
+        .dark .admin-table tbody tr:hover {
+            background-color: #374151 !important;
+        }
+        
+        /* Убираем outline при клике */
+        .admin-table tbody tr:active {
+            outline: none;
+        }
+    </style>
 </x-app-layout>

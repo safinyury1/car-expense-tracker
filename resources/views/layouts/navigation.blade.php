@@ -46,10 +46,10 @@
                     @endif
                     
                     @if(Auth::user()->role === 'admin')
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-                            {{ __('Админка') }}
-                        </x-nav-link>
-                    @endif
+    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+        {{ __('Админка') }}
+    </x-nav-link>
+@endif
                 </div>
             </div>
 
@@ -78,7 +78,7 @@
                                 <img src="{{ asset('images/icons/money.png') }}" alt="Расход" class="w-4 h-4">
                                 Добавить расход
                             </a>
-                            <a href="{{ route('cars.index') }}" 
+                            <a href="{{ route('cars.create.form') }}" 
                                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/car.png') }}" alt="Автомобиль" class="w-4 h-4">
                                 Добавить автомобиль
@@ -111,6 +111,11 @@
                          class="absolute right-0 mt-2 w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
                          style="display: none;">
                         <div class="py-1">
+                            <a href="{{ route('cars.index') }}" 
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                                <img src="{{ asset('images/icons/car2.png') }}" alt="Автомобиль" class="w-4 h-4">
+                                Автомобили
+                            </a>
                             <a href="{{ route('refuelings.index') }}" 
                                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
                                 <img src="{{ asset('images/icons/zapravka1.png') }}" alt="Заправки" class="w-4 h-4">

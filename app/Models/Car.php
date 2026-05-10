@@ -16,7 +16,7 @@ class Car extends Model
         'year',
         'vin',
         'initial_odometer',
-        'current_odometer',
+        'odometer',
         'photo',
         'distance_unit',
         'volume_unit',
@@ -26,7 +26,7 @@ class Car extends Model
     protected $casts = [
         'year' => 'integer',
         'initial_odometer' => 'integer',
-        'current_odometer' => 'integer',
+        'odometer' => 'integer',
     ];
 
     public function user()
@@ -44,13 +44,30 @@ class Car extends Model
         return $this->hasMany(Refueling::class);
     }
 
+    public function incomes()
+    {
+        return $this->hasMany(Income::class);
+    }
+
     public function reminders()
     {
         return $this->hasMany(Reminder::class);
     }
 
-    public function incomes()
+    public function getCurrentOdometerAttribute()
     {
-        return $this->hasMany(Income::class);
+        $maxExpenseOdometer = $this->expenses()->max('odometer') ?? 0;
+        $maxRefuelingOdometer = $this->refuelings()->max('odometer') ?? 0;
+        $maxIncomeOdometer = $this->incomes()->max('odometer') ?? 0;
+        
+        $maxOdometer = max(
+            $maxExpenseOdometer, 
+            $maxRefuelingOdometer, 
+            $maxIncomeOdometer, 
+            $this->odometer, 
+            $this->initial_odometer
+        );
+        
+        return $maxOdometer;
     }
 }

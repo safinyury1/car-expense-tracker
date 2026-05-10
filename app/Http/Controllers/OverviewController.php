@@ -75,8 +75,11 @@ class OverviewController extends Controller
         // Лента событий
         $allEvents = collect();
         
-        // Расходы
-        $expenses = Expense::where('car_id', $selectedCarId)->with('category')->get();
+        // Расходы (ИСКЛЮЧАЕМ РУЧНОЕ ОБНОВЛЕНИЕ ПРОБЕГА)
+        $expenses = Expense::where('car_id', $selectedCarId)
+            ->where('description', '!=', 'Ручное обновление пробега')
+            ->with('category')
+            ->get();
         foreach ($expenses as $item) {
             $allEvents->push([
                 'id' => $item->id,

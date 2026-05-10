@@ -13,7 +13,9 @@
                         @csrf
 
                         <div class="mb-4">
-                            <label for="car_id" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Автомобиль *</label>
+                            <label for="car_id" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Автомобиль <span class="text-red-500">*</span>
+                            </label>
                             <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm @error('car_id') border-red-500 @enderror" required>
                                 <option value="">Выберите автомобиль</option>
                                 @foreach($cars as $car)
@@ -28,7 +30,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="date" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Дата *</label>
+                            <label for="date" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Дата <span class="text-red-500">*</span>
+                            </label>
                             <input type="date" name="date" id="date" value="{{ old('date', date('Y-m-d')) }}" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm @error('date') border-red-500 @enderror" required>
                             @error('date')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -36,7 +40,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="liters" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Литры *</label>
+                            <label for="liters" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Литры <span class="text-red-500">*</span>
+                            </label>
                             <input type="number" name="liters" id="liters" value="{{ old('liters') }}" step="0.01" min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm @error('liters') border-red-500 @enderror" required>
                             @error('liters')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -44,7 +50,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="price_per_liter" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Цена за литр (₽) *</label>
+                            <label for="price_per_liter" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Цена за литр (₽) <span class="text-red-500">*</span>
+                            </label>
                             <input type="number" name="price_per_liter" id="price_per_liter" value="{{ old('price_per_liter') }}" step="0.01" min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm @error('price_per_liter') border-red-500 @enderror" required>
                             @error('price_per_liter')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -52,7 +60,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Пробег (км) *</label>
+                            <label for="odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                Пробег (км) <span class="text-red-500">*</span>
+                            </label>
                             <input type="number" name="odometer" id="odometer" value="{{ old('odometer') }}" min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm @error('odometer') border-red-500 @enderror" required>
                             @if(isset($maxOdometer) && $maxOdometer > 0)
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">

@@ -14,6 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'AutoCost'),
+    'logo' => env('APP_LOGO', '/images/logo.png'),
 
     /*
     |--------------------------------------------------------------------------

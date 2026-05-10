@@ -61,7 +61,7 @@
                                             <div class="flex items-center gap-3">
                                                 <span class="text-gray-700 dark:text-gray-300">{{ $category->name }}</span>
                                             </div>
-                                            <div class="flex gap-3">
+                                            <div class="flex gap-3 items-center">
                                                 <a href="{{ route('categories.edit', $category) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm font-medium">
                                                     Редактировать
                                                 </a>

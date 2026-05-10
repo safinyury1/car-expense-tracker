@@ -18,7 +18,7 @@
                             <!-- Раздел 1 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">1. Регистрация и вход</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Для начала работы необходимо <a href="{{ route('register') }}" class="text-blue-500 hover:underline">зарегистрироваться</a> или <a href="{{ route('login') }}" class="text-blue-500 hover:underline">войти</a> в систему. После входа вы попадёте на страницу добавления автомобиля.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Для начала работы необходимо <a class="text-blue-500 hover:underline">зарегистрироваться</a> или <a class="text-blue-500 hover:underline">войти</a> в систему. После входа вы попадёте на страницу добавления автомобиля.</p>
                             </div>
                             
                             <!-- Раздел 2 -->
