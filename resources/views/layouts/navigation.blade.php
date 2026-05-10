@@ -1,20 +1,22 @@
-<nav x-data="{ open: false, showMenu: false, showPagesMenu: false }" class="bg-white dark:bg-[#222222] border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false, showMenu: false, showPagesMenu: false, mobileMenuOpen: false }" class="bg-white dark:bg-[#222222] border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Левая часть -->
-            <div class="flex">
+            <div class="flex items-center">
+                <!-- Логотип -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('overview.index') }}">
                         <img class="theme-logo block h-9 w-auto"
-     data-light-src="{{ asset('images/logo.png') }}"
-     data-dark-src="{{ asset('images/logo1.png') }}"
-     src="{{ asset('images/logo.png') }}"
-     alt="Logo">
+                             data-light-src="{{ asset('images/logo.png') }}"
+                             data-dark-src="{{ asset('images/logo1.png') }}"
+                             src="{{ asset('images/logo.png') }}"
+                             alt="Logo">
                     </a>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <!-- Десктопное меню (видно на экранах больше 1024px) -->
+                <div class="desktop-menu">
                     <x-nav-link :href="route('overview.index')" :active="request()->routeIs('overview.*')">
                         {{ __('Обзор') }}
                     </x-nav-link>
@@ -46,19 +48,58 @@
                     @endif
                     
                     @if(Auth::user()->role === 'admin')
-    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-        {{ __('Админка') }}
-    </x-nav-link>
-@endif
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                            {{ __('Админка') }}
+                        </x-nav-link>
+                    @endif
+                </div>
+
+                <!-- Планшетное меню (видно на экранах от 768px до 1024px) -->
+                <div class="tablet-menu">
+                    <x-nav-link :href="route('overview.index')" :active="request()->routeIs('overview.*')">
+                        {{ __('Обзор') }}
+                    </x-nav-link>
+                    
+                    @if(Auth::user()->cars->isNotEmpty())
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Статистика') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
+                            {{ __('История') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
+                            {{ __('Напоминания') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                            {{ __('Категории') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
+                            {{ __('Сравнение') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
+                            {{ __('Мои автомобили') }}
+                        </x-nav-link>
+                    @endif
+                    
+                    @if(Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                            {{ __('Админка') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
-            <!-- Две круглые кнопки -->
-            <div class="hidden sm:flex sm:items-center gap-3">
+            <!-- Две круглые кнопки + бургер + аватар -->
+            <div class="flex items-center gap-2">
                 <!-- Первая кнопка: Добавить (плюс) -->
                 <div class="relative">
                     <button @click="showMenu = !showMenu" 
-                            class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none">
                         <img src="{{ asset('images/icons/plus.png') }}" alt="Добавить" class="w-5 h-5">
                     </button>
                     
@@ -101,7 +142,7 @@
                 <!-- Вторая кнопка: Страницы (меню) -->
                 <div class="relative">
                     <button @click="showPagesMenu = !showPagesMenu" 
-                            class="w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            class="w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none">
                         <img src="{{ asset('images/icons/menu2.png') }}" alt="Меню" class="w-5 h-5">
                     </button>
                     
@@ -135,8 +176,19 @@
                     </div>
                 </div>
 
-                <!-- Правая часть -->
-                <div class="hidden sm:flex sm:items-center">
+                <!-- Бургер-меню (видно только на экранах меньше 1024px, но для iPad показываем на < 768px) -->
+                <div class="burger-button">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="rounded-md p-2 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path :class="{'hidden': mobileMenuOpen, 'inline-flex': !mobileMenuOpen}" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path :class="{'hidden': !mobileMenuOpen, 'inline-flex': mobileMenuOpen}" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Аватар пользователя (на ПК) -->
+                <div class="hidden sm:flex sm:items-center ml-2">
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="flex items-center text-sm font-medium text-gray-900 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition duration-150 ease-in-out">
@@ -171,156 +223,198 @@
                         </x-slot>
                     </x-dropdown>
                 </div>
-
-                <!-- Hamburger -->
-                <div class="-mr-2 flex items-center sm:hidden">
-                    <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('overview.index')" :active="request()->routeIs('overview.*')">
-                {{ __('Обзор') }}
-            </x-responsive-nav-link>
+    <!-- Мобильное меню (бургер) -->
+    <div x-show="mobileMenuOpen" 
+         x-cloak
+         class="mobile-menu bg-white dark:bg-[#222222] border-t border-gray-100 dark:border-gray-700">
+        <div class="pt-2 pb-3 space-y-1 px-4">
+            <a href="{{ route('overview.index') }}" 
+               class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+               @click="mobileMenuOpen = false">
+                Обзор
+            </a>
             
             @if(Auth::user()->cars->isNotEmpty())
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Статистика') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
-                    {{ __('История') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('reminders.index')" :active="request()->routeIs('reminders.*')">
-                    {{ __('Напоминания') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
-                    {{ __('Категории') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
-                    {{ __('Сравнение') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('cars.index')" :active="request()->routeIs('cars.*')">
-                    {{ __('Мои автомобили') }}
-                </x-responsive-nav-link>
-                
-                <x-responsive-nav-link :href="route('incomes-list.index')" :active="request()->routeIs('incomes-list.*')">
-                    {{ __('Доходы') }}
-                </x-responsive-nav-link>
+                <a href="{{ route('dashboard') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Статистика
+                </a>
+                <a href="{{ route('history.index') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    История
+                </a>
+                <a href="{{ route('reminders.index') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Напоминания
+                </a>
+                <a href="{{ route('categories.index') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Категории
+                </a>
+                <a href="{{ route('compare.index') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Сравнение
+                </a>
+                <a href="{{ route('cars.index') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Мои автомобили
+                </a>
             @endif
             
             @if(Auth::user()->role === 'admin')
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-                    {{ __('Админка') }}
-                </x-responsive-nav-link>
+                <a href="{{ route('admin.dashboard') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Админка
+                </a>
             @endif
-        </div>
 
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex items-center px-4">
-                @if(Auth::user()->avatar)
-                    <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
-                @else
-                    <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-lg">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
-                @endif
-                <div class="ml-3">
-                    <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</div>
-                </div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('settings.index')">
-                    {{ __('Настройки') }}
-                </x-responsive-nav-link>
-
+            <!-- Настройки и Выйти -->
+            <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{{ route('settings.index') }}" 
+                   class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                   @click="mobileMenuOpen = false">
+                    Настройки
+                </a>
+                
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Выйти') }}
-                    </x-responsive-nav-link>
+                    <button type="submit" 
+                            class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            @click="mobileMenuOpen = false">
+                        Выйти
+                    </button>
                 </form>
             </div>
         </div>
     </div>
-</nav>
 
-<style>
-    [x-cloak] { display: none !important; }
-    
-    /* Стили для навигационных ссылок */
-    .nav-link {
-        position: relative;
-        transition: all 0.3s ease;
-        color: #374151 !important;
-    }
-    
-    .nav-link:hover {
-        color: #1f2937 !important;
-    }
-    
-    /* Подсветка снизу для активной ссылки */
-    .nav-link-active {
-        color: #1f2937 !important;
-    }
-    
-    .nav-link-active::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: #017CFA;
-        border-radius: 2px;
-    }
-    
-    /* Для тёмной темы */
-    .dark .nav-link {
-        color: #9ca3af !important;
-    }
-    
-    .dark .nav-link:hover {
-        color: #f3f4f6 !important;
-    }
-    
-    .dark .nav-link-active {
-        color: #f3f4f6 !important;
-    }
-    
-    /* Убираем белый квадрат при клике */
-    button:focus,
-    button:active,
-    a:focus,
-    a:active,
-    .nav-link:focus,
-    .nav-link:active,
-    .rounded-full:focus,
-    .rounded-full:active {
-        outline: none !important;
-        box-shadow: none !important;
-        ring: none !important;
-        -webkit-tap-highlight-color: transparent !important;
-    }
-    
-    *:focus {
-        outline: none !important;
-        box-shadow: none !important;
-    }
-</style>
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Десктопное меню - показывается на экранах >= 1024px */
+        .desktop-menu {
+            display: flex;
+            gap: 2rem;
+            margin-left: 2.5rem;
+        }
+        
+        /* Планшетное меню - скрыто по умолчанию, показывается от 768px до 1023px */
+        .tablet-menu {
+            display: none;
+            gap: 1rem;
+            margin-left: 1.5rem;
+        }
+        
+        /* Бургер-кнопка - скрыта на экранах >= 768px */
+        .burger-button {
+            display: none;
+        }
+        
+        /* Планшеты (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .desktop-menu {
+                display: none !important;
+            }
+            
+            .tablet-menu {
+                display: flex !important;
+            }
+            
+            .burger-button {
+                display: none !important;
+            }
+            
+            /* Уменьшаем отступы для планшетов */
+            .tablet-menu .nav-link {
+                font-size: 0.9rem;
+                padding: 0.25rem 0;
+            }
+        }
+        
+        /* Телефоны (до 767px) */
+        @media (max-width: 767px) {
+            .desktop-menu {
+                display: none !important;
+            }
+            
+            .tablet-menu {
+                display: none !important;
+            }
+            
+            .burger-button {
+                display: block !important;
+            }
+        }
+        
+        /* Десктопы и ноутбуки (от 1024px) */
+        @media (min-width: 1024px) {
+            .desktop-menu {
+                display: flex !important;
+            }
+            
+            .tablet-menu {
+                display: none !important;
+            }
+            
+            .burger-button {
+                display: none !important;
+            }
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            color: #374151 !important;
+        }
+        
+        .nav-link:hover {
+            color: #1f2937 !important;
+        }
+        
+        .nav-link-active {
+            color: #1f2937 !important;
+        }
+        
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #017CFA;
+            border-radius: 2px;
+        }
+        
+        .dark .nav-link {
+            color: #9ca3af !important;
+        }
+        
+        .dark .nav-link:hover {
+            color: #f3f4f6 !important;
+        }
+        
+        .dark .nav-link-active {
+            color: #f3f4f6 !important;
+        }
+        
+        button:focus,
+        button:active,
+        a:focus,
+        a:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+    </style>
+</nav>

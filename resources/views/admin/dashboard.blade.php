@@ -108,7 +108,7 @@
                                 </div>
                                 <div class="text-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Лучший день</p>
-                                    <p class="text-xl font-bold text-pink-600 dark:text-pink-400">{{ $bestDayVisits ?? 0 }}</p>
+                                    <p class="text-xl font-bold text-pink-600 dark:text-yellow-400">{{ $bestDayVisits ?? 0 }}</p>
                                 </div>
                             </div>
                         </div>

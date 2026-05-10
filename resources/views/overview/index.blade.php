@@ -1,13 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Обзор') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Обзор') }}
+            </h2>
+        </div>
     </x-slot>
 
     <div class="py-6 bg-[#EDEEF0] dark:bg-[#141414]">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             
+            <!-- Карточка автомобиля с фоном -->
             <div class="relative rounded-xl shadow-md overflow-hidden mb-8 min-h-[150px] sm:min-h-[200px]">
                 @if($selectedCar->photo)
                     <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -15,7 +18,7 @@
                     </div>
                     <div class="absolute inset-0 bg-black/40"></div>
                 @else
-                    <div class="absolute inset-0 bg-gray-500 dark:bg-[#6B727F]"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-800 dark:from-[#6B727F] dark:to-[#4B5563]"></div>
                 @endif
                 <div class="relative p-4 sm:p-5 z-10 h-full flex flex-col justify-between min-h-[150px] sm:min-h-[200px]">
                     <div class="flex justify-end">
@@ -27,60 +30,55 @@
                         </div>
                     </div>
                     <div class="flex justify-between items-end">
+                        <!-- Кнопка камера (круглая) -->
                         <button onclick="document.getElementById('photoInput').click()" 
-                                class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 transition w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                         </button>
                         
-                        <!-- Кнопки (правый нижний угол) -->
-                        <div class="flex items-center gap-1 sm:gap-2">
+                        <!-- Две круглые кнопки справа -->
+                        <div class="flex items-center gap-2">
+                            <!-- Круглая кнопка "Сменить" -->
                             <div class="relative">
                                 <button onclick="toggleCarDropdown()" 
-                                        class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm flex items-center gap-1 transition">
-                                    <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 transition w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
-                                    <span class="hidden sm:inline">Сменить</span>
                                 </button>
-                                <div id="carDropdown" class="hidden absolute right-0 bottom-full mb-2 w-40 sm:w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
+                                <div id="carDropdown" class="hidden absolute right-0 bottom-full mb-2 w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
                                     @foreach($cars as $car)
                                         <a href="{{ route('overview.index', ['car_id' => $car->id]) }}" 
-                                           class="block px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] {{ $selectedCarId == $car->id ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : '' }}">
+                                           class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] {{ $selectedCarId == $car->id ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : '' }}">
                                             {{ $car->brand }} {{ $car->model }}
                                         </a>
                                     @endforeach
                                 </div>
                             </div>
+                            <!-- Круглая кнопка "Редактировать" -->
                             <a href="{{ route('cars.edit', $selectedCar) }}" 
-                               class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-lg p-1 transition">
-                                <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-2 transition w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                             </a>
                         </div>
                     </div>
-
-                    <form id="photoForm" action="{{ route('cars.update.photo', $selectedCar) }}" method="POST" enctype="multipart/form-data" class="hidden">
-                        @csrf
-                        @method('PATCH')
-                        <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/jpg" onchange="this.form.submit()">
-                    </form>
                 </div>
             </div>
-            
-            <!-- Неоновая подсветка снизу карточки -->
+
+            <!-- Неоновая подсветка -->
             <div class="relative -mt-4 mb-6 flex justify-center">
                 <div class="w-3/4 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent rounded-full blur-sm"></div>
-                <div class="absolute w-1/2 h-2 bg-blue-500/50 rounded-full blur-md"></div>
             </div>
 
-            <!-- Отдельная карточка пробега -->
+            <!-- Карточка пробега -->
             <div class="bg-white dark:bg-[#222222] rounded-xl shadow-md overflow-hidden mb-6">
                 <div class="p-4">
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center flex-wrap gap-3">
                         <div>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Текущий пробег</p>
                             <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ number_format($convertedOdometer) }} <span class="text-sm font-normal">{{ $distanceUnit }}</span></p>
@@ -89,7 +87,7 @@
                             @endif
                         </div>
                         <button onclick="document.getElementById('odometerForm').classList.toggle('hidden')" 
-                                class="bg-gray-100 dark:bg-[#6B727F] hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg p-1.5 transition">
+                                class="bg-gray-100 dark:bg-[#6B727F] hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full p-2 transition w-8 h-8 flex items-center justify-center">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
@@ -99,19 +97,21 @@
                     <form id="odometerForm" action="{{ route('cars.update.odometer', $selectedCar) }}" method="POST" class="hidden mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                         @csrf
                         @method('PATCH')
-                        <div class="flex gap-2">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <input type="number" name="odometer" value="{{ $convertedOdometer }}" 
                                    class="flex-1 border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm" 
                                    placeholder="Новый пробег" required>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm">Сохранить</button>
-                            <button type="button" onclick="this.closest('form').classList.add('hidden')" 
-                                    class="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-[#1D1D1D] text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md text-sm">Отмена</button>
+                            <div class="flex gap-2">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm">Сохранить</button>
+                                <button type="button" onclick="this.closest('form').classList.add('hidden')" 
+                                        class="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-[#1D1D1D] text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md text-sm">Отмена</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Две колонки -->
+            <!-- Две колонки (на мобильных в столбик) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 
                 <!-- Напоминания -->
@@ -179,7 +179,10 @@
             <!-- Лента событий -->
             <div class="bg-white dark:bg-[#222222] rounded-xl shadow-md overflow-hidden">
                 <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="font-semibold text-gray-700 dark:text-gray-300">📋 Последние события</h3>
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <img src="{{ asset('images/icons/history.png') }}" alt="События" class="w-5 h-5">
+                        Последние события
+                    </h3>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse($events as $event)
@@ -195,7 +198,7 @@
                             @endphp
                             <a href="{{ $routeName !== '#' ? route($routeName, $event['id']) : '#' }}" 
                                class="block px-5 py-3 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition">
-                                <div class="flex justify-between items-center">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $event['type'] === 'income' ? 'bg-green-100 dark:bg-green-900/50' : ($event['type'] === 'service' ? 'bg-blue-100 dark:bg-blue-900/50' : 'bg-red-100 dark:bg-red-900/50') }}">
                                             @if($event['type'] === 'expense')
@@ -210,16 +213,18 @@
                                         </div>
                                         <div>
                                             <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $event['title'] }}</p>
-                                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ \Carbon\Carbon::parse($event['date'])->format('d.m.Y') }} • {{ number_format($event['odometer']) }} {{ $event['distance_unit'] }}</p>
-                                            @if(isset($event['liters']))
-                                                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $event['liters'] }} {{ $event['volume_unit'] }}</p>
-                                            @endif
+                                            <p class="text-xs text-gray-400 dark:text-gray-500">
+                                                {{ \Carbon\Carbon::parse($event['date'])->format('d.m.Y') }} • {{ number_format($event['odometer']) }} {{ $event['distance_unit'] }}
+                                                @if(isset($event['liters']))
+                                                    • {{ $event['liters'] }} {{ $event['volume_unit'] }}
+                                                @endif
+                                            </p>
                                             @if(isset($event['description']) && $event['description'] && $event['description'] !== 'Ручное обновление пробега')
-                                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ $event['description'] }}</p>
+                                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($event['description'], 50) }}</p>
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-left sm:text-right">
                                         <p class="text-sm font-bold {{ $event['type'] === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
                                             @if($event['type'] === 'income')
                                                 +{{ number_format($event['amount'], 2) }} {{ $event['currency'] }}
@@ -241,36 +246,23 @@
         </div>
     </div>
 
-    <style>
-        /* Неоновая подсветка снизу карточки */
-        .neon-glow {
-            position: relative;
-        }
-        
-        .neon-glow::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 10%;
-            width: 80%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #3b82f6, #3b82f6, #3b82f6, transparent);
-            border-radius: 50%;
-            filter: blur(3px);
-            box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
-        }
-    </style>
+    <form id="photoForm" action="{{ route('cars.update.photo', $selectedCar) }}" method="POST" enctype="multipart/form-data" class="hidden">
+        @csrf
+        @method('PATCH')
+        <input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/jpg" onchange="this.form.submit()">
+    </form>
 
     <script>
         function toggleCarDropdown() {
             const dropdown = document.getElementById('carDropdown');
             dropdown.classList.toggle('hidden');
         }
+        
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('carDropdown');
             const button = event.target.closest('button');
-            if (!button || !button.onclick || button.onclick.toString().indexOf('toggleCarDropdown') === -1) {
-                if (dropdown && !dropdown.classList.contains('hidden')) {
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (!button || button.getAttribute('onclick') !== 'toggleCarDropdown()') {
                     dropdown.classList.add('hidden');
                 }
             }
