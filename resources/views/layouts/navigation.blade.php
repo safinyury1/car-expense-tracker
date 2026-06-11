@@ -1,4 +1,4 @@
-<nav x-data="{ open: false, showMenu: false, showPagesMenu: false, mobileMenuOpen: false }" class="bg-white dark:bg-[#222222] border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false, showMainMenu: false, mobileMenuOpen: false }" class="bg-white dark:bg-[#222222] border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -15,7 +15,7 @@
                     </a>
                 </div>
 
-                <!-- Десктопное меню (видно на экранах больше 1024px) -->
+                <!-- Десктопное меню -->
                 <div class="desktop-menu">
                     <x-nav-link :href="route('overview.index')" :active="request()->routeIs('overview.*')">
                         {{ __('Обзор') }}
@@ -54,7 +54,7 @@
                     @endif
                 </div>
 
-                <!-- Планшетное меню (видно на экранах от 768px до 1024px) -->
+                <!-- Планшетное меню -->
                 <div class="tablet-menu">
                     <x-nav-link :href="route('overview.index')" :active="request()->routeIs('overview.*')">
                         {{ __('Обзор') }}
@@ -94,89 +94,87 @@
                 </div>
             </div>
 
-            <!-- Две круглые кнопки + бургер + аватар -->
-            <div class="flex items-center gap-2">
-                <!-- Первая кнопка: Добавить (плюс) -->
+            <!-- ОДНА КНОПКА (Telegram UI Kit стиль) + бургер + аватар -->
+            <div class="flex items-center gap-3">
+                <!-- Единая прямоугольная кнопка "Действия" -->
                 <div class="relative">
-                    <button @click="showMenu = !showMenu" 
-                            class="w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none">
-                        <img src="{{ asset('images/icons/plus.png') }}" alt="Добавить" class="w-5 h-5">
+                    <button @click="showMainMenu = !showMainMenu" 
+                            class="h-9 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 transition duration-200 focus:outline-none text-sm font-medium shadow-sm">
+                        Действия
                     </button>
                     
-                    <div x-show="showMenu" 
-                         @click.away="showMenu = false"
+                    <!-- Выпадающее меню (объединяет всё из двух старых кнопок) -->
+                    <div x-show="showMainMenu" 
+                         @click.away="showMainMenu = false"
                          x-cloak
-                         class="absolute right-0 mt-2 w-56 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
+                         class="absolute right-0 mt-2 w-64 bg-white dark:bg-[#222222] rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden"
                          style="display: none;">
+                        
+                        <!-- Раздел: Добавить -->
                         <div class="py-1">
+                            <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                Добавить
+                            </div>
                             <a href="{{ route('refuelings.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/zapravka.png') }}" alt="Заправка" class="w-4 h-4">
-                                Добавить заправку
+                                Заправку
                             </a>
                             <a href="{{ route('expenses.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/money.png') }}" alt="Расход" class="w-4 h-4">
-                                Добавить расход
+                                Расход
                             </a>
                             <a href="{{ route('cars.create.form') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/car.png') }}" alt="Автомобиль" class="w-4 h-4">
-                                Добавить автомобиль
+                                Автомобиль
                             </a>
                             <a href="{{ route('service.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/wrench.png') }}" alt="Обслуживание" class="w-4 h-4">
-                                Добавить обслуживание
+                                Обслуживание
                             </a>
-                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                             <a href="{{ route('incomes.create') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/income1.png') }}" alt="Доход" class="w-4 h-4">
-                                Добавить доход
+                                Доход
                             </a>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Вторая кнопка: Страницы (меню) -->
-                <div class="relative">
-                    <button @click="showPagesMenu = !showPagesMenu" 
-                            class="w-10 h-10 rounded-full bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center shadow-lg transition duration-200 focus:outline-none">
-                        <img src="{{ asset('images/icons/menu2.png') }}" alt="Меню" class="w-5 h-5">
-                    </button>
-                    
-                    <div x-show="showPagesMenu" 
-                         @click.away="showPagesMenu = false"
-                         x-cloak
-                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50"
-                         style="display: none;">
+                        
+                        <!-- Разделитель -->
+                        <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                        
+                        <!-- Раздел: Перейти к -->
                         <div class="py-1">
+                            <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                Перейти к
+                            </div>
                             <a href="{{ route('cars.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
-                                <img src="{{ asset('images/icons/car2.png') }}" alt="Автомобиль" class="w-4 h-4">
-                                Автомобили
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                <img src="{{ asset('images/icons/car2.png') }}" alt="Автомобили" class="w-4 h-4">
+                                Автомобилям
                             </a>
                             <a href="{{ route('refuelings.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/zapravka1.png') }}" alt="Заправки" class="w-4 h-4">
-                                Заправки
+                                Заправкам
                             </a>
                             <a href="{{ route('expenses.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/consumption3.png') }}" alt="Расходы" class="w-4 h-4">
-                                Расходы
+                                Расходам
                             </a>
                             <a href="{{ route('incomes-list.index') }}" 
-                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-gray-700 transition">
+                               class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <img src="{{ asset('images/icons/income2.png') }}" alt="Доходы" class="w-4 h-4">
-                                Доходы
+                                Доходам
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Бургер-меню (видно только на экранах меньше 1024px, но для iPad показываем на < 768px) -->
+                <!-- Бургер-меню (мобильная версия) -->
                 <div class="burger-button">
                     <button @click="mobileMenuOpen = !mobileMenuOpen" 
                             class="rounded-md p-2 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition">
@@ -187,7 +185,7 @@
                     </button>
                 </div>
 
-                <!-- Аватар пользователя (на ПК) -->
+                <!-- Аватар пользователя -->
                 <div class="hidden sm:flex sm:items-center ml-2">
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
@@ -279,7 +277,6 @@
                 </a>
             @endif
 
-            <!-- Настройки и Выйти -->
             <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
                 <a href="{{ route('settings.index') }}" 
                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -305,13 +302,15 @@
         /* Десктопное меню - показывается на экранах >= 1024px */
         .desktop-menu {
             display: flex;
-            gap: 2rem;
+            align-items: center;
+            gap: 1.5rem;
             margin-left: 2.5rem;
         }
         
-        /* Планшетное меню - скрыто по умолчанию, показывается от 768px до 1023px */
+        /* Планшетное меню - показывается от 768px до 1023px */
         .tablet-menu {
             display: none;
+            align-items: center;
             gap: 1rem;
             margin-left: 1.5rem;
         }
@@ -321,61 +320,16 @@
             display: none;
         }
         
-        /* Планшеты (768px - 1023px) */
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .desktop-menu {
-                display: none !important;
-            }
-            
-            .tablet-menu {
-                display: flex !important;
-            }
-            
-            .burger-button {
-                display: none !important;
-            }
-            
-            /* Уменьшаем отступы для планшетов */
-            .tablet-menu .nav-link {
-                font-size: 0.9rem;
-                padding: 0.25rem 0;
-            }
-        }
-        
-        /* Телефоны (до 767px) */
-        @media (max-width: 767px) {
-            .desktop-menu {
-                display: none !important;
-            }
-            
-            .tablet-menu {
-                display: none !important;
-            }
-            
-            .burger-button {
-                display: block !important;
-            }
-        }
-        
-        /* Десктопы и ноутбуки (от 1024px) */
-        @media (min-width: 1024px) {
-            .desktop-menu {
-                display: flex !important;
-            }
-            
-            .tablet-menu {
-                display: none !important;
-            }
-            
-            .burger-button {
-                display: none !important;
-            }
-        }
-        
+        /* Все пункты навигации выровнены по вертикали */
         .nav-link {
             position: relative;
             transition: all 0.3s ease;
             color: #374151 !important;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            height: 100%;
+            line-height: 1;
         }
         
         .nav-link:hover {
@@ -409,12 +363,68 @@
             color: #f3f4f6 !important;
         }
         
+        /* Планшеты (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .desktop-menu {
+                display: none !important;
+            }
+            .tablet-menu {
+                display: flex !important;
+                gap: 0.75rem !important;
+            }
+            .burger-button {
+                display: none !important;
+            }
+            .tablet-menu .nav-link {
+                font-size: 0.9rem;
+                padding: 0.25rem 0;
+            }
+        }
+        
+        /* Телефоны (до 767px) */
+        @media (max-width: 767px) {
+            .desktop-menu {
+                display: none !important;
+            }
+            .tablet-menu {
+                display: none !important;
+            }
+            .burger-button {
+                display: block !important;
+            }
+        }
+        
+        /* Десктопы и ноутбуки (от 1024px) */
+        @media (min-width: 1024px) {
+            .desktop-menu {
+                display: flex !important;
+                gap: 1.75rem !important;
+            }
+            .tablet-menu {
+                display: none !important;
+            }
+            .burger-button {
+                display: none !important;
+            }
+        }
+        
         button:focus,
         button:active,
         a:focus,
         a:active {
             outline: none !important;
             box-shadow: none !important;
+        }
+        
+        /* Левая часть всегда выровнена по центру */
+        .flex.items-center {
+            align-items: center;
+        }
+        
+        /* Контейнеры меню занимают всю высоту */
+        .desktop-menu,
+        .tablet-menu {
+            height: 100%;
         }
     </style>
 </nav>
