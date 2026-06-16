@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Reminder;
+use App\Mail\ReminderNotification;
 use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ReminderController extends Controller
 {
@@ -26,24 +28,20 @@ class ReminderController extends Controller
             $car = Car::find($carId);
         }
         
-        // Пагинация (20 записей на страницу)
         $reminders = $query->orderBy('is_completed', 'asc')
             ->orderBy('due_odometer', 'asc')
             ->orderBy('due_date', 'asc')
             ->paginate(20);
         
-        // Добавляем параметр car_id к ссылкам пагинации
         if ($carId) {
             $reminders->appends(['car_id' => $carId]);
         }
         
-        // Конвертируем единицы измерения для каждого напоминания
         foreach ($reminders as $reminder) {
             if ($carId && isset($car)) {
                 $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $car);
                 $reminder->distance_unit = $this->getDistanceUnit($car);
             } else {
-                // Для отображения используем единицы измерения из автомобиля
                 $carForReminder = $reminder->car;
                 $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $carForReminder);
                 $reminder->distance_unit = $this->getDistanceUnit($carForReminder);
@@ -79,7 +77,17 @@ class ReminderController extends Controller
             abort(403);
         }
         
-        Reminder::create($validated);
+        $reminder = Reminder::create($validated);
+        
+        // Отправка email уведомления ТОЛЬКО ЕСЛИ ВКЛЮЧЕНО
+        try {
+            $user = Auth::user();
+            if ($user->notify_reminders) {
+                Mail::to($user->email)->send(new ReminderNotification($reminder, $user, $car));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Ошибка отправки email уведомления: ' . $e->getMessage());
+        }
         
         return redirect()->route('reminders.index', ['car_id' => $validated['car_id']])
             ->with('success', 'Напоминание успешно добавлено!');
@@ -93,7 +101,6 @@ class ReminderController extends Controller
         
         $cars = Auth::user()->cars;
         
-        // Конвертируем единицы для отображения
         $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $reminder->car);
         $reminder->distance_unit = $this->getDistanceUnit($reminder->car);
         

@@ -25,7 +25,7 @@
                                     Автомобиль
                                 </label>
                                 <div class="relative">
-                                    <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm pl-3 pr-8 py-2.5 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-lg shadow-sm text-sm pl-3 pr-8 py-2.5 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                         <option value="">Все автомобили</option>
                                         @foreach($cars as $car)
                                             <option value="{{ $car->id }}" {{ ($carId ?? '') == $car->id ? 'selected' : '' }}>
@@ -47,7 +47,7 @@
                                     Дата от
                                 </label>
                                 <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
 
                             <!-- Дата до -->
@@ -56,7 +56,7 @@
                                     Дата до
                                 </label>
                                 <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
 
                             <!-- Поиск -->
@@ -66,7 +66,7 @@
                                 </label>
                                 <input type="text" name="search" value="{{ $search ?? '' }}" 
                                        placeholder="Название, описание, категория..."
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
 
                             <!-- Кнопки -->
@@ -184,18 +184,12 @@
                             </div>
                             
                             <div class="flex items-center gap-2 mb-2">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
                                 <a href="{{ route('incomes.show', $income) }}" class="text-sm font-semibold text-green-600 dark:text-green-400 hover:underline">
                                     {{ $income->title }}
                                 </a>
                             </div>
                             
                             <div class="flex items-center gap-2 mb-2">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m0-3H4.5m16.5-3h-9m-6 0H3m9-9a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 013 0m-3 0h-9m-6 0H3" />
-                                </svg>
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {{ $income->car->brand }} {{ $income->car->model }}
                                 </span>

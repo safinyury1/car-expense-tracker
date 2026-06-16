@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\Income;
 use App\Models\Refueling;
 use App\Models\Reminder;
+use App\Models\ExpenseCategory;
 use App\Traits\ConvertsUnits;
 use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
@@ -62,7 +63,21 @@ class ServiceController extends Controller
         $selectedCar = $cars->find($selectedCarId);
         
         $maxOdometer = 0;
+        $lastOdometer = null;
+        $lastOdometerByCar = [];
+        
+        // Для каждого автомобиля получаем последний пробег
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
         if ($selectedCar) {
+            $lastOdometer = $lastOdometerByCar[$selectedCarId] ?? 0;
             $maxOdometerKm = max(
                 Expense::where('car_id', $selectedCarId)->max('odometer') ?? 0,
                 Refueling::where('car_id', $selectedCarId)->max('odometer') ?? 0,
@@ -71,7 +86,7 @@ class ServiceController extends Controller
             $maxOdometer = $this->convertDistance($maxOdometerKm, $selectedCar);
         }
         
-        return view('service.create', compact('cars', 'selectedCar', 'maxOdometer'));
+        return view('service.create', compact('cars', 'selectedCar', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
     
     // Сохранение обслуживания
@@ -97,9 +112,9 @@ class ServiceController extends Controller
         $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'service');
         
         // Находим категорию
-        $category = \App\Models\ExpenseCategory::where('name', 'Обслуживание')->first();
+        $category = ExpenseCategory::where('name', 'Обслуживание')->first();
         if (!$category) {
-            $category = \App\Models\ExpenseCategory::where('name', 'Ремонт')->first();
+            $category = ExpenseCategory::where('name', 'Ремонт')->first();
         }
         
         // Создаём запись в расходах
@@ -113,7 +128,7 @@ class ServiceController extends Controller
         ]);
         
         // Создаём запись в напоминаниях как выполненное обслуживание
-        $reminder = Reminder::create([
+        Reminder::create([
             'car_id' => $validated['car_id'],
             'title' => $validated['title'],
             'due_odometer' => $validated['odometer'],
@@ -127,7 +142,7 @@ class ServiceController extends Controller
             'next_due_date' => $validated['next_due_date'] ?? null,
         ]);
         
-        // Создаём напоминание для следующего ТО если указано
+        // Автоматическое создание напоминания
         if ($validated['next_due_odometer'] || $validated['next_due_date']) {
             Reminder::create([
                 'car_id' => $validated['car_id'],
@@ -139,8 +154,8 @@ class ServiceController extends Controller
             ]);
         }
         
-        return redirect()->route('service.index', ['car_id' => $validated['car_id']])
-            ->with('success', 'Обслуживание добавлено!');
+        return redirect()->route('overview.index', ['car_id' => $validated['car_id']])
+            ->with('success', '✅ Обслуживание успешно добавлено! Напоминание о следующем ТО создано автоматически.');
     }
     
     // Просмотр обслуживания

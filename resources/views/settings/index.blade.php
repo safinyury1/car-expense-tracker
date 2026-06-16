@@ -109,6 +109,75 @@
                 </div>
             </div>
 
+            <!-- ========================================== -->
+            <!-- НАСТРОЙКИ УВЕДОМЛЕНИЙ -->
+            <!-- ========================================== -->
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl mb-6">
+                <div class="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-white text-base sm:text-lg">Настройки уведомлений</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Управление email уведомлениями</p>
+                </div>
+                <form method="POST" action="{{ route('settings.update-notifications') }}" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @csrf
+                    @method('PATCH')
+                    
+                    <div class="p-4 sm:p-5 space-y-4">
+                        <!-- ТО -->
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+                            <input type="checkbox" name="notify_reminders" value="1" 
+                                   {{ old('notify_reminders', Auth::user()->notify_reminders ?? true) ? 'checked' : '' }}
+                                   class="w-4 h-4 mt-1 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500">
+                            <div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Уведомления о ТО</span>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">Получать уведомления о предстоящем техническом обслуживании</p>
+                            </div>
+                        </label>
+
+                        <!-- Расходы -->
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+                            <input type="checkbox" name="notify_expenses" value="1" 
+                                   {{ old('notify_expenses', Auth::user()->notify_expenses ?? true) ? 'checked' : '' }}
+                                   class="w-4 h-4 mt-1 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500">
+                            <div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Уведомления о новых расходах</span>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">Получать уведомления при добавлении нового расхода</p>
+                            </div>
+                        </label>
+
+                        <!-- Заправки -->
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+                            <input type="checkbox" name="notify_refuelings" value="1" 
+                                   {{ old('notify_refuelings', Auth::user()->notify_refuelings ?? true) ? 'checked' : '' }}
+                                   class="w-4 h-4 mt-1 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500">
+                            <div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Уведомления о новых заправках</span>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">Получать уведомления при добавлении новой заправки</p>
+                            </div>
+                        </label>
+
+                        <!-- Еженедельный отчёт -->
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+                            <input type="checkbox" name="notify_summary" value="1" 
+                                   {{ old('notify_summary', Auth::user()->notify_summary ?? true) ? 'checked' : '' }}
+                                   class="w-4 h-4 mt-1 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500">
+                            <div>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Еженедельный отчёт</span>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">Получать еженедельную сводку по расходам и пробегу</p>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="px-4 sm:px-5 py-3 bg-gray-50 dark:bg-gray-800/30 flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-xl">
+                        <p class="text-xs text-gray-400 dark:text-gray-500">
+                            Все уведомления приходят на ваш email: <span class="font-medium text-gray-600 dark:text-gray-300">{{ Auth::user()->email }}</span>
+                        </p>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-lg text-sm transition shadow-sm w-full sm:w-auto">
+                            Сохранить настройки
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             <!-- Помощь -->
             <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl">
                 <div class="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-700">
@@ -134,13 +203,13 @@
         </div>
     </div>
 
-    <!-- Модальное окно поддержки -->
-    <div id="supportModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-[#222222] rounded-xl shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+    <!-- Модальное окно поддержки с замылением -->
+    <div id="supportModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4">
+        <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div class="p-5 sm:p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Связаться с поддержкой</h3>
-                    <button onclick="closeSupportModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
+                    <button onclick="closeSupportModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition p-1">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -166,16 +235,6 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-xs text-gray-500 dark:text-gray-400">Telegram</p>
                             <a href="https://t.me/autocost_support" target="_blank" class="text-blue-600 dark:text-blue-400 font-medium text-sm break-all">@autocost_support</a>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                        <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Телефон</p>
-                            <a href="tel:+79991234567" class="text-blue-600 dark:text-blue-400 font-medium text-sm">+7 (999) 123-45-67</a>
                         </div>
                     </div>
                 </div>
@@ -327,6 +386,7 @@
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
             }
         }
         
@@ -335,7 +395,21 @@
             if (modal) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+                document.body.style.overflow = '';
             }
         }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSupportModal();
+            }
+        });
+        
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('supportModal');
+            if (event.target === modal) {
+                closeSupportModal();
+            }
+        });
     </script>
 </x-app-layout>

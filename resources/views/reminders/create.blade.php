@@ -26,7 +26,7 @@
                                 Автомобиль <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
+                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
                                     <option value="">Выберите автомобиль</option>
                                     @foreach($cars as $car)
                                         <option value="{{ $car->id }}" {{ $selectedCar == $car->id ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                             </label>
                             <input type="text" name="title" id="title" value="{{ old('title') }}" 
                                    placeholder="Например: Замена масла, Замена ремня ГРМ, Шиномонтаж..."
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('title') border-red-500 @enderror" required>
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('title') border-red-500 @enderror" required>
                             @error('title')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -66,7 +66,7 @@
                                 </label>
                                 <div class="relative">
                                     <input type="number" name="due_odometer" id="due_odometer" value="{{ old('due_odometer') }}" min="0" 
-                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_odometer') border-red-500 @enderror" required
+                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_odometer') border-red-500 @enderror" required
                                            placeholder="0">
                                     <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">км</span>
                                 </div>
@@ -82,7 +82,7 @@
                                     Дата <span class="text-gray-400 text-xs font-normal">(необязательно)</span>
                                 </label>
                                 <input type="date" name="due_date" id="due_date" value="{{ old('due_date') }}" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_date') border-red-500 @enderror">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_date') border-red-500 @enderror">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Дополнительное напоминание по дате</p>
                                 @error('due_date')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

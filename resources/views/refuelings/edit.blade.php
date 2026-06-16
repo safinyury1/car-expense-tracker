@@ -27,7 +27,7 @@
                                 Автомобиль <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
+                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
                                     <option value="">Выберите автомобиль</option>
                                     @foreach($cars as $car)
                                         <option value="{{ $car->id }}" {{ old('car_id', $refueling->car_id) == $car->id ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                                 Дата <span class="text-red-500">*</span>
                             </label>
                             <input type="date" name="date" id="date" value="{{ old('date', $refueling->date->format('Y-m-d')) }}" 
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('date') border-red-500 @enderror" required>
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('date') border-red-500 @enderror" required>
                             @error('date')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -65,7 +65,7 @@
                                     Литры <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" name="liters" id="liters" value="{{ old('liters', $refueling->liters) }}" step="0.01" min="0" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('liters') border-red-500 @enderror" required
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('liters') border-red-500 @enderror" required
                                        placeholder="0.00">
                                 @error('liters')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -79,7 +79,7 @@
                                 </label>
                                 <div class="relative">
                                     <input type="number" name="price_per_liter" id="price_per_liter" value="{{ old('price_per_liter', $refueling->price_per_liter) }}" step="0.01" min="0" 
-                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('price_per_liter') border-red-500 @enderror" required
+                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('price_per_liter') border-red-500 @enderror" required
                                            placeholder="0.00">
                                     <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $refueling->car->currency ?? '₽' }}</span>
                                 </div>
@@ -96,7 +96,7 @@
                             </label>
                             <div class="relative">
                                 <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $refueling->odometer) }}" min="0" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('odometer') border-red-500 @enderror"
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('odometer') border-red-500 @enderror"
                                        placeholder="0">
                                 <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $refueling->car->distance_unit ?? 'км' }}</span>
                             </div>
@@ -116,7 +116,7 @@
                                 АЗС
                             </label>
                             <input type="text" name="gas_station" id="gas_station" value="{{ old('gas_station', $refueling->gas_station) }}" 
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('gas_station') border-red-500 @enderror"
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('gas_station') border-red-500 @enderror"
                                    placeholder="Название АЗС">
                             @error('gas_station')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

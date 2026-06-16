@@ -7,10 +7,12 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Refueling;
 use App\Models\Income;
+use App\Mail\ExpenseNotification;
 use App\Traits\ConvertsUnits;
 use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 
 class ExpenseController extends Controller
@@ -97,19 +99,27 @@ class ExpenseController extends Controller
         $selectedCar = $request->get('car_id');
         
         $maxOdometer = 0;
+        $lastOdometer = null;
+        $lastOdometerByCar = [];
+        
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
         if ($selectedCar) {
             $car = Car::find($selectedCar);
             if ($car) {
-                $maxOdometerKm = max(
-                    Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                    Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                    Income::where('car_id', $selectedCar)->max('odometer') ?? 0
-                );
-                $maxOdometer = $this->convertDistance($maxOdometerKm, $car);
+                $lastOdometer = $lastOdometerByCar[$selectedCar] ?? 0;
+                $maxOdometer = $this->convertDistance($lastOdometer, $car);
             }
         }
         
-        return view('expenses.create', compact('cars', 'categories', 'selectedCar', 'maxOdometer'));
+        return view('expenses.create', compact('cars', 'categories', 'selectedCar', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
 
     public function store(Request $request)
@@ -119,7 +129,7 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:expense_categories,id',
             'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
-            'odometer' => 'nullable|integer|min:0',  // ИЗМЕНЕНО: required → nullable
+            'odometer' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
         
@@ -128,12 +138,23 @@ class ExpenseController extends Controller
             abort(403);
         }
         
-        // Валидация пробега только если он указан
         if (!empty($validated['odometer'])) {
             $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'expense');
+            $car->odometer = $validated['odometer'];
+            $car->save();
         }
         
-        Expense::create($validated);
+        $expense = Expense::create($validated);
+        
+        // Отправка email уведомления ТОЛЬКО ЕСЛИ ВКЛЮЧЕНО
+        try {
+            $user = Auth::user();
+            if ($user->notify_expenses) {
+                Mail::to($user->email)->send(new ExpenseNotification($expense, $user, $car));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Ошибка отправки email уведомления: ' . $e->getMessage());
+        }
         
         return redirect()->route('expenses.index', ['car_id' => $validated['car_id']])
             ->with('success', 'Расход успешно добавлен!');
@@ -180,13 +201,15 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:expense_categories,id',
             'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
-            'odometer' => 'nullable|integer|min:0',  // ИЗМЕНЕНО: required → nullable
+            'odometer' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
         
-        // Валидация пробега только если он указан (исключаем текущую запись)
         if (!empty($validated['odometer'])) {
             $this->validateOdometer($validated['car_id'], $validated['odometer'], $expense->id, 'expense');
+            $car = Car::find($expense->car_id);
+            $car->odometer = $validated['odometer'];
+            $car->save();
         }
         
         $expense->update($validated);

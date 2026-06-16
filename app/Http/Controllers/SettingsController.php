@@ -24,4 +24,17 @@ class SettingsController extends Controller
         
         return response()->json(['success' => true]);
     }
+    
+    public function updateNotifications(Request $request)
+    {
+        $user = Auth::user();
+        
+        $user->notify_reminders = $request->has('notify_reminders');
+        $user->notify_expenses = $request->has('notify_expenses');
+        $user->notify_refuelings = $request->has('notify_refuelings');
+        $user->notify_summary = $request->has('notify_summary');
+        $user->save();
+        
+        return redirect()->route('settings.index')->with('success', '✅ Настройки уведомлений обновлены!');
+    }
 }

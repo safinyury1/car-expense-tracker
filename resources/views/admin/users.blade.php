@@ -40,7 +40,7 @@
                                        name="search" 
                                        value="{{ $search ?? '' }}" 
                                        placeholder="Поиск по имени или email..."
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
                             
                             <!-- Роль -->
@@ -49,7 +49,7 @@
                                     Роль
                                 </label>
                                 <div class="relative">
-                                    <select name="role" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none pr-8">
+                                    <select name="role" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none pr-8">
                                         <option value="all" {{ ($role ?? 'all') == 'all' ? 'selected' : '' }}>Все роли</option>
                                         <option value="user" {{ ($role ?? '') == 'user' ? 'selected' : '' }}>Пользователи</option>
                                         <option value="admin" {{ ($role ?? '') == 'admin' ? 'selected' : '' }}>Администраторы</option>

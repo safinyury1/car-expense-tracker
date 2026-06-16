@@ -70,11 +70,11 @@
                                 <input type="text" name="brand" id="brand" autocomplete="off"
                                     value="{{ old('brand') }}" 
                                     placeholder="Например: LADA, BMW, Toyota..."
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('brand') border-red-500 @enderror"
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('brand') border-red-500 @enderror"
                                     required>
                                 
                                 <div id="brandDropdown" 
-                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#222222] border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#333333] border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                                     <div class="py-1"></div>
                                 </div>
                                 @error('brand')
@@ -90,11 +90,11 @@
                                 <input type="text" name="model" id="model" autocomplete="off"
                                     value="{{ old('model') }}" 
                                     placeholder="Сначала выберите марку..."
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('model') border-red-500 @enderror"
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('model') border-red-500 @enderror"
                                     required>
                                 
                                 <div id="modelDropdown" 
-                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#222222] border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#333333] border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                                     <div class="py-1"></div>
                                 </div>
                                 @error('model')
@@ -110,7 +110,7 @@
                                 <input type="number" name="year" id="year" value="{{ old('year') }}" 
                                     placeholder="2020" 
                                     min="1900" max="{{ date('Y') }}" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('year') border-red-500 @enderror">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('year') border-red-500 @enderror">
                                 @error('year')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -124,7 +124,7 @@
                                 <div class="relative">
                                     <input type="number" name="initial_odometer" id="initial_odometer" value="{{ old('initial_odometer', 0) }}" 
                                         min="0" 
-                                        class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('initial_odometer') border-red-500 @enderror">
+                                        class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('initial_odometer') border-red-500 @enderror">
                                     <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">км</span>
                                 </div>
                                 @error('initial_odometer')
@@ -139,7 +139,7 @@
                                 </label>
                                 <input type="text" name="vin" id="vin" value="{{ old('vin') }}" 
                                     placeholder="WBAGL..." maxlength="17" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('vin') border-red-500 @enderror">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('vin') border-red-500 @enderror">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">17 символов, только латиница и цифры</p>
                                 @error('vin')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -281,7 +281,7 @@
             filtered.forEach((brand, index) => {
                 const div = document.createElement('div');
                 div.textContent = brand;
-                div.className = 'px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 text-sm transition';
+                div.className = 'px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-200 text-sm transition';
                 div.onclick = () => {
                     brandInput.value = brand;
                     brandDropdown.classList.add('hidden');
@@ -339,7 +339,7 @@
             filtered.forEach((model, index) => {
                 const div = document.createElement('div');
                 div.textContent = model;
-                div.className = 'px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 text-sm transition';
+                div.className = 'px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-200 text-sm transition';
                 div.onclick = () => {
                     modelInput.value = model;
                     modelDropdown.classList.add('hidden');

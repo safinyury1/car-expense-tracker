@@ -27,7 +27,7 @@
                                 Автомобиль <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
+                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
                                     @foreach($cars as $car)
                                         <option value="{{ $car->id }}" {{ old('car_id', $income->car_id) == $car->id ? 'selected' : '' }}>
                                             {{ $car->brand }} {{ $car->model }}
@@ -51,7 +51,7 @@
                                 Категория <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="category" id="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('category') border-red-500 @enderror" required>
+                                <select name="category" id="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('category') border-red-500 @enderror" required>
                                     <option value="salary" {{ old('category', $income->category) == 'salary' ? 'selected' : '' }}>Зарплата</option>
                                     <option value="business" {{ old('category', $income->category) == 'business' ? 'selected' : '' }}>Бизнес</option>
                                     <option value="gift" {{ old('category', $income->category) == 'gift' ? 'selected' : '' }}>Подарок</option>
@@ -76,7 +76,7 @@
                             </label>
                             <input type="text" name="title" id="title" value="{{ old('title', $income->title) }}" required
                                    placeholder="Например: Зарплата, Премия, Кэшбэк..."
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('title') border-red-500 @enderror">
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('title') border-red-500 @enderror">
                             @error('title')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -89,7 +89,7 @@
                                     Дата <span class="text-red-500">*</span>
                                 </label>
                                 <input type="date" name="date" id="date" value="{{ old('date', $income->date->format('Y-m-d')) }}" required
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('date') border-red-500 @enderror">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('date') border-red-500 @enderror">
                                 @error('date')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -103,7 +103,7 @@
                                 <div class="relative">
                                     <input type="number" name="amount" id="amount" step="0.01" value="{{ old('amount', $income->amount) }}" required
                                            placeholder="0.00"
-                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('amount') border-red-500 @enderror">
+                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('amount') border-red-500 @enderror">
                                     <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $income->car->currency ?? '₽' }}</span>
                                 </div>
                                 @error('amount')
@@ -119,7 +119,7 @@
                             </label>
                             <div class="relative">
                                 <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $income->odometer) }}" min="0" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('odometer') border-red-500 @enderror"
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('odometer') border-red-500 @enderror"
                                        placeholder="0">
                                 <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $income->car->distance_unit ?? 'км' }}</span>
                             </div>
@@ -139,7 +139,7 @@
                                 Описание
                             </label>
                             <textarea name="description" id="description" rows="3"
-                                      class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none @error('description') border-red-500 @enderror"
+                                      class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none @error('description') border-red-500 @enderror"
                                       placeholder="Дополнительная информация...">{{ old('description', $income->description) }}</textarea>
                             @error('description')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

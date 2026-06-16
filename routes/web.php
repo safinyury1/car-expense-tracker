@@ -18,11 +18,33 @@ use App\Http\Controllers\GuideController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\IncomeListController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\OCRController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// ==========================================
+// ВОССТАНОВЛЕНИЕ ПАРОЛЯ
+// ==========================================
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->middleware('guest')
+    ->name('password.request');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->middleware('guest')
+    ->name('password.email');
+
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+    ->middleware('guest')
+    ->name('password.reset');
+
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+    ->middleware('guest')
+    ->name('password.update');
 
 // Дашборд
 Route::middleware(['auth', 'has.car'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -57,6 +79,11 @@ Route::middleware('auth')->group(function () {
     // Настройки
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
+    
+    // ==========================================
+    // НАСТРОЙКИ УВЕДОМЛЕНИЙ
+    // ==========================================
+    Route::patch('/settings/update-notifications', [SettingsController::class, 'updateNotifications'])->name('settings.update-notifications');
     
     // Настройки авто
     Route::get('/car-settings', [CarSettingsController::class, 'index'])->name('car-settings.index');
@@ -126,7 +153,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/support', [SupportController::class, 'userIndex'])->name('support.user.index');
     Route::get('/support/{id}', [SupportController::class, 'userShow'])->name('support.user.show');
     Route::post('/support', [SupportController::class, 'store'])->name('support.store');
-    Route::delete('/support/{id}', [SupportController::class, 'userDestroy'])->name('support.user.destroy'); // ДОБАВЛЕНО
+    Route::delete('/support/{id}', [SupportController::class, 'userDestroy'])->name('support.user.destroy');
+    
+    // OCR - Распознавание чеков
+    Route::post('/ocr/scan', [OCRController::class, 'scan'])->name('ocr.scan');
+    Route::get('/ocr/test', [OCRController::class, 'test'])->name('ocr.test');
 });
 
 // Админ-панель

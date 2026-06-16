@@ -25,7 +25,7 @@
                                     Автомобиль
                                 </label>
                                 <div class="relative">
-                                    <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm pl-3 pr-8 py-2.5 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-lg shadow-sm text-sm pl-3 pr-8 py-2.5 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                         <option value="">Все автомобили</option>
                                         @foreach($cars as $car)
                                             <option value="{{ $car->id }}" {{ ($carId ?? '') == $car->id ? 'selected' : '' }}>
@@ -47,7 +47,7 @@
                                     Дата от
                                 </label>
                                 <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <!-- Дата до -->
@@ -56,7 +56,7 @@
                                     Дата до
                                 </label>
                                 <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <!-- Поиск -->
@@ -66,7 +66,7 @@
                                 </label>
                                 <input type="text" name="search" value="{{ $search ?? '' }}" 
                                        placeholder="АЗС, марка, модель..."
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-lg shadow-sm text-sm px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <!-- Кнопки -->

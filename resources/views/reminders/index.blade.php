@@ -74,7 +74,6 @@
                     <div class="p-8 sm:p-12 text-center">
                         <svg class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m0 12v1m-7-7h1m12 0h1M5 12a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 01-2 2m-7 0h-4" />
                         </svg>
                         <p class="text-gray-500 dark:text-gray-400 font-medium">Нет добавленных напоминаний</p>
                         <p class="text-xs sm:text-sm text-gray-400 dark:text-gray-500 mt-1">Добавьте напоминание о техническом обслуживании</p>

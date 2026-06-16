@@ -6,10 +6,12 @@ use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Models\Refueling;
+use App\Mail\RefuelingNotification;
 use App\Traits\ConvertsUnits;
 use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 
 class RefuelingController extends Controller
@@ -92,19 +94,27 @@ class RefuelingController extends Controller
         $selectedCar = $request->get('car_id');
         
         $maxOdometer = 0;
+        $lastOdometer = null;
+        $lastOdometerByCar = [];
+        
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
         if ($selectedCar) {
             $car = Car::find($selectedCar);
             if ($car) {
-                $maxOdometerKm = max(
-                    Expense::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                    Refueling::where('car_id', $selectedCar)->max('odometer') ?? 0,
-                    Income::where('car_id', $selectedCar)->max('odometer') ?? 0
-                );
-                $maxOdometer = $this->convertDistance($maxOdometerKm, $car);
+                $lastOdometer = $lastOdometerByCar[$selectedCar] ?? 0;
+                $maxOdometer = $this->convertDistance($lastOdometer, $car);
             }
         }
         
-        return view('refuelings.create', compact('cars', 'selectedCar', 'maxOdometer'));
+        return view('refuelings.create', compact('cars', 'selectedCar', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
 
     public function store(Request $request)
@@ -125,12 +135,23 @@ class RefuelingController extends Controller
             abort(403);
         }
         
-        // Валидация пробега только если он указан
         if (!empty($validated['odometer'])) {
             $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'refueling');
+            $car->odometer = $validated['odometer'];
+            $car->save();
         }
         
-        Refueling::create($validated);
+        $refueling = Refueling::create($validated);
+        
+        // Отправка email уведомления ТОЛЬКО ЕСЛИ ВКЛЮЧЕНО
+        try {
+            $user = Auth::user();
+            if ($user->notify_refuelings) {
+                Mail::to($user->email)->send(new RefuelingNotification($refueling, $user, $car));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Ошибка отправки email уведомления: ' . $e->getMessage());
+        }
         
         return redirect()->route('refuelings.index', ['car_id' => $validated['car_id']])
             ->with('success', 'Заправка успешно добавлена!');
@@ -142,7 +163,6 @@ class RefuelingController extends Controller
             abort(403);
         }
         
-        // КОНВЕРТАЦИЯ ДЛЯ ОТОБРАЖЕНИЯ
         $car = $refueling->car;
         $refueling->converted_amount = $this->convertCurrency($refueling->total_amount, $car);
         $refueling->converted_odometer = $this->convertDistance($refueling->odometer, $car);
@@ -165,7 +185,6 @@ class RefuelingController extends Controller
         
         $cars = Auth::user()->cars;
         
-        // КОНВЕРТАЦИЯ ДЛЯ ФОРМЫ РЕДАКТИРОВАНИЯ
         $car = $refueling->car;
         $refueling->converted_amount = $this->convertCurrency($refueling->total_amount, $car);
         $refueling->converted_odometer = $this->convertDistance($refueling->odometer, $car);
@@ -202,9 +221,11 @@ class RefuelingController extends Controller
         
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
         
-        // Валидация пробега только если он указан (исключаем текущую запись)
         if (!empty($validated['odometer'])) {
             $this->validateOdometer($validated['car_id'], $validated['odometer'], $refueling->id, 'refueling');
+            $car = Car::find($refueling->car_id);
+            $car->odometer = $validated['odometer'];
+            $car->save();
         }
         
         $refueling->update($validated);

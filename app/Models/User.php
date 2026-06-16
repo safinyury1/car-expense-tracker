@@ -15,8 +15,13 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
-        'theme',
         'role',
+        'theme',
+        'language',
+        'notify_reminders',
+        'notify_expenses',
+        'notify_refuelings',
+        'notify_summary',
     ];
 
     protected $hidden = [
@@ -29,11 +34,20 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notify_reminders' => 'boolean',
+            'notify_expenses' => 'boolean',
+            'notify_refuelings' => 'boolean',
+            'notify_summary' => 'boolean',
         ];
     }
 
     public function cars()
     {
         return $this->hasMany(Car::class);
+    }
+
+    public function visits()
+    {
+        return $this->hasMany(Visit::class);
     }
 }

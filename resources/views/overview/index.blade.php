@@ -39,22 +39,14 @@
                         </button>
                         
                         <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="relative">
-                                <button onclick="toggleCarDropdown()" 
-                                        class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-1.5 sm:p-2 transition w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center">
-                                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                    </svg>
-                                </button>
-                                <div id="carDropdown" class="hidden absolute right-0 bottom-full mb-2 w-48 bg-white dark:bg-[#222222] rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
-                                    @foreach($cars as $car)
-                                        <a href="{{ route('overview.index', ['car_id' => $car->id]) }}" 
-                                           class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] {{ $selectedCarId == $car->id ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : '' }}">
-                                            {{ $car->brand }} {{ $car->model }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </div>
+                            <!-- КНОПКА ВЫБОРА АВТОМОБИЛЯ (ОТКРЫВАЕТ МОДАЛЬНОЕ ОКНО) -->
+                            <button onclick="openCarModal()" 
+                                    class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-1.5 sm:p-2 transition w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                            </button>
+                            
                             <a href="{{ route('cars.edit', $selectedCar) }}" 
                                class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-1.5 sm:p-2 transition w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center">
                                 <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,6 +54,62 @@
                                 </svg>
                             </a>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- МОДАЛЬНОЕ ОКНО ВЫБОРА АВТОМОБИЛЯ -->
+            <div id="carModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
+                    <!-- Заголовок -->
+                    <div class="px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Выберите автомобиль</h3>
+                        <button onclick="closeCarModal()" 
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition p-1">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Список автомобилей -->
+                    <div class="p-2 overflow-y-auto max-h-[60vh]">
+                        @foreach($cars as $car)
+                            <a href="{{ route('overview.index', ['car_id' => $car->id]) }}" 
+                               onclick="closeCarModal()"
+                               class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-[#E5E7EB] dark:hover:bg-[#1D1D1D] transition {{ $selectedCarId == $car->id ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800' : '' }}">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                        @if($car->photo)
+                                            <img src="{{ Storage::url($car->photo) }}" alt="{{ $car->brand }}" class="w-full h-full object-cover">
+                                        @else
+                                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 dark:text-white">{{ $car->brand }} {{ $car->model }}</p>
+                                        @if($car->year)
+                                            <p class="text-xs text-gray-400 dark:text-gray-500">{{ $car->year }} г.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                @if($selectedCarId == $car->id)
+                                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                @endif
+                            </a>
+                        @endforeach
+                    </div>
+                    
+                    <!-- Кнопка закрытия внизу -->
+                    <div class="px-5 sm:px-6 py-3 border-t border-gray-100 dark:border-gray-700">
+                        <button onclick="closeCarModal()" 
+                                class="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2.5 rounded-xl transition">
+                            Закрыть
+                        </button>
                     </div>
                 </div>
             </div>
@@ -95,7 +143,7 @@
                         @method('PATCH')
                         <div class="flex flex-col sm:flex-row gap-2">
                             <input type="number" name="odometer" value="{{ $convertedOdometer }}" 
-                                   class="flex-1 border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm text-sm px-2 py-1.5 sm:py-2" 
+                                   class="flex-1 border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-md shadow-sm text-sm px-2 py-1.5 sm:py-2" 
                                    placeholder="Новый пробег" required>
                             <div class="flex gap-2">
                                 <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm">Сохранить</button>
@@ -249,18 +297,26 @@
     </form>
 
     <script>
-        function toggleCarDropdown() {
-            const dropdown = document.getElementById('carDropdown');
-            dropdown.classList.toggle('hidden');
+        function openCarModal() {
+            document.getElementById('carModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
         
+        function closeCarModal() {
+            document.getElementById('carModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCarModal();
+            }
+        });
+        
         document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('carDropdown');
-            const button = event.target.closest('button');
-            if (dropdown && !dropdown.classList.contains('hidden')) {
-                if (!button || button.getAttribute('onclick') !== 'toggleCarDropdown()') {
-                    dropdown.classList.add('hidden');
-                }
+            const modal = document.getElementById('carModal');
+            if (event.target === modal) {
+                closeCarModal();
             }
         });
     </script>

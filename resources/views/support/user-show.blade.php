@@ -54,7 +54,7 @@
                         </div>
                     @else
                         <div class="text-center py-4 text-gray-400 dark:text-gray-500 text-sm">
-                            ⏳ Ожидайте ответа от поддержки
+                            Ожидайте ответа от поддержки
                         </div>
                     @endif
                 </div>

@@ -77,7 +77,7 @@
                                 @csrf
                                 <div class="mb-3">
                                     <textarea name="admin_reply" rows="4" 
-                                              class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                              class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                               placeholder="Введите ответ...">{{ old('admin_reply') }}</textarea>
                                 </div>
                                 <div class="flex gap-2">

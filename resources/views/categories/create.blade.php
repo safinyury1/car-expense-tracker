@@ -41,7 +41,7 @@
                                 Название категории <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="name" id="name" value="{{ old('name') }}" 
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror" 
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror" 
                                    required
                                    placeholder="Например: Ремонт, Страховка, Налог...">
                             @error('name')

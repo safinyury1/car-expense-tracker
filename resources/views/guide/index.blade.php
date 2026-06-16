@@ -83,38 +83,105 @@
                             
                             <!-- Раздел 10 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">10. Статистика и графики</h2>
-                                <p class="text-gray-600 dark:text-gray-400">На странице <strong>«Статистика»</strong> вы можете увидеть графики расходов по категориям, динамику расходов по месяцам и историю расхода топлива. Доступен выбор периода (сегодня, неделя, месяц, свой период) и фильтр по автомобилям. Также есть кнопка <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Экспорт PDF</span> для сохранения отчёта.</p>
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">10. Уведомления</h2>
+                                <p class="text-gray-600 dark:text-gray-400">AutoCost может отправлять вам уведомления на email о важных событиях:</p>
+                                
+                                <div class="mt-3 space-y-2 bg-gray-50 dark:bg-gray-800/30 p-4 rounded-xl">
+                                    <div>
+                                        <p class="font-medium text-gray-800 dark:text-white">Уведомления о ТО</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Приходит за день до запланированного технического обслуживания</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 dark:text-white">Уведомления о новых расходах</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Приходит сразу после добавления нового расхода</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 dark:text-white">Уведомления о новых заправках</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Приходит сразу после добавления новой заправки</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 dark:text-white">Еженедельный отчёт</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Приходит раз в неделю со сводкой по расходам и пробегу</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                                        Вы можете управлять уведомлениями в разделе <strong>«Настройки» → «Настройки уведомлений»</strong>. Отключите ненужные вам типы уведомлений в любой момент.
+                                    </p>
+                                </div>
                             </div>
                             
                             <!-- Раздел 11 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">11. Сравнение автомобилей</h2>
-                                <p class="text-gray-600 dark:text-gray-400">В разделе <strong>«Сравнение»</strong> вы можете выбрать до 4 автомобилей и сравнить их по таким параметрам, как общие расходы, затраты на топливо, средний расход топлива, стоимость 1 км пробега. Результаты отображаются в виде таблицы и наглядных графиков.</p>
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">11. Статистика и графики</h2>
+                                <p class="text-gray-600 dark:text-gray-400">На странице <strong>«Статистика»</strong> вы можете увидеть графики расходов по категориям, динамику расходов по месяцам и историю расхода топлива. Доступен выбор периода (сегодня, неделя, месяц, свой период) и фильтр по автомобилям. Также есть кнопка <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Экспорт PDF</span> для сохранения отчёта.</p>
                             </div>
                             
                             <!-- Раздел 12 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">12. История операций</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Страница <strong>«История»</strong> показывает все ваши расходы, заправки и доходы в хронологическом порядке. Вы можете фильтровать по автомобилю, категории и периоду, а также удалять ненужные записи.</p>
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">12. Сравнение автомобилей</h2>
+                                <p class="text-gray-600 dark:text-gray-400">В разделе <strong>«Сравнение»</strong> вы можете выбрать до 4 автомобилей и сравнить их по таким параметрам, как общие расходы, затраты на топливо, средний расход топлива, стоимость 1 км пробега. Результаты отображаются в виде таблицы и наглядных графиков.</p>
                             </div>
                             
                             <!-- Раздел 13 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">13. Настройки профиля</h2>
-                                <p class="text-gray-600 dark:text-gray-400">В выпадающем меню с вашим именем (в правом верхнем углу) можно изменить аватар, имя, email и пароль. Также можно удалить аккаунт.</p>
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">13. История операций</h2>
+                                <p class="text-gray-600 dark:text-gray-400">Страница <strong>«История»</strong> показывает все ваши расходы, заправки и доходы в хронологическом порядке. Вы можете фильтровать по автомобилю, категории и периоду, а также удалять ненужные записи.</p>
                             </div>
                             
                             <!-- Раздел 14 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">14. Настройки автомобиля</h2>
-                                <p class="text-gray-600 dark:text-gray-400">В разделе <strong>«Настройки» → «Управление автомобилями» → «Настройки авто»</strong> вы можете изменить единицы измерения (км/мили, литры/галлоны), валюту для каждого автомобиля, а также управлять категориями расходов.</p>
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">14. Настройки профиля</h2>
+                                <p class="text-gray-600 dark:text-gray-400">В выпадающем меню с вашим именем (в правом верхнем углу) можно изменить аватар, имя, email и пароль. Также можно удалить аккаунт.</p>
                             </div>
                             
                             <!-- Раздел 15 -->
-                            <div class="pb-4">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">15. Восстановление пароля</h2>
+                            <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">15. Настройки автомобиля</h2>
+                                <p class="text-gray-600 dark:text-gray-400">В разделе <strong>«Настройки» → «Управление автомобилями» → «Настройки авто»</strong> вы можете изменить единицы измерения (км/мили, литры/галлоны), валюту для каждого автомобиля, а также управлять категориями расходов.</p>
+                            </div>
+                            
+                            <!-- Раздел 16 -->
+                            <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">16. Восстановление пароля</h2>
                                 <p class="text-gray-600 dark:text-gray-400">Если вы забыли пароль, нажмите на ссылку <strong>«Забыли пароль?»</strong> на странице входа. Введите email, и на почту придёт ссылка для сброса пароля.</p>
+                            </div>
+                            
+                            <!-- ========================================== -->
+                            <!-- РАЗДЕЛ 17: ПОДДЕРЖКА (НОВЫЙ) -->
+                            <!-- ========================================== -->
+                            <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">17. Поддержка</h2>
+                                <p class="text-gray-600 dark:text-gray-400">Если у вас возникли вопросы или проблемы при использовании AutoCost, вы можете обратиться в службу поддержки:</p>
+                                
+                                <div class="mt-3 space-y-3 bg-gray-50 dark:bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex items-center gap-3">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white">Email</p>
+                                            <a href="mailto:autocost774@gmail.com" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">autocost774@gmail.com</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-3">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white">Telegram</p>
+                                            <a href="https://t.me/autocost_support" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">@autocost_support</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                                    <p class="text-sm text-green-700 dark:text-green-300">
+                                        <strong>Как отправить обращение:</strong> В разделе <strong>«Настройки» → «Помощь» → «Связаться с поддержкой»</strong> вы можете заполнить форму с темой и описанием проблемы. Наши специалисты ответят вам в ближайшее время.
+                                    </p>
+                                </div>
+                                
+                                <div class="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                                    <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                                        <strong>Совет:</strong> Перед обращением в поддержку ознакомьтесь с данным руководством — возможно, ответ на ваш вопрос уже есть здесь.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

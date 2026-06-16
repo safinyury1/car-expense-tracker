@@ -70,8 +70,8 @@
                         </div>
                     </div>
                 @else
-                    <!-- Сравнительная таблица -->
-                    <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl mb-6">
+                    <!-- ДЕСКТОПНАЯ ТАБЛИЦА (скрыта на мобильных) -->
+                    <div class="hidden md:block bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl mb-6">
                         <div class="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-700">
                             <h3 class="font-semibold text-gray-800 dark:text-gray-200">Сравнение показателей</h3>
                         </div>
@@ -150,6 +150,57 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    <!-- МОБИЛЬНЫЕ КАРТОЧКИ (видны на экранах < 768px) -->
+                    <div class="block md:hidden space-y-4 mb-6">
+                        @foreach($selectedCars as $car)
+                            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl border border-gray-100 dark:border-gray-700">
+                                <div class="p-4">
+                                    <!-- Заголовок карточки -->
+                                    <div class="flex justify-between items-start mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800 dark:text-white">{{ $car->brand }} {{ $car->model }}</h4>
+                                            @if($car->year)
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $car->year }} г.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Показатели -->
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-gray-800">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Общие расходы</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($comparisonData[$car->id]['totalExpenses'], 2) }} {{ $comparisonData[$car->id]['currency'] }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-gray-800">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Затраты на топливо</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($comparisonData[$car->id]['totalFuelCost'], 2) }} {{ $comparisonData[$car->id]['currency'] }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-gray-800">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Средний расход</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $comparisonData[$car->id]['avgFuelConsumption'] }} {{ $comparisonData[$car->id]['fuel_unit'] }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-gray-800">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Стоимость 1 км</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($comparisonData[$car->id]['costPerKm'], 2) }} {{ $comparisonData[$car->id]['currency'] }}/{{ $comparisonData[$car->id]['distance_unit'] }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-gray-800">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Общий пробег</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($comparisonData[$car->id]['totalDistance']) }} {{ $comparisonData[$car->id]['distance_unit'] }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-gray-800">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Количество расходов</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $comparisonData[$car->id]['expensesCount'] }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-1.5">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">Количество заправок</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $comparisonData[$car->id]['refuelingsCount'] }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
 
                     <!-- График сравнения расходов -->
@@ -406,7 +457,6 @@
                 display: block !important;
             }
             
-            /* Показываем графики */
             #comparisonChart, #trendChart, [id^="pieChart_"] {
                 visibility: visible !important;
             }
@@ -459,7 +509,6 @@
             margin: 0;
         }
         
-        /* Скрываем тулбар в PDF */
         @media print {
             .apexcharts-toolbar {
                 display: none !important;

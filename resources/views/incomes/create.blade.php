@@ -25,7 +25,7 @@
                                 Автомобиль <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none cursor-pointer" required>
+                                <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none cursor-pointer" required>
                                     @foreach($cars as $car)
                                         <option value="{{ $car->id }}" {{ $selectedCar?->id == $car->id ? 'selected' : '' }}>
                                             {{ $car->brand }} {{ $car->model }}
@@ -49,12 +49,12 @@
                                 Категория <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none cursor-pointer" required>
-                                    <option value="salary">Зарплата</option>
-                                    <option value="business">Бизнес</option>
-                                    <option value="gift">Подарок</option>
-                                    <option value="refund">Возврат</option>
-                                    <option value="other">Прочее</option>
+                                <select name="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none cursor-pointer" required>
+                                    <option value="salary" {{ old('category') == 'salary' ? 'selected' : '' }}>Зарплата</option>
+                                    <option value="business" {{ old('category') == 'business' ? 'selected' : '' }}>Бизнес</option>
+                                    <option value="gift" {{ old('category') == 'gift' ? 'selected' : '' }}>Подарок</option>
+                                    <option value="refund" {{ old('category') == 'refund' ? 'selected' : '' }}>Возврат</option>
+                                    <option value="other" {{ old('category') == 'other' ? 'selected' : '' }}>Прочее</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@
                             </label>
                             <input type="text" name="title" value="{{ old('title') }}" required
                                    placeholder="Например: Зарплата, Премия, Кэшбэк..."
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('title') border-red-500 @enderror">
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('title') border-red-500 @enderror">
                             @error('title')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -87,7 +87,7 @@
                                     Дата <span class="text-red-500">*</span>
                                 </label>
                                 <input type="date" name="date" value="{{ old('date', date('Y-m-d')) }}" required
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('date') border-red-500 @enderror">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('date') border-red-500 @enderror">
                                 @error('date')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -101,7 +101,7 @@
                                 <div class="relative">
                                     <input type="number" name="amount" step="0.01" value="{{ old('amount') }}" required
                                            placeholder="0.00"
-                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('amount') border-red-500 @enderror">
+                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('amount') border-red-500 @enderror">
                                     <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">₽</span>
                                 </div>
                                 @error('amount')
@@ -118,7 +118,7 @@
                             <div class="relative">
                                 <input type="number" name="odometer" value="{{ old('odometer') }}"
                                        placeholder="Текущий пробег"
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('odometer') border-red-500 @enderror">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('odometer') border-red-500 @enderror">
                                 <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">км</span>
                             </div>
                             @if(isset($maxOdometer) && $maxOdometer > 0)
@@ -138,7 +138,7 @@
                             </label>
                             <textarea name="description" rows="3"
                                       placeholder="Дополнительная информация..."
-                                      class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+                                      class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
                             @error('description')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
