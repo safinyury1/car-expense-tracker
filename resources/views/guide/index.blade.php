@@ -1,14 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Руководство пользователя') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h2 class="font-semibold text-xl sm:text-2xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Руководство пользователя') }}
+            </h2>
+            <a href="{{ route('settings.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg text-sm transition w-full sm:w-auto text-center">
+                Назад
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden">
-                <div class="p-6">
+    <div class="py-4 sm:py-6 md:py-12">
+        <div class="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl">
+                <div class="p-5 sm:p-6 md:p-8">
                     
                     <div class="prose max-w-none dark:prose-invert">
                         <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Добро пожаловать в AutoCost!</h1>
@@ -18,25 +23,25 @@
                             <!-- Раздел 1 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">1. Регистрация и вход</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Для начала работы необходимо <a class="text-blue-500 hover:underline">зарегистрироваться</a> или <a class="text-blue-500 hover:underline">войти</a> в систему. После входа вы попадёте на страницу добавления автомобиля.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Для начала работы необходимо зарегистрироваться или войти в систему. После входа вы попадёте на страницу добавления автомобиля.</p>
                             </div>
                             
                             <!-- Раздел 2 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">2. Добавление автомобиля</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-500 text-white px-2 py-0.5 rounded text-sm">Добавить автомобиль</span> или на круглую синюю кнопку с плюсом в центре шапки. Заполните марку, модель, год и пробег. При необходимости добавьте фото автомобиля.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Добавить автомобиль</span> в шапке страницы. Заполните марку, модель, год и пробег. При необходимости добавьте фото автомобиля.</p>
                                 <p class="text-gray-500 dark:text-gray-500 text-sm mt-1">Все добавленные автомобили хранятся в разделе <strong>«Мои автомобили» (Гараж)</strong>.</p>
                             </div>
                             
                             <!-- Раздел 3 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">3. Навигация по приложению</h2>
-                                <p class="text-gray-600 dark:text-gray-400">В верхней панели находятся две круглые кнопки:</p>
+                                <p class="text-gray-600 dark:text-gray-400">В верхней панели находится кнопка <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Действия</span>, которая открывает меню для быстрого доступа:</p>
                                 <ul class="list-disc list-inside mt-2 space-y-1 text-gray-600 dark:text-gray-400">
-                                    <li><span class="bg-blue-500 text-white px-2 py-0.5 rounded text-sm">Синяя кнопка (+)</span> — для быстрого добавления: заправка, расход, автомобиль, обслуживание, доход.</li>
-                                    <li><span class="bg-gray-500 text-white px-2 py-0.5 rounded text-sm">Серая кнопка (☰)</span> — для быстрой навигации по страницам: Заправки, Расходы, Доходы.</li>
+                                    <li><strong>Добавить:</strong> заправку, расход, автомобиль, обслуживание, доход</li>
+                                    <li><strong>Перейти к:</strong> автомобилям, заправкам, расходам, доходам</li>
                                 </ul>
-                                <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">Остальные разделы доступны в основном меню слева от кнопок.</p>
+                                <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">Остальные разделы доступны в основном меню слева (на десктопе) или через бургер-меню (на мобильных).</p>
                             </div>
                             
                             <!-- Раздел 4 -->
@@ -49,25 +54,25 @@
                             <!-- Раздел 5 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">5. Добавление расходов</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Чтобы добавить расход, нажмите на круглую синюю кнопку с плюсом → <span class="text-red-500 font-medium">Добавить расход</span>. Укажите категорию, сумму, пробег и дату. Расходы автоматически появятся в истории и на дашборде.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Чтобы добавить расход, нажмите на кнопку <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Действия</span> → <span class="text-red-500 font-medium">Расход</span>. Укажите категорию, сумму, пробег и дату. Расходы автоматически появятся в истории и на дашборде.</p>
                             </div>
                             
                             <!-- Раздел 6 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">6. Добавление заправок</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Нажмите на круглую синюю кнопку с плюсом → <span class="text-green-500 font-medium">Добавить заправку</span>. Укажите количество литров, цену и пробег. Система автоматически рассчитает сумму и расход топлива.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Действия</span> → <span class="text-green-500 font-medium">Заправку</span>. Укажите количество литров, цену и пробег. Система автоматически рассчитает сумму и расход топлива.</p>
                             </div>
                             
                             <!-- Раздел 7 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">7. Добавление дохода</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Нажмите на круглую синюю кнопку с плюсом → <span class="text-green-500 font-medium">Добавить доход</span>. Укажите категорию, название, сумму и дату. Доходы отображаются в истории зелёным цветом.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Действия</span> → <span class="text-green-500 font-medium">Доход</span>. Укажите категорию, название, сумму и дату. Доходы отображаются в истории зелёным цветом.</p>
                             </div>
                             
                             <!-- Раздел 8 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">8. Добавление обслуживания</h2>
-                                <p class="text-gray-600 dark:text-gray-400">Нажмите на круглую синюю кнопку с плюсом → <span class="text-yellow-500 font-medium">Добавить обслуживание</span>. Запишите выполненные работы, укажите пробег, стоимость и при необходимости создайте напоминание о следующем ТО.</p>
+                                <p class="text-gray-600 dark:text-gray-400">Нажмите на кнопку <span class="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">Действия</span> → <span class="text-yellow-500 font-medium">Обслуживание</span>. Запишите выполненные работы, укажите пробег, стоимость и при необходимости создайте напоминание о следующем ТО.</p>
                             </div>
                             
                             <!-- Раздел 9 -->
@@ -97,7 +102,7 @@
                             <!-- Раздел 13 -->
                             <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">13. Настройки профиля</h2>
-                                <p class="text-gray-600 dark:text-gray-400">В выпадающем меню с вашим именем можно изменить аватар, имя, email и пароль. Также можно удалить аккаунт.</p>
+                                <p class="text-gray-600 dark:text-gray-400">В выпадающем меню с вашим именем (в правом верхнем углу) можно изменить аватар, имя, email и пароль. Также можно удалить аккаунт.</p>
                             </div>
                             
                             <!-- Раздел 14 -->

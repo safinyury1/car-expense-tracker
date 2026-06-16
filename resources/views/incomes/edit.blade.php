@@ -1,87 +1,163 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Редактировать доход') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h2 class="font-semibold text-xl sm:text-2xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Редактировать доход') }}
+            </h2>
+            <a href="{{ route('incomes.show', $income) }}" 
+               class="bg-gray-500 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm w-full sm:w-auto">
+                <span>Список истории доходов</span>
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-sm overflow-hidden">
-                <form action="{{ route('incomes.update', $income) }}" method="POST">
-                    @csrf
-                    @method('PUT')
+    <div class="py-4 sm:py-6 md:py-12">
+        <div class="max-w-2xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl">
+                <div class="p-5 sm:p-7 md:p-8">
                     
-                    <div class="p-6 space-y-5">
+                    <form action="{{ route('incomes.update', $income) }}" method="POST" class="space-y-5 sm:space-y-6">
+                        @csrf
+                        @method('PUT')
+
+                        <!-- Автомобиль -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Автомобиль</label>
-                            <select name="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm" required>
-                                @foreach($cars as $car)
-                                    <option value="{{ $car->id }}" {{ old('car_id', $income->car_id) == $car->id ? 'selected' : '' }}>
-                                        {{ $car->brand }} {{ $car->model }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label for="car_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Автомобиль <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
+                                    @foreach($cars as $car)
+                                        <option value="{{ $car->id }}" {{ old('car_id', $income->car_id) == $car->id ? 'selected' : '' }}>
+                                            {{ $car->brand }} {{ $car->model }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            @error('car_id')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
-                        
+
+                        <!-- Категория -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Категория</label>
-                            <select name="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm" required>
-                                <option value="salary" {{ old('category', $income->category) == 'salary' ? 'selected' : '' }}>Зарплата</option>
-                                <option value="business" {{ old('category', $income->category) == 'business' ? 'selected' : '' }}>Бизнес</option>
-                                <option value="gift" {{ old('category', $income->category) == 'gift' ? 'selected' : '' }}>Подарок</option>
-                                <option value="refund" {{ old('category', $income->category) == 'refund' ? 'selected' : '' }}>Возврат</option>
-                                <option value="other" {{ old('category', $income->category) == 'other' ? 'selected' : '' }}>Прочее</option>
-                            </select>
+                            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Категория <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select name="category" id="category" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('category') border-red-500 @enderror" required>
+                                    <option value="salary" {{ old('category', $income->category) == 'salary' ? 'selected' : '' }}>Зарплата</option>
+                                    <option value="business" {{ old('category', $income->category) == 'business' ? 'selected' : '' }}>Бизнес</option>
+                                    <option value="gift" {{ old('category', $income->category) == 'gift' ? 'selected' : '' }}>Подарок</option>
+                                    <option value="refund" {{ old('category', $income->category) == 'refund' ? 'selected' : '' }}>Возврат</option>
+                                    <option value="other" {{ old('category', $income->category) == 'other' ? 'selected' : '' }}>Прочее</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            @error('category')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
-                        
+
+                        <!-- Название -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Название</label>
-                            <input type="text" name="title" value="{{ old('title', $income->title) }}" required
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm">
+                            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Название <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="title" id="title" value="{{ old('title', $income->title) }}" required
+                                   placeholder="Например: Зарплата, Премия, Кэшбэк..."
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('title') border-red-500 @enderror">
+                            @error('title')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Дата</label>
-                            <input type="date" name="date" value="{{ old('date', $income->date->format('Y-m-d')) }}" required
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+                            <!-- Дата -->
+                            <div>
+                                <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Дата <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="date" id="date" value="{{ old('date', $income->date->format('Y-m-d')) }}" required
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('date') border-red-500 @enderror">
+                                @error('date')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Сумма -->
+                            <div>
+                                <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Сумма <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input type="number" name="amount" id="amount" step="0.01" value="{{ old('amount', $income->amount) }}" required
+                                           placeholder="0.00"
+                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('amount') border-red-500 @enderror">
+                                    <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $income->car->currency ?? '₽' }}</span>
+                                </div>
+                                @error('amount')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
-                        
+
+                        <!-- Пробег -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Сумма</label>
-                            <input type="number" name="amount" step="0.01" value="{{ old('amount', $income->amount) }}" required
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm">
-                        </div>
-                        
-                        <div>
-                            <label for="odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Пробег (км)</label>
-                            <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $income->odometer) }}" min="0" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
+                            <label for="odometer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Пробег
+                            </label>
+                            <div class="relative">
+                                <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $income->odometer) }}" min="0" 
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent @error('odometer') border-red-500 @enderror"
+                                       placeholder="0">
+                                <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $income->car->distance_unit ?? 'км' }}</span>
+                            </div>
                             @if(isset($maxOdometer) && $maxOdometer > 0)
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    Последний зафиксированный пробег: {{ number_format($maxOdometer) }} км
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                    Последний зафиксированный пробег: <span class="font-medium">{{ number_format($maxOdometer) }}</span> {{ $income->car->distance_unit ?? 'км' }}
                                 </p>
                             @endif
                             @error('odometer')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-                        
+
+                        <!-- Описание -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Описание</label>
-                            <textarea name="description" rows="3"
-                                      class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-lg shadow-sm">{{ old('description', $income->description) }}</textarea>
+                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Описание
+                            </label>
+                            <textarea name="description" id="description" rows="3"
+                                      class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none @error('description') border-red-500 @enderror"
+                                      placeholder="Дополнительная информация...">{{ old('description', $income->description) }}</textarea>
+                            @error('description')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
-                    </div>
-                    
-                    <div class="px-6 py-4 bg-gray-50 dark:bg-[#6B727F] border-t border-gray-200 dark:border-gray-600 flex justify-end gap-3">
-                        <a href="{{ route('incomes.show', $income) }}" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition">
-                            Отмена
-                        </a>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition">
-                            Сохранить
-                        </button>
-                    </div>
-                </form>
+
+                        <!-- Кнопки -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-5 border-t border-gray-100 dark:border-gray-700">
+                            <a href="{{ route('incomes.show', $income) }}" 
+                               class="px-5 py-3 rounded-xl text-base font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition text-center">
+                                Отмена
+                            </a>
+                            <button type="submit" class="px-6 py-3 rounded-xl text-base font-medium text-white bg-green-600 hover:bg-green-700 transition shadow-sm">
+                                Сохранить изменения
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -6,6 +6,7 @@ use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Refueling;
 use App\Models\Reminder;
+use App\Models\Visit;
 use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,6 +51,22 @@ class DashboardController extends Controller
         // Топ-3 расходов (ИСКЛЮЧАЕМ РУЧНОЕ ОБНОВЛЕНИЕ ПРОБЕГА)
         $topExpenses = $this->getTopExpenses($selectedCarId, $period, $dateFrom, $dateTo);
         
+        // ==========================================
+        // СТАТИСТИКА ПОСЕЩЕНИЙ ПО ДНЯМ
+        // ==========================================
+        $visitsByDay = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $count = Visit::whereDate('created_at', $date)
+                ->where('user_id', Auth::id())
+                ->count();
+            $visitsByDay[] = [
+                'date' => $date->format('d.m'),
+                'count' => $count,
+                'full_date' => $date->format('Y-m-d')
+            ];
+        }
+        
         return view('dashboard', compact(
             'cars', 
             'selectedCar', 
@@ -62,7 +79,8 @@ class DashboardController extends Controller
             'monthlyData',
             'fuelHistory',
             'insights',
-            'topExpenses'
+            'topExpenses',
+            'visitsByDay'
         ));
     }
     

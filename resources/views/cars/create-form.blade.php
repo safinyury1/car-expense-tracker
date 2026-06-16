@@ -1,56 +1,80 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Добавить авто') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h2 class="font-semibold text-xl sm:text-2xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Добавить автомобиль') }}
+            </h2>
+            <a href="{{ route('cars.index') }}" 
+               class="bg-gray-500 hover:bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 transition shadow-sm w-full sm:w-auto">
+                <span>Список автомобилей</span>
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+    <div class="py-6 sm:py-8 md:py-12">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
+            
+            <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl">
+                <div class="p-5 sm:p-7 md:p-8">
                     
-                    <div class="text-center mb-6">
-                        <div class="inline-block p-4 bg-[#6B727E] dark:bg-[#6B727E] rounded-full">
-                            <img src="{{ asset('images/car.svg') }}" alt="Автомобиль" class="w-25 h-20">
-                        </div>
-                    </div>
-
-                    <form action="{{ route('cars.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('cars.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5 sm:space-y-6">
                         @csrf
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Фото автомобиля</label>
-                                <div id="photoPreview" class="hidden mb-3">
-                                    <img id="previewImage" class="w-32 h-32 object-cover rounded-lg border dark:border-gray-600">
+                        <!-- Фото автомобиля (по центру, с меньшим отступом сверху) -->
+                        <div class="text-center -mt-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-center">
+                                Фото автомобиля
+                            </label>
+                            
+                            <!-- Превью фото -->
+                            <div id="photoPreview" class="hidden mb-3 flex justify-center">
+                                <div class="relative inline-block">
+                                    <img id="previewImage" class="w-40 h-40 object-cover rounded-xl border-2 border-gray-200 dark:border-gray-600 shadow-sm">
+                                    <button type="button" onclick="removePhoto()" 
+                                            class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm shadow-md transition">
+                                        ×
+                                    </button>
                                 </div>
-                                <div class="flex items-center gap-4">
-                                    <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition">
-                                        Выбрать файл
-                                        <input type="file" name="photo" id="photo" class="hidden" accept="image/jpeg,image/png,image/jpg" onchange="previewPhoto(this)">
-                                    </label>
-                                    <span id="fileName" class="text-sm text-gray-500 dark:text-gray-400">Файл не выбран</span>
-                                </div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Поддерживаются JPEG, PNG, JPG. Максимум 2 МБ</p>
-                                @error('photo')
-                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                @enderror
                             </div>
+                            
+                            <!-- Заглушка когда нет фото -->
+                            <div id="photoPlaceholder" class="mb-3 flex justify-center">
+                                <div class="w-40 h-40 bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition" onclick="document.getElementById('photo').click()">
+                                    <svg class="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">Нажмите для выбора фото</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Кнопка выбора файла -->
+                            <div class="flex justify-center">
+                                <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition text-sm shadow-sm">
+                                    Выбрать файл
+                                    <input type="file" name="photo" id="photo" class="hidden" accept="image/jpeg,image/png,image/jpg" onchange="previewPhoto(this)">
+                                </label>
+                            </div>
+                            <span id="fileName" class="text-sm text-gray-500 dark:text-gray-400 block mt-1">Файл не выбран</span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Поддерживаются JPEG, PNG, JPG</p>
+                            @error('photo')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                            <!-- Марка с выпадающим списком -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                            <!-- Марка -->
                             <div class="relative">
-                                <label for="brand" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                <label for="brand" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Марка <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="brand" id="brand" autocomplete="off"
                                     value="{{ old('brand') }}" 
                                     placeholder="Например: LADA, BMW, Toyota..."
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm"
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('brand') border-red-500 @enderror"
                                     required>
                                 
                                 <div id="brandDropdown" 
-                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#222222] border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#222222] border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                                     <div class="py-1"></div>
                                 </div>
                                 @error('brand')
@@ -58,19 +82,19 @@
                                 @enderror
                             </div>
 
-                            <!-- Модель с выпадающим списком -->
+                            <!-- Модель -->
                             <div class="relative">
-                                <label for="model" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                                <label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Модель <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="model" id="model" autocomplete="off"
                                     value="{{ old('model') }}" 
                                     placeholder="Сначала выберите марку..."
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm"
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('model') border-red-500 @enderror"
                                     required>
                                 
                                 <div id="modelDropdown" 
-                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#222222] border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                     class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-[#222222] border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                                     <div class="py-1"></div>
                                 </div>
                                 @error('model')
@@ -78,44 +102,59 @@
                                 @enderror
                             </div>
 
+                            <!-- Год -->
                             <div>
-                                <label for="year" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Год</label>
+                                <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Год выпуска
+                                </label>
                                 <input type="number" name="year" id="year" value="{{ old('year') }}" 
                                     placeholder="2020" 
                                     min="1900" max="{{ date('Y') }}" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('year') border-red-500 @enderror">
                                 @error('year')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
+                            <!-- Пробег -->
                             <div>
-                                <label for="initial_odometer" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">Пробег (км)</label>
-                                <input type="number" name="initial_odometer" id="initial_odometer" value="{{ old('initial_odometer', 0) }}" 
-                                    min="0" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
+                                <label for="initial_odometer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Начальный пробег
+                                </label>
+                                <div class="relative">
+                                    <input type="number" name="initial_odometer" id="initial_odometer" value="{{ old('initial_odometer', 0) }}" 
+                                        min="0" 
+                                        class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('initial_odometer') border-red-500 @enderror">
+                                    <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">км</span>
+                                </div>
                                 @error('initial_odometer')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
+                            <!-- VIN -->
                             <div class="md:col-span-2">
-                                <label for="vin" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">VIN</label>
+                                <label for="vin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    VIN-код
+                                </label>
                                 <input type="text" name="vin" id="vin" value="{{ old('vin') }}" 
                                     placeholder="WBAGL..." maxlength="17" 
-                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-md shadow-sm">
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('vin') border-red-500 @enderror">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">17 символов, только латиница и цифры</p>
                                 @error('vin')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
 
-                        <div class="flex justify-between mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <a href="{{ route('cars.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition">
-                                Назад
+                        <!-- Кнопки -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-5 border-t border-gray-100 dark:border-gray-700">
+                            <a href="{{ route('cars.index') }}" 
+                               class="px-5 py-3 rounded-xl text-base font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition text-center">
+                                Отмена
                             </a>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">
-                                Сохранить
+                            <button type="submit" class="px-6 py-3 rounded-xl text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm">
+                                Сохранить автомобиль
                             </button>
                         </div>
                     </form>
@@ -222,12 +261,8 @@
         
         let brandSelectedIndex = -1;
         let modelSelectedIndex = -1;
-        let currentBrandFilter = '';
-        let currentModelFilter = '';
 
-        // Показать подсказки для марок
         function showBrandSuggestions(filterText) {
-            currentBrandFilter = filterText;
             const brands = Object.keys(carDatabase);
             const filtered = brands.filter(brand => 
                 brand.toLowerCase().includes(filterText.toLowerCase())
@@ -246,8 +281,7 @@
             filtered.forEach((brand, index) => {
                 const div = document.createElement('div');
                 div.textContent = brand;
-                div.setAttribute('data-index', index);
-                div.className = 'px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 text-sm transition';
+                div.className = 'px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 text-sm transition';
                 div.onclick = () => {
                     brandInput.value = brand;
                     brandDropdown.classList.add('hidden');
@@ -272,17 +306,13 @@
             items.forEach((item, i) => {
                 if (i === index) {
                     item.classList.add('bg-blue-500', 'text-white');
-                    item.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
                 } else {
                     item.classList.remove('bg-blue-500', 'text-white');
-                    item.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
                 }
             });
         }
 
-        // Показать подсказки для моделей
         function showModelSuggestions(filterText) {
-            currentModelFilter = filterText;
             const selectedBrand = brandInput.value.trim();
             
             if (!selectedBrand || !carDatabase[selectedBrand]) {
@@ -309,8 +339,7 @@
             filtered.forEach((model, index) => {
                 const div = document.createElement('div');
                 div.textContent = model;
-                div.setAttribute('data-index', index);
-                div.className = 'px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 text-sm transition';
+                div.className = 'px-4 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 text-sm transition';
                 div.onclick = () => {
                     modelInput.value = model;
                     modelDropdown.classList.add('hidden');
@@ -331,15 +360,12 @@
             items.forEach((item, i) => {
                 if (i === index) {
                     item.classList.add('bg-blue-500', 'text-white');
-                    item.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
                 } else {
                     item.classList.remove('bg-blue-500', 'text-white');
-                    item.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
                 }
             });
         }
 
-        // Клавиатурная навигация для марки
         brandInput.addEventListener('keydown', function(e) {
             const items = brandDropdown.querySelectorAll('.py-1 > div');
             if (items.length === 0) return;
@@ -370,7 +396,6 @@
             }
         });
 
-        // Клавиатурная навигация для модели
         modelInput.addEventListener('keydown', function(e) {
             const items = modelDropdown.querySelectorAll('.py-1 > div');
             if (items.length === 0) return;
@@ -396,7 +421,6 @@
             }
         });
 
-        // События для марки
         brandInput.addEventListener('input', function(e) {
             showBrandSuggestions(e.target.value);
             if (carDatabase[e.target.value.trim()]) {
@@ -412,7 +436,6 @@
             }
         });
 
-        // События для модели
         modelInput.addEventListener('input', function(e) {
             if (brandInput.value.trim() && carDatabase[brandInput.value.trim()]) {
                 showModelSuggestions(e.target.value);
@@ -428,7 +451,6 @@
             }
         });
 
-        // Скрыть подсказки при клике вне полей
         document.addEventListener('click', function(e) {
             if (e.target !== brandInput && !brandDropdown.contains(e.target)) {
                 brandDropdown.classList.add('hidden');
@@ -440,11 +462,13 @@
             }
         });
 
+        // Функция предпросмотра фото
         function previewPhoto(input) {
             const file = input.files[0];
             const fileNameSpan = document.getElementById('fileName');
             const previewDiv = document.getElementById('photoPreview');
             const previewImage = document.getElementById('previewImage');
+            const placeholderDiv = document.getElementById('photoPlaceholder');
             
             if (file) {
                 fileNameSpan.textContent = file.name;
@@ -452,12 +476,24 @@
                 reader.onload = function(e) {
                     previewImage.src = e.target.result;
                     previewDiv.classList.remove('hidden');
+                    placeholderDiv.classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
             } else {
-                fileNameSpan.textContent = 'Файл не выбран';
-                previewDiv.classList.add('hidden');
+                removePhoto();
             }
+        }
+        
+        function removePhoto() {
+            const photoInput = document.getElementById('photo');
+            const fileNameSpan = document.getElementById('fileName');
+            const previewDiv = document.getElementById('photoPreview');
+            const placeholderDiv = document.getElementById('photoPlaceholder');
+            
+            photoInput.value = '';
+            fileNameSpan.textContent = 'Файл не выбран';
+            previewDiv.classList.add('hidden');
+            placeholderDiv.classList.remove('hidden');
         }
     </script>
 </x-app-layout>

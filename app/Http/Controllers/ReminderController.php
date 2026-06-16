@@ -26,17 +26,27 @@ class ReminderController extends Controller
             $car = Car::find($carId);
         }
         
+        // Пагинация (20 записей на страницу)
         $reminders = $query->orderBy('is_completed', 'asc')
             ->orderBy('due_odometer', 'asc')
+            ->orderBy('due_date', 'asc')
             ->paginate(20);
         
+        // Добавляем параметр car_id к ссылкам пагинации
+        if ($carId) {
+            $reminders->appends(['car_id' => $carId]);
+        }
+        
+        // Конвертируем единицы измерения для каждого напоминания
         foreach ($reminders as $reminder) {
-            if (isset($car)) {
+            if ($carId && isset($car)) {
                 $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $car);
                 $reminder->distance_unit = $this->getDistanceUnit($car);
             } else {
-                $reminder->converted_odometer = $reminder->due_odometer;
-                $reminder->distance_unit = 'км';
+                // Для отображения используем единицы измерения из автомобиля
+                $carForReminder = $reminder->car;
+                $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $carForReminder);
+                $reminder->distance_unit = $this->getDistanceUnit($carForReminder);
             }
         }
         
@@ -60,6 +70,7 @@ class ReminderController extends Controller
             'title' => 'required|string|max:255',
             'due_odometer' => 'required|integer|min:0',
             'due_date' => 'nullable|date',
+            'service_notes' => 'nullable|string',
             'is_completed' => 'boolean',
         ]);
         
@@ -81,6 +92,10 @@ class ReminderController extends Controller
         }
         
         $cars = Auth::user()->cars;
+        
+        // Конвертируем единицы для отображения
+        $reminder->converted_odometer = $this->convertDistance($reminder->due_odometer, $reminder->car);
+        $reminder->distance_unit = $this->getDistanceUnit($reminder->car);
         
         return view('reminders.show', compact('reminder', 'cars'));
     }
@@ -107,6 +122,7 @@ class ReminderController extends Controller
             'title' => 'required|string|max:255',
             'due_odometer' => 'required|integer|min:0',
             'due_date' => 'nullable|date',
+            'service_notes' => 'nullable|string',
             'is_completed' => 'boolean',
         ]);
         

@@ -119,7 +119,7 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:expense_categories,id',
             'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
-            'odometer' => 'required|integer|min:0',
+            'odometer' => 'nullable|integer|min:0',  // ИЗМЕНЕНО: required → nullable
             'description' => 'nullable|string',
         ]);
         
@@ -128,8 +128,10 @@ class ExpenseController extends Controller
             abort(403);
         }
         
-        // Валидация пробега
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'expense');
+        // Валидация пробега только если он указан
+        if (!empty($validated['odometer'])) {
+            $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'expense');
+        }
         
         Expense::create($validated);
         
@@ -178,12 +180,14 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:expense_categories,id',
             'date' => 'required|date',
             'amount' => 'required|numeric|min:0',
-            'odometer' => 'required|integer|min:0',
+            'odometer' => 'nullable|integer|min:0',  // ИЗМЕНЕНО: required → nullable
             'description' => 'nullable|string',
         ]);
         
-        // Валидация пробега (исключаем текущую запись)
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], $expense->id, 'expense');
+        // Валидация пробега только если он указан (исключаем текущую запись)
+        if (!empty($validated['odometer'])) {
+            $this->validateOdometer($validated['car_id'], $validated['odometer'], $expense->id, 'expense');
+        }
         
         $expense->update($validated);
         

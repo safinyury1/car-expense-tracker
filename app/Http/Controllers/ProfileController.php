@@ -79,7 +79,7 @@ class ProfileController extends Controller
     /**
      * Delete the user's avatar.
      */
-    public function deleteAvatar(Request $request): RedirectResponse
+    public function deleteAvatar(Request $request)
     {
         $user = $request->user();
 
@@ -88,6 +88,14 @@ class ProfileController extends Controller
         }
 
         $user->update(['avatar' => null]);
+
+        // Если это AJAX запрос, возвращаем JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Фото профиля удалено!'
+            ]);
+        }
 
         return redirect()->route('profile.edit')->with('status', 'avatar-deleted');
     }

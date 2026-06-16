@@ -114,7 +114,7 @@ class RefuelingController extends Controller
             'date' => 'required|date',
             'liters' => 'required|numeric|min:0',
             'price_per_liter' => 'required|numeric|min:0',
-            'odometer' => 'required|integer|min:0',
+            'odometer' => 'nullable|integer|min:0',
             'gas_station' => 'nullable|string|max:255',
         ]);
         
@@ -125,8 +125,10 @@ class RefuelingController extends Controller
             abort(403);
         }
         
-        // Валидация пробега
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'refueling');
+        // Валидация пробега только если он указан
+        if (!empty($validated['odometer'])) {
+            $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'refueling');
+        }
         
         Refueling::create($validated);
         
@@ -140,6 +142,16 @@ class RefuelingController extends Controller
             abort(403);
         }
         
+        // КОНВЕРТАЦИЯ ДЛЯ ОТОБРАЖЕНИЯ
+        $car = $refueling->car;
+        $refueling->converted_amount = $this->convertCurrency($refueling->total_amount, $car);
+        $refueling->converted_odometer = $this->convertDistance($refueling->odometer, $car);
+        $refueling->converted_liters = $this->convertVolume($refueling->liters, $car);
+        $refueling->converted_price = $this->convertCurrency($refueling->price_per_liter, $car);
+        $refueling->currency = $this->getCurrencySymbol($car);
+        $refueling->distance_unit = $this->getDistanceUnit($car);
+        $refueling->volume_unit = $this->getVolumeUnit($car);
+        
         $cars = Auth::user()->cars;
         
         return view('refuelings.show', compact('refueling', 'cars'));
@@ -152,6 +164,16 @@ class RefuelingController extends Controller
         }
         
         $cars = Auth::user()->cars;
+        
+        // КОНВЕРТАЦИЯ ДЛЯ ФОРМЫ РЕДАКТИРОВАНИЯ
+        $car = $refueling->car;
+        $refueling->converted_amount = $this->convertCurrency($refueling->total_amount, $car);
+        $refueling->converted_odometer = $this->convertDistance($refueling->odometer, $car);
+        $refueling->converted_liters = $this->convertVolume($refueling->liters, $car);
+        $refueling->converted_price = $this->convertCurrency($refueling->price_per_liter, $car);
+        $refueling->currency = $this->getCurrencySymbol($car);
+        $refueling->distance_unit = $this->getDistanceUnit($car);
+        $refueling->volume_unit = $this->getVolumeUnit($car);
         
         $maxOdometerKm = max(
             Expense::where('car_id', $refueling->car_id)->max('odometer') ?? 0,
@@ -174,14 +196,16 @@ class RefuelingController extends Controller
             'date' => 'required|date',
             'liters' => 'required|numeric|min:0',
             'price_per_liter' => 'required|numeric|min:0',
-            'odometer' => 'required|integer|min:0',
+            'odometer' => 'nullable|integer|min:0',
             'gas_station' => 'nullable|string|max:255',
         ]);
         
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
         
-        // Валидация пробега (исключаем текущую запись)
-        $this->validateOdometer($validated['car_id'], $validated['odometer'], $refueling->id, 'refueling');
+        // Валидация пробега только если он указан (исключаем текущую запись)
+        if (!empty($validated['odometer'])) {
+            $this->validateOdometer($validated['car_id'], $validated['odometer'], $refueling->id, 'refueling');
+        }
         
         $refueling->update($validated);
         

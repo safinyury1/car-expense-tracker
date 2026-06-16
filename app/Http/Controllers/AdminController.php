@@ -9,13 +9,15 @@ use App\Models\Refueling;
 use App\Models\Income;
 use App\Models\Reminder;
 use App\Models\Visit;
+use App\Models\ExpenseCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $stats = [
             'users' => User::count(),
@@ -26,62 +28,87 @@ class AdminController extends Controller
             'services' => Reminder::where('service_type', 'service')->count(),
         ];
         
-        $recentUsers = User::orderBy('created_at', 'desc')->limit(5)->get();
+        // ПАГИНАЦИЯ ДЛЯ ПОСЛЕДНИХ ПОЛЬЗОВАТЕЛЕЙ (10 на страницу)
+        $recentUsers = User::orderBy('created_at', 'desc')->paginate(10);
         $recentCars = Car::with('user')->orderBy('created_at', 'desc')->limit(5)->get();
         
-        // Статистика посещений
+        // ==========================================
+        // СТАТИСТИКА ПОСЕЩЕНИЙ (ВСЕ ПОСЕЩЕНИЯ)
+        // ==========================================
+        
+        $today = today();
+        $weekAgo = now()->subDays(7);
+        $monthAgo = now()->subDays(30);
+        
+        // ВСЕГО ЗАПИСЕЙ
         $totalVisits = Visit::count();
-        $uniqueVisitors = Visit::distinct('user_id')->count('user_id');
-        $uniqueIps = Visit::distinct('ip')->count('ip');
         
-        $todayVisits = Visit::whereDate('created_at', today())->count();
+        // ВСЕ ПОСЕЩЕНИЯ ЗА ПЕРИОДЫ (не уникальные)
+        $todayVisits = Visit::whereDate('created_at', $today)->count();
         $yesterdayVisits = Visit::whereDate('created_at', today()->subDay())->count();
-        $weekVisits = Visit::where('created_at', '>=', now()->subWeek())->count();
-        $monthVisits = Visit::where('created_at', '>=', now()->subMonth())->count();
+        $weekVisits = Visit::where('created_at', '>=', $weekAgo)->count();
+        $monthVisits = Visit::where('created_at', '>=', $monthAgo)->count();
         
-        $recentVisits = Visit::with('user')->latest()->limit(20)->get();
+        // УНИКАЛЬНЫЕ ПОСЕТИТЕЛИ (для информации)
+        $totalUniqueVisitors = Visit::distinct('user_id')->count('user_id');
+        $activeUsers = Visit::where('created_at', '>=', $weekAgo)->distinct('user_id')->count('user_id');
         
-        // Динамика по дням (последние 7 дней)
+        // УНИКАЛЬНЫЕ IP
+        $totalUniqueIps = Visit::distinct('ip')->count('ip');
+        
+        // ПОСЕЩЕНИЯ ПО ДНЯМ (последние 7 дней) - ВСЕ посещения
         $visitsByDay = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
+            $date = now()->subDays($i);
             $count = Visit::whereDate('created_at', $date)->count();
             $visitsByDay[] = [
-                'date' => now()->subDays($i)->format('d.m'),
+                'date' => $date->format('d.m'),
                 'count' => $count,
-                'full_date' => $date
+                'full_date' => $date->format('Y-m-d')
             ];
         }
         
-        // Лучший день
+        // ЛУЧШИЙ ДЕНЬ
         $bestDay = Visit::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('count', 'desc')
             ->first();
         $bestDayVisits = $bestDay ? $bestDay->count : 0;
         
-        // Среднее посещений в день
+        // СРЕДНЕЕ В ДЕНЬ
         $daysCount = Visit::select(DB::raw('DATE(created_at) as date'))
             ->distinct()
             ->get()
             ->count();
         $avgVisitsPerDay = $daysCount > 0 ? round($totalVisits / $daysCount, 1) : 0;
+
+        // КАТЕГОРИИ РАСХОДОВ
+        $categoryStats = Expense::join('expense_categories', 'expenses.category_id', '=', 'expense_categories.id')
+            ->select('expense_categories.name', DB::raw('SUM(expenses.amount) as total'))
+            ->groupBy('expense_categories.name')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        $categoryColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#14b8a6'];
         
         return view('admin.dashboard', compact(
-            'stats', 
-            'recentUsers', 
+            'stats',
+            'recentUsers',
             'recentCars',
+            // Статистика посещений
             'totalVisits',
-            'uniqueVisitors',
-            'uniqueIps',
             'todayVisits',
             'yesterdayVisits',
             'weekVisits',
             'monthVisits',
-            'recentVisits',
+            'totalUniqueVisitors',
+            'totalUniqueIps',
             'visitsByDay',
             'bestDayVisits',
-            'avgVisitsPerDay'
+            'avgVisitsPerDay',
+            'activeUsers',
+            'categoryStats',
+            'categoryColors'
         ));
     }
     
@@ -231,5 +258,43 @@ class AdminController extends Controller
             'allExpenses', 
             'netProfit'
         ));
+    }
+
+    // Сброс пароля пользователя
+    public function resetPassword(Request $request, $id)
+    {
+        $request->validate([
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = User::findOrFail($id);
+        
+        if ($user->id === Auth::id()) {
+            return redirect()->back()->with('error', 'Используйте раздел профиля для смены своего пароля');
+        }
+        
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Пароль пользователя успешно изменён!');
+    }
+
+    // Обновление email пользователя
+    public function updateEmail(Request $request, $id)
+    {
+        $request->validate([
+            'new_email' => 'required|email|unique:users,email,' . $id,
+        ]);
+
+        $user = User::findOrFail($id);
+        
+        if ($user->id === Auth::id()) {
+            return redirect()->back()->with('error', 'Используйте раздел профиля для смены своего email');
+        }
+        
+        $user->email = $request->new_email;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Email пользователя успешно изменён на ' . $user->email);
     }
 }

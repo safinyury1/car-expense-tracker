@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained('expense_categories');
             $table->date('date');
             $table->decimal('amount', 10, 2);
-            $table->integer('odometer');
+            $table->integer('odometer')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

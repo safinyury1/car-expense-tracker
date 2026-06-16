@@ -10,6 +10,7 @@ use App\Models\Reminder;
 use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HistoryController extends Controller
 {
@@ -105,7 +106,6 @@ class HistoryController extends Controller
                 ->get();
             foreach ($services as $item) {
                 $serviceDate = $item->service_date ?? $item->created_at;
-                // Преобразуем в Carbon если это строка
                 if (!$serviceDate instanceof \Carbon\Carbon) {
                     $serviceDate = \Carbon\Carbon::parse($serviceDate);
                 }
@@ -201,7 +201,6 @@ class HistoryController extends Controller
                 ->get();
             foreach ($services as $item) {
                 $serviceDate = $item->service_date ?? $item->created_at;
-                // Преобразуем в Carbon если это строка
                 if (!$serviceDate instanceof \Carbon\Carbon) {
                     $serviceDate = \Carbon\Carbon::parse($serviceDate);
                 }
@@ -239,18 +238,43 @@ class HistoryController extends Controller
         }
         
         // Сортировка
-        $operations = $allOperations->sortByDesc('sort_date')->values();
+        $sortedOperations = $allOperations->sortByDesc('sort_date')->values();
         
-        // Категории для фильтра
+        // ПАГИНАЦИЯ (15 записей на страницу)
+        $perPage = 15;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentPageItems = $sortedOperations->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        
+        $operations = new LengthAwarePaginator(
+            $currentPageItems,
+            $sortedOperations->count(),
+            $perPage,
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+        
+        // Сохраняем параметры запроса для пагинации
+        $operations->appends($request->except('page'));
+        
+        // Категории для фильтра (из отфильтрованных, но до пагинации)
         $categories = collect();
-        foreach ($allOperations as $op) {
+        foreach ($sortedOperations as $op) {
             if (!$categories->contains($op['category'])) {
                 $categories->push($op['category']);
             }
         }
         $sortedCategories = $categories->sort()->values();
         
-        return view('history.index', compact('cars', 'selectedCarId', 'operations', 'sortedCategories', 'categoryFilter', 'period', 'dateFrom', 'dateTo'));
+        return view('history.index', compact(
+            'cars', 
+            'selectedCarId', 
+            'operations', 
+            'sortedCategories', 
+            'categoryFilter', 
+            'period', 
+            'dateFrom', 
+            'dateTo'
+        ));
     }
     
     public function destroy($type, $id)

@@ -19,9 +19,12 @@ class CarController extends Controller
 {
     use ConvertsUnits;
 
-    public function index()
+    public function index(Request $request)
     {
-        $cars = Auth::user()->cars;
+        // Пагинация (6 автомобилей на страницу)
+        $cars = Auth::user()->cars()
+            ->orderBy('created_at', 'desc')
+            ->paginate(6);
         
         foreach ($cars as $car) {
             $maxOdometerExpense = Expense::where('car_id', $car->id)->max('odometer');
@@ -94,7 +97,16 @@ class CarController extends Controller
             'year' => 'nullable|integer|min:1900|max:' . date('Y'),
             'vin' => 'nullable|string|max:17',
             'initial_odometer' => 'nullable|integer|min:0',
+            'delete_photo' => 'nullable|boolean',
         ]);
+
+        // Если нужно удалить фото
+        if ($request->delete_photo == 1 && $car->photo) {
+            if (Storage::disk('public')->exists($car->photo)) {
+                Storage::disk('public')->delete($car->photo);
+            }
+            $car->photo = null;
+        }
 
         $car->update($validated);
 
@@ -103,72 +115,89 @@ class CarController extends Controller
     }
 
     public function updatePhoto(Request $request, Car $car)
-{
-    if ($car->user_id !== Auth::id()) {
-        abort(403);
-    }
+    {
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
 
-    $request->validate([
-        'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    if ($car->photo && Storage::disk('public')->exists($car->photo)) {
-        Storage::disk('public')->delete($car->photo);
-    }
-
-    $path = $request->file('photo')->store('car-photos', 'public');
-    $car->photo = $path;
-    $car->save();
-
-    // Возвращаем JSON для AJAX запроса
-    if ($request->ajax()) {
-        return response()->json([
-            'success' => true,
-            'photo_url' => Storage::url($path)
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        // Удаляем старое фото если есть
+        if ($car->photo && Storage::disk('public')->exists($car->photo)) {
+            Storage::disk('public')->delete($car->photo);
+        }
+
+        $path = $request->file('photo')->store('car-photos', 'public');
+        $car->photo = $path;
+        $car->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'photo_url' => Storage::url($path)
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Фото автомобиля обновлено!');
     }
 
-    return redirect()->back()->with('success', 'Фото автомобиля обновлено!');
-}
+    public function deletePhoto(Car $car)
+    {
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($car->photo && Storage::disk('public')->exists($car->photo)) {
+            Storage::disk('public')->delete($car->photo);
+        }
+
+        $car->photo = null;
+        $car->save();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', 'Фото автомобиля удалено!');
+    }
 
     public function updateOdometer(Request $request, Car $car)
-{
-    if ($car->user_id !== auth()->id()) {
-        abort(403);
+    {
+        if ($car->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'odometer' => 'required|integer|min:0',
+        ]);
+
+        $newOdometer = $request->odometer;
+
+        DB::table('cars')->where('id', $car->id)->update([
+            'odometer' => $newOdometer,
+            'updated_at' => now()
+        ]);
+
+        Expense::where('car_id', $car->id)
+            ->where('description', 'Ручное обновление пробега')
+            ->where('amount', 0)
+            ->delete();
+
+        $category = ExpenseCategory::where('name', 'Прочее')->first();
+        
+        Expense::create([
+            'car_id' => $car->id,
+            'category_id' => $category->id ?? 1,
+            'date' => now(),
+            'amount' => 0,
+            'odometer' => $newOdometer,
+            'description' => 'Ручное обновление пробега',
+        ]);
+
+        return redirect()->back()->with('success', 'Пробег обновлён на ' . number_format($newOdometer, 0, ',', ' ') . ' км');
     }
-
-    $request->validate([
-        'odometer' => 'required|integer|min:0',
-    ]);
-
-    $newOdometer = $request->odometer;
-
-    // 1. Обновляем в таблице cars
-    DB::table('cars')->where('id', $car->id)->update([
-        'odometer' => $newOdometer,
-        'updated_at' => now()
-    ]);
-
-    // 2. Удаляем старую запись "Ручное обновление пробега" (если есть)
-    Expense::where('car_id', $car->id)
-        ->where('description', 'Ручное обновление пробега')
-        ->where('amount', 0)
-        ->delete();
-
-    // 3. Создаём НОВУЮ запись с новым пробегом
-    $category = ExpenseCategory::where('name', 'Прочее')->first();
-    
-    Expense::create([
-        'car_id' => $car->id,
-        'category_id' => $category->id ?? 1,
-        'date' => now(),
-        'amount' => 0,
-        'odometer' => $newOdometer,
-        'description' => 'Ручное обновление пробега',
-    ]);
-
-    return redirect()->back()->with('success', 'Пробег обновлён на ' . number_format($newOdometer, 0, ',', ' ') . ' км');
-}
 
     public function destroy(Car $car)
     {

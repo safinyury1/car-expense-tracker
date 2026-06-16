@@ -17,6 +17,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\GuideController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\IncomeListController;
+use App\Http\Controllers\SupportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -73,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cars/{car}/edit', [CarController::class, 'edit'])->name('cars.edit');
     Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
     Route::delete('/cars/{car}', [CarController::class, 'destroy'])->name('cars.destroy');
+    Route::delete('/cars/{car}/delete-photo', [CarController::class, 'deletePhoto'])->name('cars.delete-photo');
     Route::patch('/cars/{car}/update-photo', [CarController::class, 'updatePhoto'])->name('cars.update.photo');
     Route::patch('/cars/{car}/update-odometer', [CarController::class, 'updateOdometer'])->name('cars.update.odometer');
     Route::get('/cars/export-csv', [CarController::class, 'exportCsv'])->name('cars.export-csv');
@@ -119,6 +121,12 @@ Route::middleware('auth')->group(function () {
     
     // Руководство
     Route::get('/guide', [GuideController::class, 'index'])->name('guide.index')->middleware('auth');
+    
+    // Поддержка (пользователь)
+    Route::get('/support', [SupportController::class, 'userIndex'])->name('support.user.index');
+    Route::get('/support/{id}', [SupportController::class, 'userShow'])->name('support.user.show');
+    Route::post('/support', [SupportController::class, 'store'])->name('support.store');
+    Route::delete('/support/{id}', [SupportController::class, 'userDestroy'])->name('support.user.destroy'); // ДОБАВЛЕНО
 });
 
 // Админ-панель
@@ -132,6 +140,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
     Route::get('/users/{id}/make-admin', [AdminController::class, 'makeAdmin'])->name('make.admin');
     Route::get('/users/{id}/make-user', [AdminController::class, 'makeUser'])->name('make.user');
+    
+    // Управление пользователями (пароль и email)
+    Route::post('/users/{id}/reset-password', [AdminController::class, 'resetPassword'])->name('reset.password');
+    Route::post('/users/{id}/update-email', [AdminController::class, 'updateEmail'])->name('update.email');
+    
+    // Поддержка (админ)
+    Route::get('/support', [SupportController::class, 'adminIndex'])->name('support.index');
+    Route::get('/support/{id}', [SupportController::class, 'adminShow'])->name('support.show');
+    Route::post('/support/{id}/reply', [SupportController::class, 'adminReply'])->name('support.reply');
+    Route::post('/support/{id}/close', [SupportController::class, 'adminClose'])->name('support.close');
+    Route::delete('/support/{id}', [SupportController::class, 'adminDestroy'])->name('support.destroy');
 });
 
 require __DIR__.'/auth.php';

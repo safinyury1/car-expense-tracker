@@ -94,7 +94,7 @@
                 </div>
             </div>
 
-            <!-- ОДНА КНОПКА (Telegram UI Kit стиль) + бургер + аватар -->
+            <!-- ОДНА КНОПКА + бургер + аватар -->
             <div class="flex items-center gap-3">
                 <!-- Единая прямоугольная кнопка "Действия" -->
                 <div class="relative">
@@ -103,7 +103,7 @@
                         Действия
                     </button>
                     
-                    <!-- Выпадающее меню (объединяет всё из двух старых кнопок) -->
+                    <!-- Выпадающее меню -->
                     <div x-show="showMainMenu" 
                          @click.away="showMainMenu = false"
                          x-cloak
@@ -193,8 +193,10 @@
                                 @if(Auth::user()->avatar)
                                     <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ Storage::url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
                                 @else
-                                    <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm mr-2">
-                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                    <div class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center mr-2">
+                                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
                                     </div>
                                 @endif
                                 <div class="text-gray-900 dark:text-gray-300">{{ Auth::user()->name }}</div>
@@ -210,6 +212,17 @@
                             <x-dropdown-link :href="route('settings.index')">
                                 {{ __('Настройки') }}
                             </x-dropdown-link>
+
+                            <!-- Ссылка на поддержку (только для админа) -->
+                            @if(Auth::user()->role === 'admin')
+                                <x-dropdown-link :href="route('admin.support.index')">
+                                    {{ __('Поддержка') }}
+                                    @php $pending = \App\Models\SupportMessage::pending()->count(); @endphp
+                                    @if($pending > 0)
+                                        <span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ $pending }}</span>
+                                    @endif
+                                </x-dropdown-link>
+                            @endif
 
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -299,7 +312,6 @@
     <style>
         [x-cloak] { display: none !important; }
         
-        /* Десктопное меню - показывается на экранах >= 1024px */
         .desktop-menu {
             display: flex;
             align-items: center;
@@ -307,7 +319,6 @@
             margin-left: 2.5rem;
         }
         
-        /* Планшетное меню - показывается от 768px до 1023px */
         .tablet-menu {
             display: none;
             align-items: center;
@@ -315,12 +326,10 @@
             margin-left: 1.5rem;
         }
         
-        /* Бургер-кнопка - скрыта на экранах >= 768px */
         .burger-button {
             display: none;
         }
         
-        /* Все пункты навигации выровнены по вертикали */
         .nav-link {
             position: relative;
             transition: all 0.3s ease;
@@ -363,49 +372,23 @@
             color: #f3f4f6 !important;
         }
         
-        /* Планшеты (768px - 1023px) */
         @media (min-width: 768px) and (max-width: 1023px) {
-            .desktop-menu {
-                display: none !important;
-            }
-            .tablet-menu {
-                display: flex !important;
-                gap: 0.75rem !important;
-            }
-            .burger-button {
-                display: none !important;
-            }
-            .tablet-menu .nav-link {
-                font-size: 0.9rem;
-                padding: 0.25rem 0;
-            }
+            .desktop-menu { display: none !important; }
+            .tablet-menu { display: flex !important; gap: 0.75rem !important; }
+            .burger-button { display: none !important; }
+            .tablet-menu .nav-link { font-size: 0.9rem; padding: 0.25rem 0; }
         }
         
-        /* Телефоны (до 767px) */
         @media (max-width: 767px) {
-            .desktop-menu {
-                display: none !important;
-            }
-            .tablet-menu {
-                display: none !important;
-            }
-            .burger-button {
-                display: block !important;
-            }
+            .desktop-menu { display: none !important; }
+            .tablet-menu { display: none !important; }
+            .burger-button { display: block !important; }
         }
         
-        /* Десктопы и ноутбуки (от 1024px) */
         @media (min-width: 1024px) {
-            .desktop-menu {
-                display: flex !important;
-                gap: 1.75rem !important;
-            }
-            .tablet-menu {
-                display: none !important;
-            }
-            .burger-button {
-                display: none !important;
-            }
+            .desktop-menu { display: flex !important; gap: 1.75rem !important; }
+            .tablet-menu { display: none !important; }
+            .burger-button { display: none !important; }
         }
         
         button:focus,
@@ -416,12 +399,10 @@
             box-shadow: none !important;
         }
         
-        /* Левая часть всегда выровнена по центру */
         .flex.items-center {
             align-items: center;
         }
         
-        /* Контейнеры меню занимают всю высоту */
         .desktop-menu,
         .tablet-menu {
             height: 100%;

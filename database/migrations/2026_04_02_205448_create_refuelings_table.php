@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('liters', 6, 2);
             $table->decimal('price_per_liter', 6, 2);
             $table->decimal('total_amount', 10, 2);
-            $table->integer('odometer');
+            $table->integer('odometer')->nullable();
             $table->string('gas_station')->nullable();
             $table->timestamps();
         });

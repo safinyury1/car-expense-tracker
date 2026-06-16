@@ -1,7 +1,9 @@
 <x-guest-layout>
     <div class="text-center mb-6">
         <div class="flex justify-center mb-4">
-            <img src="{{ asset('images/logo.png') }}" alt="AutoCost" class="h-20 w-auto">
+            <a href="{{ url('/') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="AutoCost" class="h-20 w-auto cursor-pointer hover:opacity-80 transition">
+            </a>
         </div>
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Регистрация</h2>
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Создайте новый аккаунт</p>
