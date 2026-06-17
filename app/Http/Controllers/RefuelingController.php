@@ -52,10 +52,10 @@ class RefuelingController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('gas_station', 'like', "%{$search}%")
-                  ->orWhereHas('car', function ($car) use ($search) {
-                      $car->where('brand', 'like', "%{$search}%")
-                          ->orWhere('model', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('car', function ($car) use ($search) {
+                    $car->where('brand', 'like', "%{$search}%")
+                        ->orWhere('model', 'like', "%{$search}%");
+                });
             });
         }
         
@@ -201,7 +201,21 @@ class RefuelingController extends Controller
         );
         $maxOdometer = $this->convertDistance($maxOdometerKm, $refueling->car);
         
-        return view('refuelings.edit', compact('refueling', 'cars', 'maxOdometer'));
+        // Получаем последний пробег для каждого автомобиля
+        $lastOdometerByCar = [];
+        foreach ($cars as $carItem) {
+            $lastOdometerByCar[$carItem->id] = max(
+                Expense::where('car_id', $carItem->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $carItem->id)->max('odometer') ?? 0,
+                Income::where('car_id', $carItem->id)->max('odometer') ?? 0,
+                $carItem->initial_odometer ?? 0
+            );
+        }
+        
+        // Последний пробег для текущего автомобиля
+        $lastOdometer = $lastOdometerByCar[$refueling->car_id] ?? 0;
+        
+        return view('refuelings.edit', compact('refueling', 'cars', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
 
     public function update(Request $request, Refueling $refueling)
@@ -273,10 +287,10 @@ class RefuelingController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('gas_station', 'like', "%{$search}%")
-                  ->orWhereHas('car', function ($car) use ($search) {
-                      $car->where('brand', 'like', "%{$search}%")
-                          ->orWhere('model', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('car', function ($car) use ($search) {
+                    $car->where('brand', 'like', "%{$search}%")
+                        ->orWhere('model', 'like', "%{$search}%");
+                });
             });
         }
         

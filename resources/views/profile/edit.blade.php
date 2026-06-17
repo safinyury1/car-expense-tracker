@@ -4,6 +4,10 @@
             <h2 class="font-semibold text-xl sm:text-2xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Профиль') }}
             </h2>
+            <a href="{{ route('settings.index') }}" 
+               class="bg-gray-500 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm w-full sm:w-auto">
+                <span>Назад</span>
+            </a>
         </div>
     </x-slot>
 
@@ -77,7 +81,7 @@
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Имя</label>
                                 <input id="name" name="name" type="text" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                                        value="{{ old('name', Auth::user()->name) }}" required>
                                 @error('name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -87,7 +91,7 @@
                             <div class="mt-4">
                                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
                                 <input id="email" name="email" type="email" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                                        value="{{ old('email', Auth::user()->email) }}" required>
                                 @error('email')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -116,7 +120,7 @@
                             <div>
                                 <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Текущий пароль</label>
                                 <input id="current_password" name="current_password" type="password" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 @error('current_password')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -125,7 +129,7 @@
                             <div class="mt-4">
                                 <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Новый пароль</label>
                                 <input id="password" name="password" type="password" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 @error('password')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -134,7 +138,7 @@
                             <div class="mt-4">
                                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Подтверждение пароля</label>
                                 <input id="password_confirmation" name="password_confirmation" type="password" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-2.5 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                             </div>
 
                             <div class="flex justify-end mt-6">
@@ -165,8 +169,8 @@
     </div>
 
     <!-- Модальное окно подтверждения удаления -->
-    <div id="deleteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-[#222222] rounded-xl shadow-xl w-full max-w-md mx-4">
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-2xl w-full max-w-md">
             <div class="p-5 sm:p-6">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Подтверждение удаления</h3>
                 <p class="text-gray-700 dark:text-gray-300 mb-6">
@@ -287,12 +291,29 @@
         function openDeleteModal() {
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('deleteModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
         }
         
         function closeDeleteModal() {
             document.getElementById('deleteModal').classList.add('hidden');
             document.getElementById('deleteModal').classList.remove('flex');
+            document.body.style.overflow = '';
         }
+        
+        // Закрытие по Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+        
+        // Закрытие по клику на фон
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        });
         
         const style = document.createElement('style');
         style.textContent = `

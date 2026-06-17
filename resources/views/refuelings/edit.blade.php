@@ -30,7 +30,8 @@
                                 <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
                                     <option value="">Выберите автомобиль</option>
                                     @foreach($cars as $car)
-                                        <option value="{{ $car->id }}" {{ old('car_id', $refueling->car_id) == $car->id ? 'selected' : '' }}>
+                                        <option value="{{ $car->id }}" {{ old('car_id', $refueling->car_id) == $car->id ? 'selected' : '' }}
+                                                data-odometer="{{ $lastOdometerByCar[$car->id] ?? '' }}">
                                             {{ $car->brand }} {{ $car->model }}
                                         </option>
                                     @endforeach
@@ -89,19 +90,19 @@
                             </div>
                         </div>
 
-                        <!-- Пробег (необязательный) -->
+                        <!-- Пробег (необязательный) - АВТОМАТИЧЕСКИ ЗАПОЛНЯЕТСЯ -->
                         <div>
                             <label for="odometer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Пробег <span class="text-gray-400 text-xs font-normal">(необязательно)</span>
                             </label>
                             <div class="relative">
-                                <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $refueling->odometer) }}" min="0" 
+                                <input type="number" name="odometer" id="odometer" value="{{ old('odometer', $lastOdometer ?? $refueling->odometer) }}" min="0" 
                                        class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('odometer') border-red-500 @enderror"
                                        placeholder="0">
                                 <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $refueling->car->distance_unit ?? 'км' }}</span>
                             </div>
                             @if(isset($maxOdometer) && $maxOdometer > 0)
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" id="lastOdometerText">
                                     Последний зафиксированный пробег: <span class="font-medium">{{ number_format($maxOdometer) }}</span> {{ $refueling->car->distance_unit ?? 'км' }}
                                 </p>
                             @endif
@@ -138,4 +139,41 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const carSelect = document.getElementById('car_id');
+            const odometerInput = document.getElementById('odometer');
+            const lastOdometerText = document.getElementById('lastOdometerText');
+            
+            function updateOdometer() {
+                const selectedOption = carSelect.options[carSelect.selectedIndex];
+                const odometerValue = selectedOption.getAttribute('data-odometer');
+                
+                if (odometerValue && odometerValue !== '') {
+                    odometerInput.value = odometerValue;
+                    if (lastOdometerText) {
+                        const formatted = new Intl.NumberFormat('ru-RU').format(odometerValue);
+                        lastOdometerText.innerHTML = 'Последний зафиксированный пробег: <span class="font-medium">' + formatted + '</span> км';
+                    }
+                } else {
+                    // Если нет данных, оставляем текущее значение или пустым
+                    // Не перезаписываем, если пользователь уже ввел значение
+                    if (!odometerInput.value) {
+                        odometerInput.value = '';
+                    }
+                    if (lastOdometerText) {
+                        lastOdometerText.innerHTML = 'Последний зафиксированный пробег: <span class="font-medium">0</span> км';
+                    }
+                }
+            }
+            
+            carSelect.addEventListener('change', updateOdometer);
+            
+            // Обновляем при загрузке, если выбран автомобиль
+            if (carSelect.value) {
+                updateOdometer();
+            }
+        });
+    </script>
 </x-app-layout>

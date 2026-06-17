@@ -27,10 +27,11 @@
                                 Автомобиль <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
+                                <select name="car_id" id="car_id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm text-base px-4 py-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('car_id') border-red-500 @enderror" required>
                                     <option value="">Выберите автомобиль</option>
                                     @foreach($cars as $car)
-                                        <option value="{{ $car->id }}" {{ old('car_id', $reminder->car_id) == $car->id ? 'selected' : '' }}>
+                                        <option value="{{ $car->id }}" {{ old('car_id', $reminder->car_id) == $car->id ? 'selected' : '' }}
+                                                data-odometer="{{ $lastOdometerByCar[$car->id] ?? '' }}">
                                             {{ $car->brand }} {{ $car->model }}
                                         </option>
                                     @endforeach
@@ -53,7 +54,7 @@
                             </label>
                             <input type="text" name="title" id="title" value="{{ old('title', $reminder->title) }}" 
                                    placeholder="Например: Замена масла, ТО-15, Шиномонтаж..."
-                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('title') border-red-500 @enderror" required>
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('title') border-red-500 @enderror" required>
                             @error('title')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -66,11 +67,16 @@
                                     Пробег для напоминания <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
-                                    <input type="number" name="due_odometer" id="due_odometer" value="{{ old('due_odometer', $reminder->due_odometer) }}" min="0" 
-                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_odometer') border-red-500 @enderror" required
+                                    <input type="number" name="due_odometer" id="due_odometer" value="{{ old('due_odometer', $lastOdometer ?? $reminder->due_odometer) }}" min="0" 
+                                           class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white dark:placeholder-gray-400 rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_odometer') border-red-500 @enderror" required
                                            placeholder="0">
                                     <span class="absolute right-4 top-3 text-gray-500 dark:text-gray-400 text-base">{{ $reminder->car->distance_unit ?? 'км' }}</span>
                                 </div>
+                                @if(isset($maxOdometer) && $maxOdometer > 0)
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" id="lastOdometerText">
+                                        Последний зафиксированный пробег: <span class="font-medium">{{ number_format($maxOdometer) }}</span> {{ $reminder->car->distance_unit ?? 'км' }}
+                                    </p>
+                                @endif
                                 @error('due_odometer')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -82,7 +88,7 @@
                                     Дата <span class="text-gray-400 text-xs font-normal">(необязательно)</span>
                                 </label>
                                 <input type="date" name="due_date" id="due_date" value="{{ old('due_date', $reminder->due_date ? $reminder->due_date->format('Y-m-d') : '') }}" 
-                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#6B727F] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_date') border-red-500 @enderror">
+                                       class="w-full border-gray-300 dark:border-gray-600 dark:bg-[#4B5563] dark:text-white rounded-xl shadow-sm px-4 py-3 text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('due_date') border-red-500 @enderror">
                                 @error('due_date')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -104,4 +110,40 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const carSelect = document.getElementById('car_id');
+            const odometerInput = document.getElementById('due_odometer');
+            const lastOdometerText = document.getElementById('lastOdometerText');
+            
+            function updateOdometer() {
+                const selectedOption = carSelect.options[carSelect.selectedIndex];
+                const odometerValue = selectedOption.getAttribute('data-odometer');
+                
+                if (odometerValue && odometerValue !== '') {
+                    odometerInput.value = odometerValue;
+                    if (lastOdometerText) {
+                        const formatted = new Intl.NumberFormat('ru-RU').format(odometerValue);
+                        lastOdometerText.innerHTML = 'Последний зафиксированный пробег: <span class="font-medium">' + formatted + '</span> км';
+                    }
+                } else {
+                    // Если нет данных, оставляем текущее значение или пустым
+                    if (!odometerInput.value) {
+                        odometerInput.value = '';
+                    }
+                    if (lastOdometerText) {
+                        lastOdometerText.innerHTML = 'Последний зафиксированный пробег: <span class="font-medium">0</span> км';
+                    }
+                }
+            }
+            
+            carSelect.addEventListener('change', updateOdometer);
+            
+            // Обновляем при загрузке, если выбран автомобиль
+            if (carSelect.value) {
+                updateOdometer();
+            }
+        });
+    </script>
 </x-app-layout>

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Reminder;
+use App\Models\Expense;
+use App\Models\Refueling;
+use App\Models\Income;
 use App\Mail\ReminderNotification;
 use App\Traits\ConvertsUnits;
 use Illuminate\Http\Request;
@@ -115,7 +118,30 @@ class ReminderController extends Controller
         
         $cars = Auth::user()->cars;
         
-        return view('reminders.edit', compact('reminder', 'cars'));
+        // Получаем последний пробег для каждого автомобиля
+        $lastOdometerByCar = [];
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
+        // Последний пробег для текущего автомобиля
+        $lastOdometer = $lastOdometerByCar[$reminder->car_id] ?? 0;
+        
+        // Максимальный пробег для отображения (конвертированный)
+        $maxOdometerKm = max(
+            Expense::where('car_id', $reminder->car_id)->max('odometer') ?? 0,
+            Refueling::where('car_id', $reminder->car_id)->max('odometer') ?? 0,
+            Income::where('car_id', $reminder->car_id)->max('odometer') ?? 0,
+            $reminder->car->initial_odometer ?? 0
+        );
+        $maxOdometer = $this->convertDistance($maxOdometerKm, $reminder->car);
+        
+        return view('reminders.edit', compact('reminder', 'cars', 'lastOdometer', 'lastOdometerByCar', 'maxOdometer'));
     }
 
     public function update(Request $request, Reminder $reminder)

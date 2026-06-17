@@ -187,7 +187,21 @@ class ExpenseController extends Controller
         );
         $maxOdometer = $this->convertDistance($maxOdometerKm, $expense->car);
         
-        return view('expenses.edit', compact('expense', 'cars', 'categories', 'maxOdometer'));
+        // Получаем последний пробег для каждого автомобиля
+        $lastOdometerByCar = [];
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
+        // Последний пробег для текущего автомобиля
+        $lastOdometer = $lastOdometerByCar[$expense->car_id] ?? 0;
+        
+        return view('expenses.edit', compact('expense', 'cars', 'categories', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
 
     public function update(Request $request, Expense $expense)

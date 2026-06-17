@@ -22,7 +22,21 @@ class IncomeController extends Controller
         $selectedCar = $cars->find($selectedCarId);
         
         $maxOdometer = 0;
+        $lastOdometer = null;
+        $lastOdometerByCar = [];
+        
+        // Для каждого автомобиля получаем последний пробег
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
         if ($selectedCar) {
+            $lastOdometer = $lastOdometerByCar[$selectedCarId] ?? 0;
             $maxOdometerKm = max(
                 Expense::where('car_id', $selectedCarId)->max('odometer') ?? 0,
                 Refueling::where('car_id', $selectedCarId)->max('odometer') ?? 0,
@@ -31,7 +45,7 @@ class IncomeController extends Controller
             $maxOdometer = $this->convertDistance($maxOdometerKm, $selectedCar);
         }
         
-        return view('incomes.create', compact('cars', 'selectedCar', 'maxOdometer'));
+        return view('incomes.create', compact('cars', 'selectedCar', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
     
     public function store(Request $request)
@@ -54,6 +68,10 @@ class IncomeController extends Controller
         // Валидация пробега (если указан)
         if (!empty($validated['odometer'])) {
             $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'income');
+            
+            // Обновляем пробег в автомобиле
+            $car->odometer = $validated['odometer'];
+            $car->save();
         }
         
         Income::create($validated);
@@ -88,7 +106,21 @@ class IncomeController extends Controller
         );
         $maxOdometer = $this->convertDistance($maxOdometerKm, $income->car);
         
-        return view('incomes.edit', compact('income', 'cars', 'maxOdometer'));
+        // Получаем последний пробег для каждого автомобиля
+        $lastOdometerByCar = [];
+        foreach ($cars as $car) {
+            $lastOdometerByCar[$car->id] = max(
+                Expense::where('car_id', $car->id)->max('odometer') ?? 0,
+                Refueling::where('car_id', $car->id)->max('odometer') ?? 0,
+                Income::where('car_id', $car->id)->max('odometer') ?? 0,
+                $car->initial_odometer ?? 0
+            );
+        }
+        
+        // Последний пробег для текущего автомобиля
+        $lastOdometer = $lastOdometerByCar[$income->car_id] ?? 0;
+        
+        return view('incomes.edit', compact('income', 'cars', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
     
     public function update(Request $request, Income $income)
@@ -110,6 +142,11 @@ class IncomeController extends Controller
         // Валидация пробега (если указан, исключаем текущую запись)
         if (!empty($validated['odometer'])) {
             $this->validateOdometer($validated['car_id'], $validated['odometer'], $income->id, 'income');
+            
+            // Обновляем пробег в автомобиле
+            $car = Car::find($income->car_id);
+            $car->odometer = $validated['odometer'];
+            $car->save();
         }
         
         $income->update($validated);
