@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ExpenseController extends Controller
 {
@@ -34,7 +35,7 @@ class ExpenseController extends Controller
             $sortBy = 'date';
         }
         
-        $query = Expense::with(['car', 'category'])
+        $query = Expense::with(['car', 'category', 'attachments'])
             ->whereHas('car', function ($q) {
                 $q->where('user_id', Auth::id());
             });
@@ -131,6 +132,8 @@ class ExpenseController extends Controller
             'amount' => 'required|numeric|min:0',
             'odometer' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
         
         $car = Car::findOrFail($validated['car_id']);
@@ -146,7 +149,23 @@ class ExpenseController extends Controller
         
         $expense = Expense::create($validated);
         
-        // Отправка email уведомления ТОЛЬКО ЕСЛИ ВКЛЮЧЕНО
+        // Сохраняем вложения (максимум 4)
+        if ($request->hasFile('attachments')) {
+            $count = 0;
+            foreach ($request->file('attachments') as $file) {
+                if ($count >= 4) break;
+                $path = $file->store('attachments/expenses', 'public');
+                $expense->attachments()->create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+                $count++;
+            }
+        }
+        
+        // Отправка email уведомления
         try {
             $user = Auth::user();
             if ($user->notify_expenses) {
@@ -166,9 +185,57 @@ class ExpenseController extends Controller
             abort(403);
         }
         
+        $car = $expense->car;
+        
+        // Конвертируем значения для отображения
+        $expense->converted_amount = $this->convertCurrency($expense->amount, $car);
+        $expense->converted_odometer = $this->convertDistance($expense->odometer, $car);
+        $expense->currency = $this->getCurrencySymbol($car);
+        $expense->distance_unit = $this->getDistanceUnit($car);
+        
+        $expense->load('attachments');
+        
         $cars = Auth::user()->cars;
         
         return view('expenses.show', compact('expense', 'cars'));
+    }
+
+    public function addAttachment(Request $request, Expense $expense)
+    {
+        if ($expense->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $request->validate([
+            'attachments' => 'required|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
+        ]);
+        
+        $currentCount = $expense->attachments->count();
+        $maxFiles = 4;
+        $availableSlots = $maxFiles - $currentCount;
+        
+        if ($availableSlots <= 0) {
+            return redirect()->route('expenses.show', $expense)
+                ->with('attachment_error', 'Достигнут лимит в 4 файла');
+        }
+        
+        $uploaded = 0;
+        foreach ($request->file('attachments') as $file) {
+            if ($uploaded >= $availableSlots) break;
+            
+            $path = $file->store('attachments/expenses', 'public');
+            $expense->attachments()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+            ]);
+            $uploaded++;
+        }
+        
+        return redirect()->route('expenses.show', $expense)
+            ->with('attachment_success', 'Добавлено файлов: ' . $uploaded);
     }
 
     public function edit(Expense $expense)
@@ -187,7 +254,6 @@ class ExpenseController extends Controller
         );
         $maxOdometer = $this->convertDistance($maxOdometerKm, $expense->car);
         
-        // Получаем последний пробег для каждого автомобиля
         $lastOdometerByCar = [];
         foreach ($cars as $car) {
             $lastOdometerByCar[$car->id] = max(
@@ -198,7 +264,6 @@ class ExpenseController extends Controller
             );
         }
         
-        // Последний пробег для текущего автомобиля
         $lastOdometer = $lastOdometerByCar[$expense->car_id] ?? 0;
         
         return view('expenses.edit', compact('expense', 'cars', 'categories', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
@@ -217,6 +282,8 @@ class ExpenseController extends Controller
             'amount' => 'required|numeric|min:0',
             'odometer' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
         
         if (!empty($validated['odometer'])) {
@@ -227,6 +294,24 @@ class ExpenseController extends Controller
         }
         
         $expense->update($validated);
+        
+        if ($request->hasFile('attachments')) {
+            $count = 0;
+            $currentCount = $expense->attachments->count();
+            $availableSlots = 4 - $currentCount;
+            
+            foreach ($request->file('attachments') as $file) {
+                if ($count >= $availableSlots) break;
+                $path = $file->store('attachments/expenses', 'public');
+                $expense->attachments()->create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+                $count++;
+            }
+        }
         
         return redirect()->route('expenses.index', ['car_id' => $expense->car_id])
             ->with('success', 'Расход успешно обновлён!');
@@ -239,6 +324,12 @@ class ExpenseController extends Controller
         }
         
         $carId = $expense->car_id;
+        
+        foreach ($expense->attachments as $attachment) {
+            Storage::disk('public')->delete($attachment->file_path);
+            $attachment->delete();
+        }
+        
         $expense->delete();
         
         return redirect()->route('expenses.index', ['car_id' => $carId])

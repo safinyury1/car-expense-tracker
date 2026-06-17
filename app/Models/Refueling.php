@@ -32,4 +32,9 @@ class Refueling extends Model
     {
         return $this->belongsTo(Car::class);
     }
+
+    public function attachments()
+{
+    return $this->morphMany(Attachment::class, 'attachable');
+}
 }

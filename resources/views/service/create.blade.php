@@ -15,7 +15,7 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
             
             <div class="bg-white dark:bg-[#222222] overflow-hidden shadow-sm rounded-xl">
-                <form action="{{ route('service.store') }}" method="POST" class="space-y-0">
+                <form action="{{ route('service.store') }}" method="POST" enctype="multipart/form-data" class="space-y-0">
                     @csrf
                     
                     <div class="p-5 sm:p-7 md:p-8 space-y-5 sm:space-y-6">
@@ -161,6 +161,37 @@
                                 <span>После сохранения автоматически создастся напоминание</span>
                             </div>
                         </div>
+
+                        <!-- ========================================== -->
+                        <!-- ВЛОЖЕНИЯ (ЧЕКИ) - МАКСИМУМ 4 ФАЙЛА -->
+                        <!-- ========================================== -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Прикрепить чек/квитанцию
+                                <span class="text-xs text-gray-400 font-normal">(максимум 4 файла)</span>
+                            </label>
+                            
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 hover:border-blue-500 transition relative">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="text-blue-500 dark:text-blue-400 font-medium">Нажмите для выбора</span> или перетащите файлы
+                                    </p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">JPG, PNG, PDF до 5 МБ (макс. 4 файла)</p>
+                                </div>
+                                <input type="file" name="attachments[]" id="attachments" 
+                                       multiple accept=".jpg,.jpeg,.png,.pdf"
+                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            </div>
+                            
+                            <div id="fileList" class="mt-3 space-y-2"></div>
+                            <div id="fileLimitMessage" class="text-red-500 text-sm mt-2 hidden">Достигнут лимит в 4 файла</div>
+                            @error('attachments.*')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                     
                     <div class="px-5 sm:px-7 md:px-8 py-4 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-end gap-3">
@@ -179,6 +210,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Автозаполнение пробега
             const carSelect = document.getElementById('car_id');
             const odometerInput = document.getElementById('odometer');
             const lastOdometerText = document.getElementById('lastOdometerText');
@@ -206,6 +238,105 @@
             if (carSelect.value) {
                 updateOdometer();
             }
+
+            // ВЛОЖЕНИЯ С ЛИМИТОМ 4 ФАЙЛА
+            const fileInput = document.getElementById('attachments');
+            const fileList = document.getElementById('fileList');
+            const fileLimitMessage = document.getElementById('fileLimitMessage');
+            const MAX_FILES = 4;
+            const dropZone = fileInput.closest('.border-2');
+            
+            function updateFileList() {
+                fileList.innerHTML = '';
+                const files = fileInput.files;
+                if (files.length === 0) {
+                    fileList.innerHTML = '<p class="text-sm text-gray-400 dark:text-gray-500">Файлы не выбраны</p>';
+                    return;
+                }
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const size = (file.size / 1024 / 1024).toFixed(2);
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg';
+                    
+                    let previewHtml = '';
+                    if (file.type.startsWith('image/')) {
+                        previewHtml = `<img src="${URL.createObjectURL(file)}" class="w-8 h-8 object-cover rounded">`;
+                    } else if (file.type === 'application/pdf') {
+                        previewHtml = `<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>`;
+                    } else {
+                        previewHtml = `<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`;
+                    }
+                    
+                    div.innerHTML = `
+                        ${previewHtml}
+                        <span class="text-sm text-gray-700 dark:text-gray-300 flex-1 truncate">${file.name}</span>
+                        <span class="text-xs text-gray-400 dark:text-gray-500">${size} MB</span>
+                        <button type="button" onclick="removeFile(${i})" class="text-red-500 hover:text-red-600 text-sm font-medium">✕</button>
+                    `;
+                    fileList.appendChild(div);
+                }
+            }
+            
+            fileInput.addEventListener('change', function(e) {
+                const files = this.files;
+                if (files.length > MAX_FILES) {
+                    fileLimitMessage.classList.remove('hidden');
+                    const dt = new DataTransfer();
+                    for (let i = 0; i < MAX_FILES; i++) {
+                        dt.items.add(files[i]);
+                    }
+                    this.files = dt.files;
+                } else {
+                    fileLimitMessage.classList.add('hidden');
+                }
+                updateFileList();
+            });
+            
+            if (dropZone) {
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('border-blue-500', 'bg-blue-50/20');
+                });
+                
+                dropZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('border-blue-500', 'bg-blue-50/20');
+                });
+                
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('border-blue-500', 'bg-blue-50/20');
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files.length > MAX_FILES) {
+                        fileLimitMessage.classList.remove('hidden');
+                        const newDt = new DataTransfer();
+                        for (let i = 0; i < MAX_FILES; i++) {
+                            newDt.items.add(files[i]);
+                        }
+                        fileInput.files = newDt.files;
+                    } else {
+                        fileLimitMessage.classList.add('hidden');
+                        fileInput.files = files;
+                    }
+                    updateFileList();
+                });
+            }
+            
+            window.removeFile = function(index) {
+                const dt = new DataTransfer();
+                const files = fileInput.files;
+                for (let i = 0; i < files.length; i++) {
+                    if (i !== index) dt.items.add(files[i]);
+                }
+                fileInput.files = dt.files;
+                fileLimitMessage.classList.add('hidden');
+                updateFileList();
+            };
+            
+            updateFileList();
         });
     </script>
 </x-app-layout>

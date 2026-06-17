@@ -35,4 +35,9 @@ class Expense extends Model
     {
         return $this->belongsTo(ExpenseCategory::class);
     }
+
+    public function attachments()
+    {
+    return $this->morphMany(\App\Models\Attachment::class, 'attachable');
+    }
 }

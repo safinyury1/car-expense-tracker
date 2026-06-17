@@ -39,7 +39,6 @@
                         </button>
                         
                         <div class="flex items-center gap-1.5 sm:gap-2">
-                            <!-- КНОПКА ВЫБОРА АВТОМОБИЛЯ (ОТКРЫВАЕТ МОДАЛЬНОЕ ОКНО) -->
                             <button onclick="openCarModal()" 
                                     class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-1.5 sm:p-2 transition w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center">
                                 <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,10 +57,9 @@
                 </div>
             </div>
 
-            <!-- МОДАЛЬНОЕ ОКНО ВЫБОРА АВТОМОБИЛЯ -->
+            <!-- МОДАЛЬНОЕ ОКНО -->
             <div id="carModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
                 <div class="bg-white dark:bg-[#222222] rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
-                    <!-- Заголовок -->
                     <div class="px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Выберите автомобиль</h3>
                         <button onclick="closeCarModal()" 
@@ -72,7 +70,6 @@
                         </button>
                     </div>
                     
-                    <!-- Список автомобилей -->
                     <div class="p-2 overflow-y-auto max-h-[60vh]">
                         @foreach($cars as $car)
                             <a href="{{ route('overview.index', ['car_id' => $car->id]) }}" 
@@ -104,7 +101,6 @@
                         @endforeach
                     </div>
                     
-                    <!-- Кнопка закрытия внизу -->
                     <div class="px-5 sm:px-6 py-3 border-t border-gray-100 dark:border-gray-700">
                         <button onclick="closeCarModal()" 
                                 class="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2.5 rounded-xl transition">
@@ -114,9 +110,22 @@
                 </div>
             </div>
 
-            <!-- Неоновая подсветка -->
-            <div class="relative -mt-5 mb-5 flex justify-center">
-                <div class="w-2/3 sm:w-3/4 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent rounded-full blur-[1px] sm:blur-sm"></div>
+            <!-- ========================================== -->
+            <!-- НЕОНОВАЯ ПОДСВЕТКА (ЯРКАЯ) -->
+            <!-- ========================================== -->
+            <div class="relative -mt-6 mb-5 flex justify-center overflow-visible">
+                <div class="neon-line-wrapper" style="width: 85%; max-width: 550px;">
+                    <!-- Основная линия -->
+                    <div class="neon-line"></div>
+                    <!-- Свечение 1 -->
+                    <div class="neon-glow glow-1"></div>
+                    <!-- Свечение 2 (более широкое) -->
+                    <div class="neon-glow glow-2"></div>
+                    <!-- Свечение 3 (самое широкое) -->
+                    <div class="neon-glow glow-3"></div>
+                    <!-- Дополнительное свечение (голубое) -->
+                    <div class="neon-glow glow-blue"></div>
+                </div>
             </div>
 
             <!-- Карточка пробега -->
@@ -320,4 +329,220 @@
             }
         });
     </script>
+
+    <style>
+        /* ========================================== */
+        /* НЕОНОВАЯ ПОДСВЕТКА (МАКСИМАЛЬНО ЯРКАЯ) */
+        /* ========================================== */
+        .neon-line-wrapper {
+            position: relative;
+            height: 4px;
+            margin: 0 auto;
+        }
+
+        /* Основная линия */
+        .neon-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #3b82f6 20%,
+                #60a5fa 40%,
+                #93c5fd 50%,
+                #60a5fa 60%,
+                #3b82f6 80%,
+                transparent 100%
+            );
+            border-radius: 3px;
+            animation: neonPulse 2s ease-in-out infinite;
+            z-index: 3;
+        }
+
+        /* Свечение 1 (ближнее) */
+        .neon-glow.glow-1 {
+            position: absolute;
+            top: -6px;
+            left: 5%;
+            width: 90%;
+            height: 400%;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.8) 0%, transparent 70%);
+            filter: blur(8px);
+            animation: glowPulse 2.5s ease-in-out infinite;
+            z-index: 2;
+            opacity: 0.9;
+        }
+
+        /* Свечение 2 (среднее) */
+        .neon-glow.glow-2 {
+            position: absolute;
+            top: -12px;
+            left: 0;
+            width: 100%;
+            height: 600%;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.5) 0%, transparent 70%);
+            filter: blur(20px);
+            animation: glowPulse2 3s ease-in-out infinite;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        /* Свечение 3 (дальнее) */
+        .neon-glow.glow-3 {
+            position: absolute;
+            top: -25px;
+            left: -10%;
+            width: 120%;
+            height: 800%;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: glowPulse3 3.5s ease-in-out infinite;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        /* Дополнительное голубое свечение */
+        .neon-glow.glow-blue {
+            position: absolute;
+            top: -3px;
+            left: 15%;
+            width: 70%;
+            height: 300%;
+            background: radial-gradient(ellipse at center, rgba(147, 197, 253, 0.6) 0%, transparent 70%);
+            filter: blur(10px);
+            animation: glowBlue 2.8s ease-in-out infinite;
+            z-index: 2;
+            opacity: 0.7;
+        }
+
+        /* Анимации */
+        @keyframes neonPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+            25% {
+                opacity: 1;
+                transform: scaleX(1.03);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scaleX(0.97);
+            }
+            75% {
+                opacity: 1;
+                transform: scaleX(1.02);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes glowPulse2 {
+            0%, 100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.3);
+            }
+        }
+
+        @keyframes glowPulse3 {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(1.4);
+            }
+        }
+
+        @keyframes glowBlue {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.15);
+            }
+        }
+
+        /* ========================================== */
+        /* ТЁМНАЯ ТЕМА — УСИЛЕННОЕ СВЕЧЕНИЕ */
+        /* ========================================== */
+        .dark .neon-line {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #60a5fa 20%,
+                #93c5fd 40%,
+                #bfdbfe 50%,
+                #93c5fd 60%,
+                #60a5fa 80%,
+                transparent 100%
+            );
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3);
+        }
+
+        .dark .neon-glow.glow-1 {
+            background: radial-gradient(ellipse at center, rgba(96, 165, 250, 0.9) 0%, transparent 70%);
+            filter: blur(10px);
+        }
+
+        .dark .neon-glow.glow-2 {
+            background: radial-gradient(ellipse at center, rgba(96, 165, 250, 0.6) 0%, transparent 70%);
+            filter: blur(25px);
+        }
+
+        .dark .neon-glow.glow-3 {
+            background: radial-gradient(ellipse at center, rgba(96, 165, 250, 0.3) 0%, transparent 70%);
+            filter: blur(50px);
+        }
+
+        .dark .neon-glow.glow-blue {
+            background: radial-gradient(ellipse at center, rgba(147, 197, 253, 0.7) 0%, transparent 70%);
+            filter: blur(12px);
+        }
+
+        /* ========================================== */
+        /* СВЕТЛАЯ ТЕМА — КОНТРАСТНАЯ ЛИНИЯ */
+        /* ========================================== */
+        .neon-line-wrapper {
+            --shadow-color: rgba(59, 130, 246, 0.15);
+        }
+
+        .neon-line {
+            box-shadow: 
+                0 0 15px rgba(59, 130, 246, 0.3),
+                0 0 30px rgba(59, 130, 246, 0.15),
+                0 0 60px rgba(59, 130, 246, 0.08);
+        }
+
+        @media (max-width: 640px) {
+            .neon-line-wrapper {
+                width: 92% !important;
+            }
+            .neon-glow.glow-3 {
+                display: none;
+            }
+            .neon-glow.glow-2 {
+                top: -8px;
+                height: 400%;
+                filter: blur(15px);
+            }
+        }
+    </style>
 </x-app-layout>

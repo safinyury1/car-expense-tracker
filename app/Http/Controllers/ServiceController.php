@@ -8,21 +8,22 @@ use App\Models\Income;
 use App\Models\Refueling;
 use App\Models\Reminder;
 use App\Models\ExpenseCategory;
+use App\Models\Attachment;
 use App\Traits\ConvertsUnits;
 use App\Traits\ValidatesOdometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
     use ConvertsUnits, ValidatesOdometer;
     
-    // Список обслуживаний
     public function index(Request $request)
     {
         $carId = $request->get('car_id');
         
-        $query = Reminder::with('car')
+        $query = Reminder::with(['car', 'attachments'])
             ->whereHas('car', function ($q) {
                 $q->where('user_id', Auth::id());
             })
@@ -55,7 +56,6 @@ class ServiceController extends Controller
         return view('service.index', compact('services', 'cars', 'carId'));
     }
     
-    // Форма создания обслуживания
     public function create(Request $request)
     {
         $cars = Auth::user()->cars;
@@ -66,7 +66,6 @@ class ServiceController extends Controller
         $lastOdometer = null;
         $lastOdometerByCar = [];
         
-        // Для каждого автомобиля получаем последний пробег
         foreach ($cars as $car) {
             $lastOdometerByCar[$car->id] = max(
                 Expense::where('car_id', $car->id)->max('odometer') ?? 0,
@@ -89,7 +88,6 @@ class ServiceController extends Controller
         return view('service.create', compact('cars', 'selectedCar', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
     }
     
-    // Сохранение обслуживания
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -101,6 +99,8 @@ class ServiceController extends Controller
             'notes' => 'nullable|string',
             'next_due_odometer' => 'nullable|integer|min:0',
             'next_due_date' => 'nullable|date',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
         
         $car = Car::findOrFail($validated['car_id']);
@@ -108,10 +108,8 @@ class ServiceController extends Controller
             abort(403);
         }
         
-        // Валидация пробега
         $this->validateOdometer($validated['car_id'], $validated['odometer'], null, 'service');
         
-        // Находим категорию
         $category = ExpenseCategory::where('name', 'Обслуживание')->first();
         if (!$category) {
             $category = ExpenseCategory::where('name', 'Ремонт')->first();
@@ -127,8 +125,8 @@ class ServiceController extends Controller
             'description' => 'Обслуживание: ' . $validated['title'] . ($validated['notes'] ? '. ' . $validated['notes'] : ''),
         ]);
         
-        // Создаём запись в напоминаниях как выполненное обслуживание
-        Reminder::create([
+        // Создаём запись обслуживания
+        $service = Reminder::create([
             'car_id' => $validated['car_id'],
             'title' => $validated['title'],
             'due_odometer' => $validated['odometer'],
@@ -142,7 +140,28 @@ class ServiceController extends Controller
             'next_due_date' => $validated['next_due_date'] ?? null,
         ]);
         
-        // Автоматическое создание напоминания
+        // ==========================================
+        // СОХРАНЕНИЕ ВЛОЖЕНИЙ (ЧЕРЕЗ МОДЕЛЬ ATTACHMENT)
+        // ==========================================
+        if ($request->hasFile('attachments')) {
+            $count = 0;
+            foreach ($request->file('attachments') as $file) {
+                if ($count >= 4) break;
+                
+                $path = $file->store('attachments/services', 'public');
+                
+                Attachment::create([
+                    'attachable_id' => $service->id,
+                    'attachable_type' => Reminder::class,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+                $count++;
+            }
+        }
+        
         if ($validated['next_due_odometer'] || $validated['next_due_date']) {
             Reminder::create([
                 'car_id' => $validated['car_id'],
@@ -158,19 +177,67 @@ class ServiceController extends Controller
             ->with('success', '✅ Обслуживание успешно добавлено! Напоминание о следующем ТО создано автоматически.');
     }
     
-    // Просмотр обслуживания
-    public function show(Reminder $reminder)
+    public function show(Reminder $service)
     {
-        if ($reminder->car->user_id !== Auth::id()) {
+        if ($service->car->user_id !== Auth::id()) {
             abort(403);
         }
         
+        $car = $service->car;
+        
+        $service->converted_odometer = $this->convertDistance($service->due_odometer, $car);
+        $service->converted_cost = $this->convertCurrency($service->service_cost ?? 0, $car);
+        $service->currency = $this->getCurrencySymbol($car);
+        $service->distance_unit = $this->getDistanceUnit($car);
+        
+        $service->load('attachments');
+        
         $cars = Auth::user()->cars;
         
-        return view('service.show', compact('reminder', 'cars'));
+        return view('service.show', compact('service', 'cars'));
     }
     
-    // Удаление обслуживания
+    public function addAttachment(Request $request, Reminder $service)
+    {
+        if ($service->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $request->validate([
+            'attachments' => 'required|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
+        ]);
+        
+        $currentCount = $service->attachments->count();
+        $maxFiles = 4;
+        $availableSlots = $maxFiles - $currentCount;
+        
+        if ($availableSlots <= 0) {
+            return redirect()->route('service.show', $service)
+                ->with('attachment_error', 'Достигнут лимит в 4 файла');
+        }
+        
+        $uploaded = 0;
+        foreach ($request->file('attachments') as $file) {
+            if ($uploaded >= $availableSlots) break;
+            
+            $path = $file->store('attachments/services', 'public');
+            
+            Attachment::create([
+                'attachable_id' => $service->id,
+                'attachable_type' => Reminder::class,
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+            ]);
+            $uploaded++;
+        }
+        
+        return redirect()->route('service.show', $service)
+            ->with('attachment_success', 'Добавлено файлов: ' . $uploaded);
+    }
+    
     public function destroy(Reminder $service)
     {
         if ($service->car->user_id !== Auth::id()) {
@@ -178,6 +245,12 @@ class ServiceController extends Controller
         }
         
         $carId = $service->car_id;
+        
+        foreach ($service->attachments as $attachment) {
+            Storage::disk('public')->delete($attachment->file_path);
+            $attachment->delete();
+        }
+        
         $service->delete();
         
         return redirect()->route('service.index', ['car_id' => $carId])

@@ -28,4 +28,9 @@ class Reminder extends Model
     {
         return $this->belongsTo(Car::class);
     }
+
+    public function attachments()
+    {
+    return $this->morphMany(\App\Models\Attachment::class, 'attachable');
+    }
 }

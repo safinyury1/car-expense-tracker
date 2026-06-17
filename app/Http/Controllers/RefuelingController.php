@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class RefuelingController extends Controller
 {
@@ -32,7 +33,7 @@ class RefuelingController extends Controller
             $sortBy = 'date';
         }
         
-        $query = Refueling::with('car')
+        $query = Refueling::with(['car', 'attachments'])
             ->whereHas('car', function ($q) {
                 $q->where('user_id', Auth::id());
             });
@@ -126,6 +127,8 @@ class RefuelingController extends Controller
             'price_per_liter' => 'required|numeric|min:0',
             'odometer' => 'nullable|integer|min:0',
             'gas_station' => 'nullable|string|max:255',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
         
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
@@ -143,7 +146,23 @@ class RefuelingController extends Controller
         
         $refueling = Refueling::create($validated);
         
-        // Отправка email уведомления ТОЛЬКО ЕСЛИ ВКЛЮЧЕНО
+        // Сохраняем вложения (максимум 4)
+        if ($request->hasFile('attachments')) {
+            $count = 0;
+            foreach ($request->file('attachments') as $file) {
+                if ($count >= 4) break;
+                $path = $file->store('attachments/refuelings', 'public');
+                $refueling->attachments()->create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+                $count++;
+            }
+        }
+        
+        // Отправка email уведомления
         try {
             $user = Auth::user();
             if ($user->notify_refuelings) {
@@ -172,9 +191,49 @@ class RefuelingController extends Controller
         $refueling->distance_unit = $this->getDistanceUnit($car);
         $refueling->volume_unit = $this->getVolumeUnit($car);
         
+        $refueling->load('attachments');
+        
         $cars = Auth::user()->cars;
         
         return view('refuelings.show', compact('refueling', 'cars'));
+    }
+
+    public function addAttachment(Request $request, Refueling $refueling)
+    {
+        if ($refueling->car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        
+        $request->validate([
+            'attachments' => 'required|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
+        ]);
+        
+        $currentCount = $refueling->attachments->count();
+        $maxFiles = 4;
+        $availableSlots = $maxFiles - $currentCount;
+        
+        if ($availableSlots <= 0) {
+            return redirect()->route('refuelings.show', $refueling)
+                ->with('attachment_error', 'Достигнут лимит в 4 файла');
+        }
+        
+        $uploaded = 0;
+        foreach ($request->file('attachments') as $file) {
+            if ($uploaded >= $availableSlots) break;
+            
+            $path = $file->store('attachments/refuelings', 'public');
+            $refueling->attachments()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+            ]);
+            $uploaded++;
+        }
+        
+        return redirect()->route('refuelings.show', $refueling)
+            ->with('attachment_success', 'Добавлено файлов: ' . $uploaded);
     }
 
     public function edit(Refueling $refueling)
@@ -201,7 +260,6 @@ class RefuelingController extends Controller
         );
         $maxOdometer = $this->convertDistance($maxOdometerKm, $refueling->car);
         
-        // Получаем последний пробег для каждого автомобиля
         $lastOdometerByCar = [];
         foreach ($cars as $carItem) {
             $lastOdometerByCar[$carItem->id] = max(
@@ -212,7 +270,6 @@ class RefuelingController extends Controller
             );
         }
         
-        // Последний пробег для текущего автомобиля
         $lastOdometer = $lastOdometerByCar[$refueling->car_id] ?? 0;
         
         return view('refuelings.edit', compact('refueling', 'cars', 'maxOdometer', 'lastOdometer', 'lastOdometerByCar'));
@@ -231,6 +288,8 @@ class RefuelingController extends Controller
             'price_per_liter' => 'required|numeric|min:0',
             'odometer' => 'nullable|integer|min:0',
             'gas_station' => 'nullable|string|max:255',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
         
         $validated['total_amount'] = $validated['liters'] * $validated['price_per_liter'];
@@ -244,6 +303,24 @@ class RefuelingController extends Controller
         
         $refueling->update($validated);
         
+        if ($request->hasFile('attachments')) {
+            $count = 0;
+            $currentCount = $refueling->attachments->count();
+            $availableSlots = 4 - $currentCount;
+            
+            foreach ($request->file('attachments') as $file) {
+                if ($count >= $availableSlots) break;
+                $path = $file->store('attachments/refuelings', 'public');
+                $refueling->attachments()->create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+                $count++;
+            }
+        }
+        
         return redirect()->route('refuelings.index', ['car_id' => $refueling->car_id])
             ->with('success', 'Заправка успешно обновлена!');
     }
@@ -255,6 +332,12 @@ class RefuelingController extends Controller
         }
         
         $carId = $refueling->car_id;
+        
+        foreach ($refueling->attachments as $attachment) {
+            Storage::disk('public')->delete($attachment->file_path);
+            $attachment->delete();
+        }
+        
         $refueling->delete();
         
         return redirect()->route('refuelings.index', ['car_id' => $carId])

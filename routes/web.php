@@ -19,6 +19,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\IncomeListController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\OCRController;
+use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -116,6 +117,14 @@ Route::middleware('auth')->group(function () {
     Route::get('refuelings/{refueling}', [RefuelingController::class, 'show'])->name('refuelings.show')->middleware('has.car');
     Route::get('refuelings/export-csv', [RefuelingController::class, 'exportCsv'])->name('refuelings.export-csv')->middleware('has.car');
     
+    // ==========================================
+    // ДОБАВЛЕНИЕ ВЛОЖЕНИЯ ИЗ ПРОСМОТРА
+    // ==========================================
+    Route::post('/refuelings/{refueling}/add-attachment', [RefuelingController::class, 'addAttachment'])->name('refuelings.add-attachment')->middleware('auth');
+    Route::post('/expenses/{expense}/add-attachment', [ExpenseController::class, 'addAttachment'])->name('expenses.add-attachment')->middleware('auth');
+    Route::post('/service/{service}/add-attachment', [ServiceController::class, 'addAttachment'])->name('service.add-attachment')->middleware('auth');
+    Route::post('/incomes/{income}/add-attachment', [IncomeController::class, 'addAttachment'])->name('incomes.add-attachment')->middleware('auth');
+    
     // Напоминания
     Route::resource('reminders', ReminderController::class)->except(['show'])->middleware('has.car');
     Route::get('reminders/{reminder}', [ReminderController::class, 'show'])->name('reminders.show')->middleware('has.car');
@@ -155,9 +164,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/support', [SupportController::class, 'store'])->name('support.store');
     Route::delete('/support/{id}', [SupportController::class, 'userDestroy'])->name('support.user.destroy');
     
-    // OCR - Распознавание чеков
-    Route::post('/ocr/scan', [OCRController::class, 'scan'])->name('ocr.scan');
-    Route::get('/ocr/test', [OCRController::class, 'test'])->name('ocr.test');
+    
+    // ==========================================
+    // УДАЛЕНИЕ ВЛОЖЕНИЙ
+    // ==========================================
+    Route::delete('/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy')->middleware('auth');
 });
 
 // Админ-панель
